@@ -143,3 +143,13 @@ router.get("/project-ideas:cat", async(req: Request, res:Response):Promise<void>
     }    
   }
 });
+
+router.get("/test-db", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT NOW()");
+    res.json({ ok: true, now: result.rows[0] });
+  } catch (err) {
+    console.error("DB connection failed:", err);
+    res.status(500).json({ ok: false, });
+  }
+});
