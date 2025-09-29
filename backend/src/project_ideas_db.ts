@@ -23,9 +23,10 @@ type BodyProjectType ={
         '42P01':{message:'Table does not exist.'}
       };
 router.get("/project-ideas", async(req: Request, res:Response):Promise<void>=>{
-  const userId = req.query.user as string
+  const {user} = req.query
+  console.log(user, "user")
     try{
-        const result = await pool.query(`SELECT * FROM project_ideas WHERE user_id = $1`,[userId])
+        const result = await pool.query(`SELECT * FROM project_ideas WHERE user_id = $1`,[user])
         console.log(result, "esult")
 
          if(!Array.isArray(result.rows) ||result.rows.length === 0){

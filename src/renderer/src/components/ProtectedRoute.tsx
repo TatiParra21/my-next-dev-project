@@ -13,5 +13,6 @@ export const ProtectedRoute =({children}:ProtectedRouteProps)=>{
     // Not logged in → redirect to login
     return <Navigate to="/" replace />;
   }
+  console.log(session)
   return <>{children}</>;
 }

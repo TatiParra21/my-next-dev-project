@@ -4,10 +4,16 @@ import { ResultFromBackendType} from "@renderer/subComponents/ProjectForm"
 export const fetchRequest =async(user_id:string):Promise<ProjectType[] | null>=>{
     try{
          const res = await fetch(`https://my-next-dev-project.onrender.com/database/project-ideas?user=${encodeURIComponent(user_id)}`)
-    const data = await res.json()
-    console.log(data.results, "data")
-     if(!data)console.log("something went wrong", data)
-    return data.results
+     if (!res.ok) {
+      console.error("Fetch failed with status", res.status);
+      return null;
+    }
+const data = await res.json();
+    console.log(data, "data from backend");
+
+    if (!data.results) return []; // user may have 0 projects
+    return data.results;
+   
     }catch(err){
         handleError(err,"fetchRequest")
         return null
