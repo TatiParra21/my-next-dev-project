@@ -5,6 +5,7 @@ import type { AllCategoriesType } from "@renderer/info"
 import { MultiValue } from "react-select"
 import { OptionComponents } from "./OptionsComponents"
 import { projectDataStore,
+    supabaseStore,
     formStore, 
     selectIsNotActive, 
     selectIsSuccess, 
@@ -40,6 +41,7 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
     const setIsSuccess  = formStore(selectSetIsSuccess)
     const isNotActive  = formStore(selectIsNotActive)
     const  setIsNotActive  = formStore(selectSetIsNotActive)
+    const userId = supabaseStore(state=>state.userId)
     useEffect(()=>{ 
         if(initialValues && initialValues.categories){
             setSelectedOptions(initialValues.categories)
@@ -73,7 +75,8 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
                 name: projectName,
                 description: projectDescription,
                 categories: selectedOptions,
-                completed:isCompleted 
+                completed:isCompleted,
+                user_id: userId!
             }
         const resultFromBackend :ResultFromBackendType |null = await onSubmit([projectFormInfo])
             if(resultFromBackend)

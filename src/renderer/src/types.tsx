@@ -22,6 +22,7 @@ export type ProjectType ={
     description: string,
     categories?: CategoriesTypeObjArr,
     completed: boolean
+    user_id: string;
 } 
 
 export type ProjectFormSubmitType = Omit<ProjectType,"id">

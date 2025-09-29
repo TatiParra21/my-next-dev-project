@@ -1,16 +1,17 @@
 
 import { JSX } from "react"
 import { deleteRequest } from "@renderer/functions/requests"
-import { type ProjectDataStoreType,projectDataStore, warningStore } from "@renderer/store/projectStore"
+import { type ProjectDataStoreType,projectDataStore, warningStore,supabaseStore } from "@renderer/store/projectStore"
 import { NavLink } from "react-router-dom";
 export const DeleteWarning =({on, id}:{on:boolean, id:string}): JSX.Element =>{
     const setWarning = warningStore(state=>state.setWarning)
+    const userId = supabaseStore(state=>state.userId)
     const {loading, setFirstTime}:ProjectDataStoreType = projectDataStore(state=>state)
     if(loading){
         return <div>...Loading</div>
     }
     const deleteRequestAndReset =():void=>{
-        deleteRequest(id)
+        deleteRequest(id, userId!)
         setTimeout(()=>setFirstTime(false),0)
         setFirstTime(true)
          setWarning()

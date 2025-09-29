@@ -12,7 +12,8 @@ type BodyProjectType ={
       frameworks: {label: Capitalize<string>, value:Lowercase<string>}[],
       libraries: {label: Capitalize<string>, value:Lowercase<string>}[],
     },
-  completed: boolean
+  completed: boolean, 
+  user_id:string
    
 };
   const errorResponses :Record<string,{message:string}> ={
@@ -22,8 +23,9 @@ type BodyProjectType ={
         '42P01':{message:'Table does not exist.'}
       };
 router.get("/project-ideas", async(req: Request, res:Response):Promise<void>=>{
+  const userId = req.query.user as string
     try{
-        const result = await pool.query(`SELECT * FROM project_ideas;`)
+        const result = await pool.query(`SELECT * FROM project_ideas WHERE user_id = $1`,[userId])
 
          if(!Array.isArray(result.rows) ||result.rows.length === 0){
        res.status(200).json({message:"Nothing was Found", found:false})
@@ -47,9 +49,9 @@ const body = req.body[0] as BodyProjectType
  try{
       if(!body)throw new Error('there was a problem with the body')
       
-        const query = `INSERT INTO project_ideas (name,description,categories,completed) VALUES ($1,$2,$3,$4) RETURNING *;`
-        const {name, description ,categories,completed} = body
-        const values = [name, description,categories,completed]
+        const query = `INSERT INTO project_ideas (name,description,categories,completed) VALUES ($1,$2,$3,$4,$5) RETURNING *;`
+        const {name, description ,categories,completed, user_id} = body
+        const values = [name, description,categories,completed, user_id]
         
         const result = await pool.query(query,values)
         if(result.rows.length ===0){throw new Error("results too short")}
@@ -70,6 +72,7 @@ const body = req.body[0] as BodyProjectType
 router.patch("/project-ideas/:id/edit",async(req:Request,res:Response):Promise<void>=>{
   const id = req.params.id
   const updatedData = req.body
+  const user = req.query.user as string
   //const updatedData = body.updatedData
   const allowedFields = ["name", "description","categories","completed"]
   
@@ -81,7 +84,7 @@ const values = fieldsChosen.map(field =>{
 let message: string
 
   try{
-      const query = `UPDATE project_ideas SET ${clauses} WHERE id = ${id}`
+      const query = `UPDATE project_ideas SET ${clauses} WHERE id = ${id} AND user_id = ${user}`
  // console.log(body,"body")
   await pool.query(query, values)
   res.status(200).json({ message: 'Project updated successfully', success:true });
@@ -102,8 +105,9 @@ router.delete("/project-ideas/:id",async(req:Request,res:Response)=>{
 
   try{
     const id = req.params.id
+    const userId = req.query.user as string
    
-    await pool.query(`DELETE FROM project_ideas WHERE id =$1`,[id])
+    await pool.query(`DELETE FROM project_ideas WHERE id =$1 AND user_id = $2`,[id,userId])
         res.status(200).json({ message: 'Project deleted successfully',success:true });
   }catch(err: any) {
       //basically if there is an error code and that error code is in errorResponses object it will send this back

@@ -7,7 +7,9 @@ type ProtectedRouteProps = {
 };
 export const ProtectedRoute =({children}:ProtectedRouteProps)=>{
     const session = supabaseStore(state=>state.session)
-    if (!session) {
+    const userId = supabaseStore(state=>state.userId)
+    console.log(session, "see")
+    if (!session || !userId) {
     // Not logged in → redirect to login
     return <Navigate to="/" replace />;
   }

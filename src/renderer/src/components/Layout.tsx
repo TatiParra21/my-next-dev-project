@@ -4,7 +4,7 @@ import { useEffect, JSX } from "react"
 import { fetchRequest } from "../functions/requests" 
 import { RouteShown } from "./RouteShown"
 import type { CategoriesTypeObjArr, ProjectType } from "@renderer/types"
-import { projectDataStore,selectFirstTime,selectSetFirstTime,selectLoading, selectSetLoading, selectSetError,selectSetProjects, selectError } from "@renderer/store/projectStore"
+import {supabaseStore, projectDataStore,selectFirstTime,selectSetFirstTime,selectLoading, selectSetLoading, selectSetError,selectSetProjects, selectError } from "@renderer/store/projectStore"
 import { handleError } from "@renderer/functions/handleError"
 export const otherDefault:CategoriesTypeObjArr ={
     languages:[{value:"",label:""}],
@@ -16,7 +16,7 @@ export const otherDefault:CategoriesTypeObjArr ={
         setProjects:  React.Dispatch<React.SetStateAction<boolean>>;
     }
 export const Layout =(): JSX.Element=>{
-   
+   const userId = supabaseStore(state=>state.userId)
     const setProjects = projectDataStore(selectSetProjects)
     const  firstTime = projectDataStore(selectFirstTime)
     const setFirstTime = projectDataStore(selectSetFirstTime)
@@ -34,10 +34,11 @@ export const Layout =(): JSX.Element=>{
     useEffect(()=>{  
          if(!firstTime)return
            setLoading(true)
+           console.log("whaa5 happenned")
             const getData: ()=>Promise<void> =async()=>{
             try{
-                console.log("WHAT?")
-                const projects:ProjectType[] | null = await fetchRequest()
+                if(!userId)throw new Error("user iid unknown")
+                const projects:ProjectType[] | null = await fetchRequest(userId)
                
                      setProjects(projects)
             

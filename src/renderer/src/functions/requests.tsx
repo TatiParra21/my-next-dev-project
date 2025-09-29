@@ -1,9 +1,9 @@
 import type { ProjectFormSubmitType, ProjectType } from "@renderer/types"
 import { handleError } from "./handleError"
 import { ResultFromBackendType} from "@renderer/subComponents/ProjectForm"
-export const fetchRequest =async():Promise<ProjectType[] | null>=>{
+export const fetchRequest =async(user_id:string):Promise<ProjectType[] | null>=>{
     try{
-         const res = await fetch(` https://my-next-dev-project.onrender.com/database/project-ideas`)
+         const res = await fetch(` https://my-next-dev-project.onrender.com/database/project-ideas?user=${encodeURIComponent(user_id)}`)
     const data = await res.json()
     console.log(data.results, "data")
      if(!data)console.log("something went wrong", data)
@@ -34,10 +34,10 @@ export const postRequest = async(body: Array<ProjectFormSubmitType>):Promise<Res
     }
 }
 
-export const patchRequest = async(id:string, body:Record<string,any>):Promise<ResultFromBackendType |null>=>{
+export const patchRequest = async(id:string,user_id:string, body:Record<string,any>):Promise<ResultFromBackendType |null>=>{
     try{
         console.log(body, "body")
-    const response = await fetch(` https://my-next-dev-project.onrender.com/database/project-ideas/${id}/edit`,{
+    const response = await fetch(` https://my-next-dev-project.onrender.com/database/project-ideas/${id}/edit?user=${encodeURIComponent(user_id)}`,{
         method:"PATCH",
         headers:{
         "Content-Type":"application/json"
@@ -52,9 +52,9 @@ export const patchRequest = async(id:string, body:Record<string,any>):Promise<Re
         return null
     }
 }
-export const deleteRequest =async(id:string):Promise<void |null>=>{
+export const deleteRequest =async(id:string, user_id:string):Promise<void |null>=>{
     try{
-        const res = await fetch(` https://my-next-dev-project.onrender.com/database/project-ideas/${id}`,
+        const res = await fetch(` https://my-next-dev-project.onrender.com/database/project-ideas/${id}?user=${encodeURIComponent(user_id)}`,
             {method: "DELETE"
         })
         const data = await res.json()
