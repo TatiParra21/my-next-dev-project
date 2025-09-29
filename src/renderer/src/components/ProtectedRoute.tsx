@@ -9,7 +9,7 @@ export const ProtectedRoute =({children}:ProtectedRouteProps)=>{
     const session = supabaseStore(state=>state.session)
     if (!session) {
     // Not logged in → redirect to login
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
   return <>{children}</>;
 }
