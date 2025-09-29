@@ -34,27 +34,30 @@ export const Layout =(): JSX.Element=>{
     const currentRoute2 = location.pathname
     useEffect(()=>{  
          if(!firstTime)return
-           setLoading(true)
-           console.log("whaa5 happenned")
+          
             const getData: ()=>Promise<void> =async()=>{
             try{
+                 setLoading(true)
+           console.log("whaa5 happenned")
                 if(!userId)throw new Error("user iid unknown")
                 const projects:ProjectType[] | null = await fetchRequest(userId)
-               console.log("here")
+                 if (projects === null) {
+                setError("Failed to load projects");
+                return;
+            }
                      setProjects(projects)
-            
-                 setFirstTime(false)
-               
+                
                
             }catch(err){
                 const errorMessage=  handleError(err, "Layout")
                 setError(errorMessage)
             }finally{
+                setFirstTime(false)
                 setLoading(false)
             }
          }
         getData()      
-},[firstTime])
+},[firstTime, userId])
 if(loading){
     return(<div>     
        <span>...Loading Projects</span>         

@@ -31,10 +31,8 @@ function App(): React.JSX.Element {
  // const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
 
  const initAuth = supabaseStore(state=>state.initAuth)
-  const session = supabaseStore(state=>state.session)
  useEffect(()=>{
   initAuth()
-console.log(session, "sees")
  },[])
 
   return (
