@@ -3,7 +3,7 @@ import { handleError } from "./handleError"
 import { ResultFromBackendType} from "@renderer/subComponents/ProjectForm"
 export const fetchRequest =async():Promise<ProjectType[] | null>=>{
     try{
-         const res = await fetch(`http://localhost:5000/database/project-ideas`)
+         const res = await fetch(` https://my-next-dev-project.onrender.com/database/project-ideas`)
     const data = await res.json()
     console.log(data.results, "data")
      if(!data)console.log("something went wrong", data)
@@ -17,7 +17,7 @@ export const fetchRequest =async():Promise<ProjectType[] | null>=>{
 export const postRequest = async(body: Array<ProjectFormSubmitType>):Promise<ResultFromBackendType |null>=>{
     console.log(body, "the body")
     try{
-        const response = await fetch(`http://localhost:5000/database/write-new-project`,{
+        const response = await fetch(` https://my-next-dev-project.onrender.com/database/write-new-project`,{
     method:"POST",
     headers:{
         "Content-Type":"application/json"
@@ -37,7 +37,7 @@ export const postRequest = async(body: Array<ProjectFormSubmitType>):Promise<Res
 export const patchRequest = async(id:string, body:Record<string,any>):Promise<ResultFromBackendType |null>=>{
     try{
         console.log(body, "body")
-    const response = await fetch(`http://localhost:5000/database/project-ideas/${id}/edit`,{
+    const response = await fetch(` https://my-next-dev-project.onrender.com/database/project-ideas/${id}/edit`,{
         method:"PATCH",
         headers:{
         "Content-Type":"application/json"
@@ -54,7 +54,7 @@ export const patchRequest = async(id:string, body:Record<string,any>):Promise<Re
 }
 export const deleteRequest =async(id:string):Promise<void |null>=>{
     try{
-        const res = await fetch(`http://localhost:5000/database/project-ideas/${id}`,
+        const res = await fetch(` https://my-next-dev-project.onrender.com/database/project-ideas/${id}`,
             {method: "DELETE"
         })
         const data = await res.json()
@@ -68,7 +68,7 @@ export const deleteRequest =async(id:string):Promise<void |null>=>{
 
 export const fetchFilteredRequest =async():Promise<ProjectType[] | null>=>{
     try{
-         const res = await fetch(`http://localhost:5000/database/project-ideas`)
+         const res = await fetch(`https://my-next-dev-project.onrender.com/database/project-ideas`)
     const data = await res.json()
     console.log(data.results, "data")
      if(!data)console.log("something went wrong", data)
