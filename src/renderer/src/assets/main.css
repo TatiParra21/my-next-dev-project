@@ -1,0 +1,250 @@
+@import './base.css';
+
+body {
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  background-image: url('./wavy-lines.svg');
+  background-size: cover;
+  user-select: none;
+  font-size: 1rem;
+  overflow-y: scroll;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing: border-box;
+}
+
+#root {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin: 2em auto auto auto;
+  width: 100%;
+}
+header{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+ 
+}
+.active-style {
+  color:red;
+  text-decoration: underline;
+}
+a.other-nav:visited  {
+  color: white;
+  text-decoration: none;
+}
+.non-active{
+  color: white;
+}
+.delete-warning{
+   position: fixed;
+    top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70%;
+  height: 50%;
+  background-color: rgba(0, 0, 0, 0.5); /* dark background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* appears over everything */
+}
+.align{
+  align-items: center;
+
+}
+.delete-warning-div{
+  
+  align-items: center;
+}
+.delete-options{
+  width: 100%;
+}
+.creator {
+  font-size: 14px;
+  line-height: 16px;
+  color: var(--ev-c-text-2);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+
+.category-class{
+  width:100%;
+  text-align: center;
+  gap:0.5em;
+  color: white;
+}
+
+ #project-description, #project-name{
+  padding:0.5rem;
+
+  font-size: 1.2rem;
+}
+form{
+  justify-content: center;
+}
+form label
+form label input{
+  display: flex;
+  align-items: center;
+  gap:1rem;
+  padding: 1rem;
+  
+}
+label{
+  display: flex;
+
+}
+
+.navigation{
+  display: flex;
+  gap:1rem;
+}
+.input-class{
+  color:red;
+
+  width: 100%;
+  font-weight: bold;
+  
+}
+.full-form{
+  width: 90%;
+  color: darkgreen;
+  margin:1rem 2rem;
+  font-weight: bold;
+}
+.full-form a{
+color:white;
+}
+.project-class{
+  gap:  0.5rem;
+}
+.write-new-project-sec{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+.all-project-cells{
+  gap:1rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto;
+}
+.project-select-cell{
+  background: black;
+  scroll-margin-top: 80px;
+  
+}
+
+
+button{
+  padding: 0 1rem;
+}
+.other-nav{
+  background: black;
+  color: darkgreen;
+  border: white solid 2px;
+  padding:0 1rem;
+}
+.flex{
+  display:flex
+}
+.colum{
+  flex-direction: column;
+}
+.row{
+  flex-direction: row;
+}
+.edit-delete-sec{
+  justify-content:  space-between;
+}
+.check-box-sec{
+  align-items: center;
+  padding:0.5rem;
+  font-size: 1.3rem;
+  
+}
+
+.middle-part{
+  margin: 0.5rem 0;
+  align-items: flex-start;
+  justify-content: flex-start;
+   border: 1px solid darkgreen;
+   padding: 01rem 0.5rem;
+}
+.back-btn{
+
+  font-size: 1em;
+  padding:  0.4rem;
+  align-self: flex-start;
+}
+.submit-btn{
+  padding: 1rem;
+  font-size: 1rem;
+}
+.select-btn{
+  padding:1em;
+}
+/* Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) { 
+  /* styles */
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) { 
+  /* styles */
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) { 
+  /* styles */
+body{
+  font-size: 2rem;
+}
+#root{
+  width: 80%;
+}
+ #project-description, #project-name{
+  padding:0.7rem;
+  font-size: 1.5rem;
+}
+.all-project-cells{
+  gap:1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-rows: 1fr;
+}
+.adjust-cells{
+  
+  grid-template-columns: 1fr;
+  
+}
+.middle-part {
+  font-size: 1.5rem;
+}
+.check-box-sec{
+  font-size: 2rem;
+}
+
+}
+
+/* Small devices (large phones, 600px and up) */
+@media (max-width: 600px) { 
+  /* styles */
+   
+}
+
+/* Extra small devices (phones, less than 600px) */
+@media (max-width: 480px) { 
+  /* styles */
+
+}
