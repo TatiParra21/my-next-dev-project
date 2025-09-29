@@ -1,23 +1,25 @@
 {
   "compilerOptions": {
-   
+    /* Output */
+    "outDir": "dist",                   /* Where compiled .js files go */
+    "rootDir": "src",                   /* Where your .ts source files live */
 
     /* Language and Environment */
-    "target": "es2016",                                  /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
-   
+    "target": "ES2020",                 /* The JavaScript version to compile to */
+    "lib": ["ES2020"],                  /* Built-in libraries for features like Promise */
 
     /* Modules */
-    "module": "commonjs",                                /* Specify what module code is generated. */
-   
-   
-    "esModuleInterop": true,                             /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */
-    // "preserveSymlinks": true,                         /* Disable resolving symlinks to their realpath. This correlates to the same flag in node. */
-    "forceConsistentCasingInFileNames": true,            /* Ensure that casing is correct in imports. */
+    "module": "commonjs",               /* Node.js uses CommonJS */
+    "moduleResolution": "node",         /* Match how Node resolves modules */
+    "resolveJsonModule": true,          /* Allow importing .json files */
+    "esModuleInterop": true,            /* Allow default imports from CommonJS modules */
+    "allowSyntheticDefaultImports": true,
 
     /* Type Checking */
-    "strict": true,                                      /* Enable all strict type-checking options. */
-    // "noImplicitAny": true,                            /* Enable error reporting for expressions and declarations with an implied 'any' type. */
-    
-    "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
-  }
+    "strict": true,                     /* Enable strict mode */
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true                /* Don’t type-check node_modules */
+  },
+  "include": ["src"],                   /* Compile everything in src/ */
+  "exclude": ["node_modules", "dist"]   /* Ignore these */
 }
