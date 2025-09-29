@@ -4,7 +4,7 @@ import { useEffect, JSX } from "react"
 import { fetchRequest } from "../functions/requests" 
 import { RouteShown } from "./RouteShown"
 import type { CategoriesTypeObjArr, ProjectType } from "@renderer/types"
-import {supabaseStore, projectDataStore,selectFirstTime,selectSetFirstTime,selectLoading, selectSetLoading, selectSetError,selectSetProjects, selectError } from "@renderer/store/projectStore"
+import {supabaseStore, projectDataStore,selectFirstTime,selectSetFirstTime,selectLoading, selectSetLoading, selectSetError,selectSetProjects, selectError, selectProjects } from "@renderer/store/projectStore"
 import { handleError } from "@renderer/functions/handleError"
 export const otherDefault:CategoriesTypeObjArr ={
     languages:[{value:"",label:""}],
@@ -18,6 +18,7 @@ export const otherDefault:CategoriesTypeObjArr ={
 export const Layout =(): JSX.Element=>{
    const userId = supabaseStore(state=>state.userId)
     const setProjects = projectDataStore(selectSetProjects)
+    const userProjects = projectDataStore(selectProjects)
     const  firstTime = projectDataStore(selectFirstTime)
     const setFirstTime = projectDataStore(selectSetFirstTime)
     const loading = projectDataStore(selectLoading)
@@ -39,7 +40,7 @@ export const Layout =(): JSX.Element=>{
             try{
                 if(!userId)throw new Error("user iid unknown")
                 const projects:ProjectType[] | null = await fetchRequest(userId)
-               
+               console.log("here")
                      setProjects(projects)
             
                  setFirstTime(false)
@@ -59,6 +60,7 @@ if(loading){
        <span>...Loading Projects</span>         
         </div>)
 }
+
 if(error && !loading){
     return(
         <div>
