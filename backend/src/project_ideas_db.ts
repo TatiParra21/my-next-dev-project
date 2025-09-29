@@ -26,6 +26,7 @@ router.get("/project-ideas", async(req: Request, res:Response):Promise<void>=>{
   const userId = req.query.user as string
     try{
         const result = await pool.query(`SELECT * FROM project_ideas WHERE user_id = $1`,[userId])
+        console.log(result, "esult")
 
          if(!Array.isArray(result.rows) ||result.rows.length === 0){
        res.status(200).json({message:"Nothing was Found", found:false})
