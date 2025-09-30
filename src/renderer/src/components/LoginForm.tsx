@@ -2,7 +2,7 @@ import { supabase } from "@renderer/supabaseClient"
 import React from "react"
 import { supabaseStore } from "@renderer/store/projectStore"
 import { useLocation, NavLink } from "react-router-dom"
-
+import { ipcRenderer } from 'electron'
 export const LoginForm =()=>{
   
      const location = useLocation()
@@ -19,9 +19,11 @@ export const LoginForm =()=>{
   })
     if(error){
         setAuthError(`Google sign in error: ${error.message}`, )
-        }else{ 
-            setAuthError("redirecting . google login")
-        }  
+        }if (data?.url) {
+      // Ask main process to open a new BrowserWindow for login
+      ipcRenderer.send('open-oauth-window', data.url)
+      setAuthError("Redirecting to Google login...")
+    }
 
 }
     const handleLogin=async(e: React.FormEvent<HTMLFormElement>)=>{
