@@ -1,10 +1,8 @@
 import { supabase } from "@renderer/supabaseClient"
 import React from "react"
-import { useState } from "react"
 import { supabaseStore } from "@renderer/store/projectStore"
-import { AuthError } from "@supabase/supabase-js"
-import { useLocation } from "react-router-dom"
-import { NavLink } from "react-router-dom"
+import { useLocation, NavLink } from "react-router-dom"
+
 export const LoginForm =()=>{
   
      const location = useLocation()
@@ -12,6 +10,20 @@ export const LoginForm =()=>{
      console.log(params)
       const authError = supabaseStore(state=>state.authError)
       const setAuthError = supabaseStore(state=>state.setAuthError)
+    const signInWithGoogle=async()=> {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      queryParams: { access_type: 'offline' }, 
+    }
+  })
+    if(error){
+        setAuthError(`Google sign in error: ${error.message}`, )
+        }else{ 
+            setAuthError("redirecting . google login")
+        }  
+
+}
     const handleLogin=async(e: React.FormEvent<HTMLFormElement>)=>{
      
         e.preventDefault()
@@ -75,6 +87,7 @@ export const LoginForm =()=>{
 
 
         </form>
+        <button onClick={signInWithGoogle}>Sign in With Google</button>
         {params == "/" && <p>{`Already have an account?`}<NavLink to="sign-in">Sign In</NavLink></p>}
          {params == "/sign-in" && <p>{`Don't have an account?`}<NavLink to="/">Sign Up</NavLink></p>}
         
