@@ -20,11 +20,10 @@ export const LoginForm =()=>{
     if(error){
         setAuthError(`Google sign in error: ${error.message}`, )
         }else if (data?.url) {
-    // ✅ Call into main process via preload
-    window.electronAPI.openGoogleLogin(data.url)
+    // Call the preload API → sends IPC to main process
+    ;(window as any).electronAPI.openGoogleLogin(data.url)
     setAuthError("Redirecting to Google login...")
   }
-
 }
     const handleLogin=async(e: React.FormEvent<HTMLFormElement>)=>{
      
