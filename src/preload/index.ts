@@ -7,6 +7,13 @@ const api = {}
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
 // just add to the DOM global.
+import {  ipcRenderer } from "electron"
+
+// expose only what’s needed
+contextBridge.exposeInMainWorld("electronAPI", {
+  openGoogleLogin: (url: string) => ipcRenderer.send("open-google-login", url)
+})
+
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('electron', electronAPI)

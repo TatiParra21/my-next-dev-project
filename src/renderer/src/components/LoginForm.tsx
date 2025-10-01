@@ -9,10 +9,11 @@ export const LoginForm =()=>{
      console.log(params)
       const authError = supabaseStore(state=>state.authError)
       const setAuthError = supabaseStore(state=>state.setAuthError)
-    const signInWithGoogle=async()=> {
+  const signInWithGoogle=async()=> {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
+       skipBrowserRedirect: true,  
       queryParams: { access_type: 'offline' }, 
     }
   })
@@ -20,6 +21,7 @@ export const LoginForm =()=>{
     if(error){
         setAuthError(`Google sign in error: ${error.message}`, )
         }else if (data?.url) {
+          console.log(data.url, "data")
     // Call the preload API → sends IPC to main process
     ;(window as any).electronAPI.openGoogleLogin(data.url)
     setAuthError("Redirecting to Google login...")
