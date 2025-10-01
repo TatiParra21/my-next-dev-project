@@ -12,7 +12,6 @@ function createWindow(): void {
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
       sandbox: false
     }
   })
@@ -72,38 +71,47 @@ app.on('window-all-closed', () => {
   }
 })
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
-// Handle Google Login popup
 ipcMain.on("open-google-login", (event, url) => {
   const loginWindow = new BrowserWindow({
     width: 600,
     height: 800,
-    autoHideMenuBar: false, // show menu bar for custom items
+    autoHideMenuBar: false, // keep menu bar visible
     webPreferences: {
       nodeIntegration: false
     }
   })
 
-  // Add a menu with "Exit Login"
+  // Menu with Back / Reload / Exit
   const { Menu } = require("electron")
   const menu = Menu.buildFromTemplate([
     {
-      label: "Options",
+      label: "Navigation",
       submenu: [
         {
-          label: "Exit Login",
-          accelerator: "Esc", // user can press Esc to close too
+          label: "Back",
+          accelerator: "Alt+Left",
           click: () => {
-            loginWindow.close()
+            if (loginWindow.webContents.canGoBack()) {
+              loginWindow.webContents.goBack()
+            }
           }
+        },
+        {
+          label: "Reload",
+          accelerator: "CmdOrCtrl+R",
+          click: () => loginWindow.reload()
+        },
+        {
+          label: "Exit Login",
+          accelerator: "Esc",
+          click: () => loginWindow.close()
         }
       ]
     }
   ])
-  loginWindow.setMenu(menu)
+  loginWindow.setMenu(menu) // <- set menu before loadURL
 
-  // Always start fresh
+  // Start fresh
   loginWindow.webContents.session.clearStorageData().then(() => {
     loginWindow.loadURL(url)
   })
