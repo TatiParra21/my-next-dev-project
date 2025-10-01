@@ -74,3 +74,41 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+// Handle Google Login popup
+ipcMain.on("open-google-login", (event, url) => {
+  const loginWindow = new BrowserWindow({
+    width: 600,
+    height: 800,
+    autoHideMenuBar: false, // show menu bar for custom items
+    webPreferences: {
+      nodeIntegration: false
+    }
+  })
+
+  // Add a menu with "Exit Login"
+  const { Menu } = require("electron")
+  const menu = Menu.buildFromTemplate([
+    {
+      label: "Options",
+      submenu: [
+        {
+          label: "Exit Login",
+          accelerator: "Esc", // user can press Esc to close too
+          click: () => {
+            loginWindow.close()
+          }
+        }
+      ]
+    }
+  ])
+  loginWindow.setMenu(menu)
+
+  // Always start fresh
+  loginWindow.webContents.session.clearStorageData().then(() => {
+    loginWindow.loadURL(url)
+  })
+
+  loginWindow.on("closed", () => {
+    console.log("Google login popup closed")
+  })
+})
