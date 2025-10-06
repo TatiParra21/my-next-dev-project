@@ -21,7 +21,7 @@ export const LoginForm =()=>{
     if(error){
         setAuthError(`Google sign in error: ${error.message}`, )
         }else if (data?.url) {
-          console.log(data.url, "data")
+          console.log(data.url, "data url exists")
     // Call the preload API → sends IPC to main process
     ;(window as any).electronAPI.openGoogleLogin(data.url)
     setAuthError("Redirecting to Google login...")

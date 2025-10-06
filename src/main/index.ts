@@ -11,7 +11,7 @@ function createWindow(): void {
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'), // ✅ preload for bridge
+      preload: join(__dirname, '../preload/index.mjs'), // ✅ preload for bridge
       sandbox: false
     }
   })
@@ -72,32 +72,46 @@ ipcMain.on('open-google-login', (event, url) => {
   })
 
   // Create custom menu
-  const menu = Menu.buildFromTemplate([
-    {
-      label: 'Navigation',
-      submenu: [
-        {
-          label: 'Back',
-          accelerator: 'Alt+Left',
-          click: () => {
-            if (loginWindow.webContents.canGoBack()) {
-              loginWindow.webContents.goBack()
-            }
-          }
-        },
-        {
-          label: 'Reload',
-          accelerator: 'CmdOrCtrl+R',
-          click: () => loginWindow.reload()
-        },
-        {
-          label: 'Exit Login',
-          accelerator: 'Esc',
-          click: () => loginWindow.close()
+ const { Menu } = require("electron")
+const menu = Menu.buildFromTemplate([
+  {
+    label: "Navigation",
+    submenu: [
+      {
+        label: "Back",
+        accelerator: "Alt+Left",
+        click: () => {
+          const history = loginWindow.webContents.navigationHistory
+          
+            history.goBack()
+          
         }
-      ]
-    }
-  ])
+      },
+      {
+        label: "Forward",
+        accelerator: "Alt+Right",
+        click: () => {
+          const history = loginWindow.webContents.navigationHistory
+         
+            history.goForward()
+          
+        }
+      },
+      {
+        label: "Reload",
+        accelerator: "CmdOrCtrl+R",
+        click: () => loginWindow.reload()
+      },
+      {
+        label: "Exit Login",
+        accelerator: "Esc",
+        click: () => loginWindow.close()
+      }
+    ]
+  }
+])
+loginWindow.setMenu(menu)
+
   loginWindow.setMenu(menu)
 
   // Always start with a fresh session
