@@ -89,8 +89,8 @@ let message: string
   try{
       const query = `UPDATE project_ideas
                    SET ${clauses}
-                   WHERE id = $${values.length + 1}
-                   AND user_id = $${values.length + 2}`;
+                   WHERE id = ${id}
+                   AND user_id = ${user}`;
  // console.log(body,"body")
   await pool.query(query,[values,id,user])
   res.status(200).json({ message: 'Project updated successfully', success:true });
