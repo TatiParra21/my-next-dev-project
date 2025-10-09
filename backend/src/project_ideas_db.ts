@@ -92,7 +92,8 @@ let message: string
                    WHERE id = ${id}
                    AND user_id = ${user}`;
  // console.log(body,"body")
-  await pool.query(query,[values,id,user])
+ console.log(query,"query")
+  await pool.query(query,values)
   res.status(200).json({ message: 'Project updated successfully', success:true });
 
   }catch(err: any) {
