@@ -27,7 +27,7 @@ router.get("/project-ideas", async(req: Request, res:Response):Promise<void>=>{
   console.log(user, "user")
     try{
         const result = await pool.query(`SELECT * FROM project_ideas WHERE user_id = $1`,[user])
-        console.log(result, "esult")
+        console.log(result.rows, "result")
 
          if(!Array.isArray(result.rows) ||result.rows.length === 0){
        res.status(200).json({message:"Nothing was Found", found:false})
@@ -76,7 +76,7 @@ router.patch("/project-ideas/:id/edit",async(req:Request,res:Response):Promise<v
   const updatedData = req.body
   const user = req.query.user as string
   //const updatedData = body.updatedData
-  const allowedFields = ["name", "description","categories","completed", " user_id"]
+  const allowedFields = ["name", "description","categories","completed"]
   
 const fieldsChosen = allowedFields.filter(field=> Object.keys(updatedData).includes(field))
 const clauses = fieldsChosen.map((field, index) => `${field} = $${index + 1}`).join(", ")
@@ -97,7 +97,7 @@ let message: string
       res.status(200).json({ message: errorResponses[err.code].message, success:false});
     }else{
       //console.error("SOMETHING WORNG",err.code)
-      res.status(404).json({message:"UNKNOWN ERROR", success:false, place: "write-new-project"})
+      res.status(404).json({message:"UNKNOWN ERROR", success:false, place: `project-ideas/${id}`})
     }  
   }
 })
