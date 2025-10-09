@@ -51,7 +51,7 @@ const body = req.body[0] as BodyProjectType
  try{
       if(!body)throw new Error('there was a problem with the body')
       
-        const query = `INSERT INTO project_ideas (name,description,categories,completed) VALUES ($1,$2,$3,$4,$5) RETURNING *;`
+        const query = `INSERT INTO project_ideas (name,description,categories,completed, user_id) VALUES ($1,$2,$3,$4,$5) RETURNING *;`
         const {name, description ,categories,completed, user_id} = body
         const values = [name, description,categories,completed, user_id]
         

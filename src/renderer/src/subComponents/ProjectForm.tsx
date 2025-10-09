@@ -62,7 +62,7 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
             setSelectedOptions({...selectedOptions, [categoryVal]:values})  
         }
         const handleSubmit=async(event: FormEvent<HTMLFormElement>): Promise<void>=>{
-            console.log(initialValues, "init")
+           // console.log(initialValues, "init")
             event.preventDefault()
             const formEl = event.currentTarget
             const formData :FormData = new FormData(formEl)
@@ -80,6 +80,7 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
                 user_id: userId!
             }
         const resultFromBackend :ResultFromBackendType |null = await onSubmit([projectFormInfo])
+        console.log(projectFormInfo, "resss")
             if(resultFromBackend)
         if( resultFromBackend.success && location.pathname == "/write-new-project"){
             formEl.reset()
