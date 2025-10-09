@@ -20,7 +20,8 @@ type BodyProjectType ={
         '23503':{message: 'Project messes with table constraint'},
         '23505':{message: 'Project already exists'},
         '23502':{message: 'NOt null violation'},
-        '42P01':{message:'Table does not exist.'}
+        '42P01':{message:'Table does not exist.'},
+        '42703':{message:'undefined colum.'}
       };
 router.get("/project-ideas", async(req: Request, res:Response):Promise<void>=>{
   const {user} = req.query
@@ -72,7 +73,7 @@ const body = req.body[0] as BodyProjectType
 })
 
 router.patch("/project-ideas/:id/edit",async(req:Request,res:Response):Promise<void>=>{
-  const id = req.params.id
+  const id = Number(req.params.id)
   const updatedData = req.body
   const user = req.query.user as string
   //const updatedData = body.updatedData
