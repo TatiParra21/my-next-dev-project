@@ -86,9 +86,12 @@ const values = fieldsChosen.map(field =>{
 let message: string
 
   try{
-      const query = `UPDATE project_ideas SET ${clauses} WHERE id = ${id} AND user_id = ${user}`
+      const query = `UPDATE project_ideas
+                   SET ${clauses}
+                   WHERE id = $${values.length + 1}
+                   AND user_id = $${values.length + 2}`;
  // console.log(body,"body")
-  await pool.query(query, values)
+  await pool.query(query,[values,id,user])
   res.status(200).json({ message: 'Project updated successfully', success:true });
 
   }catch(err: any) {
