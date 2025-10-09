@@ -90,7 +90,7 @@ let message: string
       const query = `UPDATE project_ideas
                    SET ${clauses}
                    WHERE id = ${id}
-                   AND user_id = ${user}`;
+                   AND user_id = '${user}'`;
  // console.log(body,"body")
  console.log(query,"query")
   await pool.query(query,values)
