@@ -1,8 +1,8 @@
 import {create} from "zustand"
 import type { CategoriesTypeObjArr,ProjectType } from "@renderer/types"
 import type { ResultFromBackendType } from "@renderer/subComponents/ProjectForm"
-import { supabase } from "@renderer/supabaseClient"
-import { session } from "electron"
+import { auth } from "@renderer/firebaseClient";
+import { onAuthStateChanged, signOut, User } from "firebase/auth";
 
 
 export type ProjectDataStoreType ={
@@ -71,47 +71,59 @@ export const selectSetIsSuccess= (state:FormStoreType)=>state.setIsSuccess
 export const selectIsNotActive= (state:FormStoreType)=>state.isNotActive
 export const selectSetIsNotActive= (state:FormStoreType)=>state.setIsNotActive
 
-type SupabaseStoreType ={
-    session: any | null,
-    setSession: (session: any | null) => void;
-    userId:string |null,
-    userEmail: string 
-    setUserEmail :(email:string)=>void,
-    authError: string |null,
-    setAuthError:  (message:string|null)=>void, 
-     initAuth: ()=>void
-}
+type FirebaseStoreType = {
+  user: User | null;
+  userId: string | null;
+  userEmail: string;
+  loading: boolean;
+  authError: string | null;
+  initAuth: () => void;
+  logout: () => Promise<void>;
+};
 
-export const supabaseStore = create<SupabaseStoreType>((set)=>{
-    let sessionInProgress:boolean = false;
-    return{
-        session:null,
-        setSession: (session:any|null)=>set({session:session}),
-        userId:null,
-        userEmail: "",
-        setUserEmail: (email:string)=>set({userEmail:email}),
-        authError:null,
-        setAuthError:(error:null|string)=> set({authError:error}),
-        initAuth:async()=>{
-            try{
-                if(sessionInProgress)return
-                sessionInProgress = true
-                const {data, error} = await supabase.auth.getSession()
-                if(error) throw error
-                if(!data)throw new Error("Error getting section")
-                    set({session:data.session})
-            }catch(err){
-                console.error(err)
-            }finally{
-                sessionInProgress = false
-            }
-            supabase.auth.onAuthStateChange((_event,newSession)=>{
-                set({session:newSession,
-                    userId:newSession?.user?.id,
-                    userEmail:newSession?.user?.email
-                });
-            });
-        }
+export const firebaseStore = create<FirebaseStoreType>((set) => ({
+  user: null,
+  userId: null,
+  userEmail: "",
+  loading: true,
+  authError: null,
+
+  // 👇 Replaces supabase.auth.onAuthStateChange()
+  initAuth: () => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        set({
+          user,
+          userId: user.uid,
+          userEmail: user.email || "",
+          loading: false,
+        });
+      } else {
+        set({
+          user: null,
+          userId: null,
+          userEmail: "",
+          loading: false,
+        });
+      }
+    });
+  },
+
+  // 👇 Replaces supabase.auth.signOut()
+  logout: async () => {
+    try {
+      await signOut(auth);
+      set({ user: null, userId: null, userEmail: "" });
+    } catch (err: any) {
+      set({ authError: err.message });
     }
-})
+  },
+}));
 
+// --- Optional selectors (for cleaner imports)
+export const selectUser = (state: FirebaseStoreType) => state.user;
+export const selectUserId = (state: FirebaseStoreType) => state.userId;
+export const selectUserEmail = (state: FirebaseStoreType) => state.userEmail;
+export const selectFirebaseLoading = (state: FirebaseStoreType) => state.loading;
+export const selectInitAuth = (state: FirebaseStoreType) => state.initAuth;
+export const selectLogout = (state: FirebaseStoreType) => state.logout;

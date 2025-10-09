@@ -4,8 +4,9 @@ import { useEffect, JSX } from "react"
 import { fetchRequest } from "../functions/requests" 
 import { RouteShown } from "./RouteShown"
 import type { CategoriesTypeObjArr, ProjectType } from "@renderer/types"
-import {supabaseStore, projectDataStore,selectFirstTime,selectSetFirstTime,selectLoading, selectSetLoading, selectSetError,selectSetProjects, selectError, selectProjects } from "@renderer/store/projectStore"
+import {firebaseStore,selectUser, projectDataStore,selectFirstTime,selectSetFirstTime,selectLoading, selectSetLoading, selectSetError,selectSetProjects, selectError, selectProjects, selectLogout } from "@renderer/store/projectStore"
 import { handleError } from "@renderer/functions/handleError"
+
 export const otherDefault:CategoriesTypeObjArr ={
     languages:[{value:"",label:""}],
     frameworks:[{value:"",label:""}],
@@ -16,7 +17,10 @@ export const otherDefault:CategoriesTypeObjArr ={
         setProjects:  React.Dispatch<React.SetStateAction<boolean>>;
     }
 export const Layout =(): JSX.Element=>{
-   const userId = supabaseStore(state=>state.userId)
+    const user = firebaseStore(selectUser)
+    const userId = user?.uid || null;
+    const logout = firebaseStore(selectLogout)
+    
     const setProjects = projectDataStore(selectSetProjects)
     const userProjects = projectDataStore(selectProjects)
     const  firstTime = projectDataStore(selectFirstTime)
@@ -33,8 +37,7 @@ export const Layout =(): JSX.Element=>{
     const location = useLocation()
     const currentRoute2 = location.pathname
     useEffect(()=>{  
-         if(!firstTime)return
-          
+         if(!firstTime)return   
             const getData: ()=>Promise<void> =async()=>{
             try{
                  setLoading(true)
@@ -45,9 +48,7 @@ export const Layout =(): JSX.Element=>{
                 setError("Failed to load projects");
                 return;
             }
-                     setProjects(projects)
-                
-               
+                     setProjects(projects) 
             }catch(err){
                 const errorMessage=  handleError(err, "Layout")
                 setError(errorMessage)
@@ -58,6 +59,9 @@ export const Layout =(): JSX.Element=>{
          }
         getData()      
 },[firstTime, userId])
+ const logoutFunc =async()=>{
+        await logout()
+    }
 if(loading){
     return(<div>     
        <span>...Loading Projects</span>         
@@ -75,13 +79,13 @@ if(error && !loading){
 <>
     <header>
     <button onClick={reload}>Reload</button>
+     <button onClick={logoutFunc}>Logout</button>
         <RouteShown route={currentRoute2}/> 
         <NavBar/>
     </header>
     <section className="full-form flex  colum">
         <Outlet/>
     </section>
-
 </>
     )
 }

@@ -10,9 +10,11 @@ import { ProjectBaseEdit } from './subComponents/ProjectBaseEdit'
 import { LoginForm } from './components/LoginForm'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { LoggedInRoute } from './components/LoggedInRoute'
-import { supabaseStore } from './store/projectStore'
+import { firebaseStore, selectInitAuth, selectUser, selectFirebaseLoading } from './store/projectStore'
 const router =createBrowserRouter([
    {path:"/", element:<LoggedInRoute><LoginForm/> </LoggedInRoute> , errorElement:<SectionNotReady/>},
+   
+  // { path: "/auth/callback", element: <AuthCallback /> },
    {path:"/sign-in", element: <LoggedInRoute> <LoginForm/> </LoggedInRoute>, errorElement:<SectionNotReady/>},
   {path:"/dashboard", element: <ProtectedRoute><Layout/></ProtectedRoute>,
     children:[
@@ -30,10 +32,16 @@ const router =createBrowserRouter([
 function App(): React.JSX.Element {
  // const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
 
- const initAuth = supabaseStore(state=>state.initAuth)
+ const initAuth = firebaseStore(selectInitAuth)
+ const user = firebaseStore(selectUser)
+ const loading = firebaseStore(selectFirebaseLoading);
+
  useEffect(()=>{
   initAuth()
  },[])
+  useEffect(()=>{
+  console.log(user,"user hrere")
+ },[user])
 
   return (
     <>

@@ -5,7 +5,7 @@ import type { AllCategoriesType } from "@renderer/info"
 import { MultiValue } from "react-select"
 import { OptionComponents } from "./OptionsComponents"
 import { projectDataStore,
-    supabaseStore,
+    firebaseStore,
     formStore, 
     selectIsNotActive, 
     selectIsSuccess, 
@@ -13,7 +13,8 @@ import { projectDataStore,
     selectSetFirstTime, 
     selectSetIsNotActive, 
     selectSetIsSuccess, 
-    selectSetSelectedOptions } from "@renderer/store/projectStore"
+    selectSetSelectedOptions, 
+    selectUserId} from "@renderer/store/projectStore"
 import { FormElement } from "./FormElement"
 export const capitalizeFirstLetter =(value: string):string=>{
     return value.charAt(0).toUpperCase() + value.slice(1)
@@ -41,7 +42,7 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
     const setIsSuccess  = formStore(selectSetIsSuccess)
     const isNotActive  = formStore(selectIsNotActive)
     const  setIsNotActive  = formStore(selectSetIsNotActive)
-    const userId = supabaseStore(state=>state.userId)
+    const userId = firebaseStore(selectUserId)
     useEffect(()=>{ 
         if(initialValues && initialValues.categories){
             setSelectedOptions(initialValues.categories)

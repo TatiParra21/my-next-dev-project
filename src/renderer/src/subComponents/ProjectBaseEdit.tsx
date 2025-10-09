@@ -1,6 +1,6 @@
 import { JSX } from "react"
 import {useParams, NavLink } from "react-router-dom"
-import { projectDataStore, supabaseStore} from "@renderer/store/projectStore"
+import { projectDataStore, firebaseStore, selectUserId} from "@renderer/store/projectStore"
 import { ProjectForm, type ResultFromBackendType } from "./ProjectForm"
 import { patchRequest } from "@renderer/functions/requests"
 import type { ProjectType, ProjectFormSubmitType } from "@renderer/types"
@@ -12,7 +12,7 @@ export const ProjectBaseEdit =():JSX.Element=>{
  if(!idState) throw new Error("no idea param")
   const projects = projectDataStore(state=>state.projects)
 const  loading = projectDataStore(state=>state.loading)
-const userId = supabaseStore(state=>state.userId)
+const userId = firebaseStore(selectUserId)
 if(!projects) return <>No projects yet</>
      const projectInfo :ProjectType |undefined = projects.find((pro: ProjectType)=>idState == pro.id)
      if(!projectInfo || loading)return<h2>...Loading Project</h2>

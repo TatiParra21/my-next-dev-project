@@ -1,125 +1,69 @@
-import { app, shell, BrowserWindow, ipcMain, Menu } from 'electron'
-import { join } from 'path'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
+import { app, BrowserWindow, shell } from "electron";
+import { join } from "path";
+import { electronApp, optimizer, is } from "@electron-toolkit/utils";
+import icon from "../../resources/icon.png?asset";
 
-function createWindow(): void {
-  const mainWindow = new BrowserWindow({
+let mainWindow: BrowserWindow | null = null;
+app.on("web-contents-created", (_, contents) => {
+  contents.on("console-message", (_, level, message) => {
+    if (message.includes("Cross-Origin-Opener-Policy")) return; // ignore this warning
+    console.log(message); // log everything else normally
+  });
+});
+// =======================
+// 🔹 MAIN WINDOW FUNCTION
+// =======================
+function createWindow() {
+  mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
     show: false,
     autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
+    ...(process.platform === "linux" ? { icon } : {}),
     webPreferences: {
-      preload: join(__dirname, '../preload/index.mjs'), // ✅ preload for bridge
-      sandbox: false
+      preload: join(__dirname, "../preload/index.mjs"),
+      sandbox: false, // ✅ Needed for Firebase popups
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
+  });
+
+  // ✅ Allow Firebase & Google redirects to open externally
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (
+      url.startsWith("https://accounts.google.com") ||
+      url.startsWith("https://identitytoolkit.googleapis.com") ||
+      url.startsWith("https://firebaseapp.com") ||
+      url.startsWith("https://auth.firebase.com")
+    ) {
+      shell.openExternal(url);
+      return { action: "deny" }; // Prevent Electron from handling it internally
     }
-  })
+    return { action: "allow" };
+  });
 
-  mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
-  })
+  if (is.dev) mainWindow.webContents.openDevTools({ mode: "detach" });
 
-  mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
-    return { action: 'deny' }
-  })
+  mainWindow.on("ready-to-show", () => mainWindow?.show());
 
-  if (is.dev) {
-    mainWindow.webContents.openDevTools({ mode: 'detach' })
-  }
-
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
+  if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
+    mainWindow.loadURL(process.env["ELECTRON_RENDERER_URL"]);
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    mainWindow.loadFile(join(__dirname, "../renderer/index.html"));
   }
+
+  return mainWindow;
 }
 
+// =======================
+// 🔹 APP EVENTS
+// =======================
 app.whenReady().then(() => {
-  electronApp.setAppUserModelId('com.electron')
+  electronApp.setAppUserModelId("com.electron");
+  app.on("browser-window-created", (_, w) => optimizer.watchWindowShortcuts(w));
+  createWindow();
+});
 
-  app.on('browser-window-created', (_, window) => {
-    optimizer.watchWindowShortcuts(window)
-  })
-
-  ipcMain.on('ping', () => console.log('pong'))
-
-  createWindow()
-
-  app.on('activate', function () {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  })
-})
-
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
-})
-
-/**
- * Handle Google Login popup
- */
-ipcMain.on('open-google-login', (event, url) => {
-  const loginWindow = new BrowserWindow({
-    width: 600,
-    height: 800,
-    autoHideMenuBar: false, // keep menu visible
-    webPreferences: {
-      nodeIntegration: false
-    }
-  })
-
-  // Create custom menu
- const { Menu } = require("electron")
-const menu = Menu.buildFromTemplate([
-  {
-    label: "Navigation",
-    submenu: [
-      {
-        label: "Back",
-        accelerator: "Alt+Left",
-        click: () => {
-          const history = loginWindow.webContents.navigationHistory
-          
-            history.goBack()
-          
-        }
-      },
-      {
-        label: "Forward",
-        accelerator: "Alt+Right",
-        click: () => {
-          const history = loginWindow.webContents.navigationHistory
-         
-            history.goForward()
-          
-        }
-      },
-      {
-        label: "Reload",
-        accelerator: "CmdOrCtrl+R",
-        click: () => loginWindow.reload()
-      },
-      {
-        label: "Exit Login",
-        accelerator: "Esc",
-        click: () => loginWindow.close()
-      }
-    ]
-  }
-])
-loginWindow.setMenu(menu)
-
-  loginWindow.setMenu(menu)
-
-  // Always start with a fresh session
-  loginWindow.webContents.session.clearStorageData().then(() => {
-    loginWindow.loadURL(url)
-  })
-
-  loginWindow.on('closed', () => {
-    console.log('Google login popup closed')
-  })
-})
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") app.quit();
+});

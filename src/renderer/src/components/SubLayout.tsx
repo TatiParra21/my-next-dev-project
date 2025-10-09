@@ -5,10 +5,7 @@ import { JSX } from "react";
 export const SubLayout =(): JSX.Element=>{
     return(
         <div className="flex colum">
-
-            <Outlet/>
-           
-            
+            <Outlet/>  
         </div>
             
         

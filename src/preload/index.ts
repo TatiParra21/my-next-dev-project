@@ -1,29 +1,32 @@
-import { contextBridge } from 'electron'
-import { electronAPI } from '@electron-toolkit/preload'
-
-// Custom APIs for renderer
-const api = {}
-
-// Use `contextBridge` APIs to expose Electron APIs to
-// renderer only if context isolation is enabled, otherwise
-// just add to the DOM global.
-import {  ipcRenderer } from "electron"
-
-// expose only what’s needed
-contextBridge.exposeInMainWorld("electronAPI", {
-  openGoogleLogin: (url: string) => ipcRenderer.send("open-google-login", url)
+import { contextBridge, ipcRenderer, shell } from "electron";
+import { electronAPI } from "@electron-toolkit/preload";
+contextBridge.exposeInMainWorld("authAPI", {
+  oauthGoogle: () => ipcRenderer.invoke("login-with-google"),
 })
+// ✅ Expose only what’s safe for the renderer
+contextBridge.exposeInMainWorld("electronAPI", {
+  // Send URL to main process to open Google login window
+  openGoogleLogin: (url: string) => ipcRenderer.send("open-google-login", url),
 
+  // React listens for session re-checks from main process
+  onCheckSession: (callback: () => void) => {
+    ipcRenderer.on("check-session", callback);
+  },
+
+  // Handle deep link events (optional)
+  onDeepLink: (callback: (url: string) => void) => {
+    ipcRenderer.on("deep-link", (_, url) => callback(url));
+  },
+
+  // Open external links in browser
+  openExternal: (url: string) => shell.openExternal(url),
+});
+
+// ✅ Expose base Electron API if context isolation is on
 if (process.contextIsolated) {
   try {
-    contextBridge.exposeInMainWorld('electron', electronAPI)
-    contextBridge.exposeInMainWorld('api', api)
+    contextBridge.exposeInMainWorld("electron", electronAPI);
   } catch (error) {
-    console.error(error)
+    console.error("Error exposing electronAPI:", error);
   }
-} else {
-  // @ts-ignore (define in dts)
-  window.electron = electronAPI
-  // @ts-ignore (define in dts)
-  window.api = api
 }

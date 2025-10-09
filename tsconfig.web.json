@@ -1,11 +1,12 @@
 {
   "extends": "@electron-toolkit/tsconfig/tsconfig.web.json",
   "include": [
-    "src/renderer/src/env.d.ts",
+    "src/renderer/env.d.ts",
     "src/renderer/src/**/*",
-    "src/renderer/src/**/*.tsx",
-    "src/preload/*.d.ts"
-, "src/preload/preload.ts"  ],
+    "src/preload/*.d.ts",
+    "src/preload/preload.ts",
+    "src/vite-env.d.ts"
+, "src/renderer/setFirebaseClaims.js"  ],
   "compilerOptions": {
     "composite": true,
     "jsx": "react-jsx",

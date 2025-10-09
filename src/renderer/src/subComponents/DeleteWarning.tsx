@@ -1,11 +1,12 @@
 
 import { JSX } from "react"
 import { deleteRequest } from "@renderer/functions/requests"
-import { type ProjectDataStoreType,projectDataStore, warningStore,supabaseStore } from "@renderer/store/projectStore"
+import { type ProjectDataStoreType,projectDataStore, warningStore,firebaseStore, selectUserId} from "@renderer/store/projectStore"
 import { NavLink } from "react-router-dom";
 export const DeleteWarning =({on, id}:{on:boolean, id:string}): JSX.Element =>{
     const setWarning = warningStore(state=>state.setWarning)
-    const userId = supabaseStore(state=>state.userId)
+    const userId= firebaseStore(selectUserId)
+    
     const {loading, setFirstTime}:ProjectDataStoreType = projectDataStore(state=>state)
     if(loading){
         return <div>...Loading</div>

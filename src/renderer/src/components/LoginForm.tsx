@@ -1,32 +1,52 @@
-import { supabase } from "@renderer/supabaseClient"
+
 import React from "react"
-import { supabaseStore } from "@renderer/store/projectStore"
+import { firebaseStore, selectUser } from "@renderer/store/projectStore"
 import { useLocation, NavLink } from "react-router-dom"
+import { useEffect } from "react"
+import { auth, googleProvider } from "../firebaseClient";
+import {
+  getRedirectResult,
+  signInWithPopup,
+  signInWithRedirect,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { useState } from "react";
+declare global {
+  interface Window {
+   authAPI: {
+     oauthGoogle: () => Promise<{ success: boolean; url?: string; message?: string }>
+    }
+  
+  }
+}
+
 export const LoginForm =()=>{
   
      const location = useLocation()
      const params = location.pathname
-     console.log(params)
-      const authError = supabaseStore(state=>state.authError)
-      const setAuthError = supabaseStore(state=>state.setAuthError)
-  const signInWithGoogle=async()=> {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-       skipBrowserRedirect: true,  
-      queryParams: { access_type: 'offline' }, 
-    }
-  })
-  
-    if(error){
-        setAuthError(`Google sign in error: ${error.message}`, )
-        }else if (data?.url) {
-          console.log(data.url, "data url exists")
-    // Call the preload API → sends IPC to main process
-    ;(window as any).electronAPI.openGoogleLogin(data.url)
-    setAuthError("Redirecting to Google login...")
+      const [authError, setAuthError] = useState<string | null>(null);
+     
+    
+const signInWithGoogle = async () => {
+    console.clear();
+    console.log("🟢 Starting Google sign-in...");
+    
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+    console.log("✅ Google sign-in complete:", user.email);
+
+    const idToken = await user.getIdToken();
+    console.log("🪪 Firebase ID Token:", idToken.slice(0, 60) + "...");
+  } catch (err: any) {
+    console.error("💥 Popup sign-in error:", err.message);
+    setAuthError(err.message);
   }
-}
+   
+  }
+ 
+
     const handleLogin=async(e: React.FormEvent<HTMLFormElement>)=>{
      
         e.preventDefault()
@@ -34,38 +54,35 @@ export const LoginForm =()=>{
         const formData = new FormData(form)
         const email = formData.get("email") as string
          const password = formData.get("password") as string
-         console.log(email, password)
-         let errorMessage
-         const {data, error} = params =="/sign-in" ? await supabase.auth.signInWithPassword({email, password}) : await supabase.auth.signUp({email, password})
-        if (error) {        
-    // Special case: Google-linked account trying email login
-    if (
-      params === "sign-in" &&
-      error.message.toLowerCase().includes("invalid login credentials")
-    ){
-      errorMessage = "This email is linked with Google. Please sign in with Google instead."
-    } else {
-      errorMessage = error.message
+         try {
+      if (params === "/sign-in") {
+        console.log("🔐 Signing in with email...");
+        await signInWithEmailAndPassword(auth, email, password);
+      } else {
+        console.log("🆕 Signing up new user...");
+        await createUserWithEmailAndPassword(auth, email, password);
+      }
+      // Zustand’s initAuth() will update automatically on success
+    } catch (err: any) {
+      let errorMessage = err.message;
+      switch (err.code) {
+    case "auth/user-not-found":
+      errorMessage = "No account found with this email. Try signing up instead.";
+      break;
+    case "auth/wrong-password":
+      errorMessage = "Incorrect password. Please try again.";
+      break;
+    case "auth/email-already-in-use":
+      errorMessage = "This email is already registered. Please sign in.";
+      break;
+    case "auth/invalid-credential":
+      errorMessage =
+        "This account uses Google sign-in. Please sign in with Google instead.";
+      break;
+  }
+      setAuthError(errorMessage);
+      console.error("❌ Auth error:", err.code, err.message);
     }
-    setAuthError(errorMessage)
-    return
-  } if (!data.session) {
-    console.log(data,"data")
-          if(data.user && params == "/" && !data.session){
-                setAuthError("Verification email was sent")
-                return
-            }
-            if (data.user?.aud === "authenticated") {
-              errorMessage = !data.user.user_metadata.provider ? "Account already exists, please sign in."
-              : !data.user.user_metadata?.email_verified ? "Email has not been verified yet." : "Unknown Error"
-            }else{
-              errorMessage  = "No session returned. Check credentials."}
-            setAuthError(errorMessage)
-            return
-          }  
-            console.log(data, "data")
-        
-        
 
 }
     return(
