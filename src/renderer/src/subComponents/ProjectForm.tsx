@@ -81,6 +81,7 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
             }
         const resultFromBackend :ResultFromBackendType |null = await onSubmit([projectFormInfo])
         console.log(projectFormInfo, "resss")
+        
             if(resultFromBackend)
         if( resultFromBackend.success && location.pathname == "/write-new-project"){
             formEl.reset()

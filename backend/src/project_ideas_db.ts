@@ -76,7 +76,7 @@ router.patch("/project-ideas/:id/edit",async(req:Request,res:Response):Promise<v
   const updatedData = req.body
   const user = req.query.user as string
   //const updatedData = body.updatedData
-  const allowedFields = ["name", "description","categories","completed"]
+  const allowedFields = ["name", "description","categories","completed", " user_id"]
   
 const fieldsChosen = allowedFields.filter(field=> Object.keys(updatedData).includes(field))
 const clauses = fieldsChosen.map((field, index) => `${field} = $${index + 1}`).join(", ")
