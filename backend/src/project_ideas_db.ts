@@ -97,7 +97,7 @@ let message: string
       res.status(200).json({ message: errorResponses[err.code].message, success:false});
     }else{
       //console.error("SOMETHING WORNG",err.code)
-      res.status(404).json({message:"UNKNOWN ERROR", success:false, place: `project-ideas/${id}`})
+      res.status(404).json({message:"UNKNOWN ERROR",errorCode:err.code, success:false, place: `project-ideas/${id}`})
     }  
   }
 })
