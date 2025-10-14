@@ -3,10 +3,9 @@ import { firebaseStore, selectUser, selectUserId} from "@renderer/store/projectS
 export const LoggedInRoute =({ children }: { children: React.ReactNode })=>{
       const user = firebaseStore(selectUser)
       const userId = firebaseStore(selectUserId)
-  
   // Redirect if user is already logged in
   if (user && userId ) {   
-    console.log(user, "there waas user")
+    console.log(user, "there waas user") 
     return <Navigate to="/dashboard" replace />;
   }
 

@@ -10,7 +10,8 @@ import { ProjectBaseEdit } from './subComponents/ProjectBaseEdit'
 import { LoginForm } from './components/LoginForm'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { LoggedInRoute } from './components/LoggedInRoute'
-import { firebaseStore, selectInitAuth, selectUser, selectFirebaseLoading } from './store/projectStore'
+import { firebaseStore, selectInitAuth, } from './store/projectStore'
+
 const router =createBrowserRouter([
    {path:"/", element:<LoggedInRoute><LoginForm/> </LoggedInRoute> , errorElement:<SectionNotReady/>},
    
@@ -30,21 +31,14 @@ const router =createBrowserRouter([
   }
 ])
 function App(): React.JSX.Element {
- // const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
-
  const initAuth = firebaseStore(selectInitAuth)
- const user = firebaseStore(selectUser)
- const loading = firebaseStore(selectFirebaseLoading);
-
  useEffect(()=>{
   initAuth()
  },[])
-  useEffect(()=>{
-  console.log(user,"user hrere")
- },[user])
 
   return (
     <>
+    
      <RouterProvider router={router}/>
 
      

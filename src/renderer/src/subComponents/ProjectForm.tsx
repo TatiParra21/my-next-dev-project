@@ -14,7 +14,8 @@ import { projectDataStore,
     selectSetIsNotActive, 
     selectSetIsSuccess, 
     selectSetSelectedOptions, 
-    selectUserId} from "@renderer/store/projectStore"
+    selectUserId,
+    selectUpdateProjects} from "@renderer/store/projectStore"
 import { FormElement } from "./FormElement"
 export const capitalizeFirstLetter =(value: string):string=>{
     return value.charAt(0).toUpperCase() + value.slice(1)
@@ -33,7 +34,6 @@ export type ProjectFormType ={
     onSubmit: (projectData: Array<ProjectFormSubmitType>) => Promise<ResultFromBackendType |null>
 }
 export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
-    const setFirstTime = projectDataStore(selectSetFirstTime)
     const {initialValues, onSubmit} :ProjectFormType = form
     const location= useLocation()
     const selectedOptions = formStore(selectSelectedOptions)
@@ -43,6 +43,7 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
     const isNotActive  = formStore(selectIsNotActive)
     const  setIsNotActive  = formStore(selectSetIsNotActive)
     const userId = firebaseStore(selectUserId)
+    const updateProjects = projectDataStore(selectUpdateProjects)
     useEffect(()=>{ 
         if(initialValues && initialValues.categories){
             setSelectedOptions(initialValues.categories)
@@ -64,6 +65,7 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
         const handleSubmit=async(event: FormEvent<HTMLFormElement>): Promise<void>=>{
            // console.log(initialValues, "init")
             event.preventDefault()
+        
             const formEl = event.currentTarget
             const formData :FormData = new FormData(formEl)
              const isCompleted :boolean = formData.get("is-completed") === "on"
@@ -80,17 +82,19 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
                 user_id: userId!
             }
         const resultFromBackend :ResultFromBackendType |null = await onSubmit([projectFormInfo])
-
+            console.log(resultFromBackend, "back")
+             console.log(location.pathname,"path")
             if(resultFromBackend)
-        if( resultFromBackend.success && location.pathname == "/write-new-project"){
+               
+        if( resultFromBackend.success && location.pathname == "/dashboard/write-new-project"){
+            
             formEl.reset()
-            console.log("passed")
             setSelectedOptions({})
               setIsSuccess(resultFromBackend )
-            setFirstTime(true)
+            updateProjects(userId!)
              
         }else if(resultFromBackend.success){
-            setFirstTime(true)
+            updateProjects(userId!)
             setIsSuccess({...isSuccess, success: true} )
             setIsNotActive(true)
             
@@ -99,6 +103,7 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
             }
             
         }
+        
         
     return(
         <form className="flex colum" onSubmit={handleSubmit}>

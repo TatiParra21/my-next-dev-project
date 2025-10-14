@@ -17,16 +17,16 @@ if(!projects) return <>No projects yet</>
      const projectInfo :ProjectType |undefined = projects.find((pro: ProjectType)=>idState == pro.id)
      if(!projectInfo || loading)return<h2>...Loading Project</h2>
       const { id, ...projectWithoutId}=projectInfo
-     const patchRequestCheck =async(body: Array<ProjectFormSubmitType> ):Promise<ResultFromBackendType |null>=>{
+      const patchRequestCheck =async(body: Array<ProjectFormSubmitType> ):Promise<ResultFromBackendType |null>=>{
       const mainBody :ProjectFormSubmitType = body[0]
         const updatedResults : CompareResults= compareForms({original:projectWithoutId,updated:mainBody})
-          const request: Promise<ResultFromBackendType | null> = patchRequest(idState,userId!, updatedResults )
+        const request: Promise<ResultFromBackendType | null> = patchRequest(idState,userId!, updatedResults )
           
           return request 
 }    
  return(
     <>
-    <NavLink state={{save:null}} to="/project-ideas">
+    <NavLink state={{save:null}} to="/dashboard">
                     <button>X</button>
                 </NavLink>
       <ProjectForm onSubmit={patchRequestCheck} initialValues={projectWithoutId} />

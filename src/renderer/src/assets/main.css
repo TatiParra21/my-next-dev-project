@@ -191,6 +191,13 @@ button{
   padding: 1rem;
   font-size: 1rem;
 }
+.submit-btn:hover{
+  background-color:white;
+}
+.submit-btn:disabled{
+  background-color: gray;
+}
+
 .select-btn{
   padding:1em;
 }

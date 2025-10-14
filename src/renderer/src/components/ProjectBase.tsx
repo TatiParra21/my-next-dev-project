@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom"
 import { JSX} from "react"
 import type { ProjectType,CategoriesTypeObjArr } from "@renderer/types"
 import { DeleteWarning } from "@renderer/subComponents/DeleteWarning"
-import { projectDataStore,selectLoading, selectProjects, type WarningStoreType,type ProjectDataStoreType, warningStore } from "@renderer/store/projectStore"
+import { projectDataStore,selectLoading, selectProjects, warningStore, firebaseStore, selectError } from "@renderer/store/projectStore"
 import { capitalizeFirstLetter } from "@renderer/subComponents/ProjectForm"
 type LabelsOnly ={
     languages: Capitalize<string>[] | undefined;
@@ -27,9 +27,11 @@ export const CategoryElements = ({arr}:{arr:LabelsOnly}): JSX.Element=>{
 export const ProjectBase =({state, id}): JSX.Element=>{
     const warning =  warningStore(state=>state.warning)
     const setWarning  = warningStore(state=>state.setWarning)
+    const error = projectDataStore(selectError)
     if(!id)throw new Error(" id not found")
-      
+     
     const projects: ProjectType[] | null  = projectDataStore(selectProjects)
+     console.log(projects, "projects")
     const loading  = projectDataStore(selectLoading)
     if(!projects)return <h2>...Loading</h2>
           const projectInfo :ProjectType | undefined = projects.find((pro: ProjectType)=>id == pro.id)

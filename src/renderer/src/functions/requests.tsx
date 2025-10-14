@@ -1,12 +1,12 @@
 import type { ProjectFormSubmitType, ProjectType } from "@renderer/types"
 import { handleError } from "./handleError"
 import { ResultFromBackendType} from "@renderer/subComponents/ProjectForm"
-export const fetchRequest =async(user_id:string):Promise<ProjectType[] | null>=>{
+export const fetchRequest =async(user_id:string):Promise<ProjectType[] | []>=>{
     try{
          const res = await fetch(`https://my-next-dev-project.onrender.com/database/project-ideas?user=${encodeURIComponent(user_id)}`)
      if (!res.ok) {
       console.error("Fetch failed with status", res.status);
-      return null;
+      return [];
     }
 const data = await res.json();
     console.log(data, "data from backend");
@@ -16,12 +16,12 @@ const data = await res.json();
    
     }catch(err){
         handleError(err,"fetchRequest")
-        return null
+        return []
         
     }
 }
 export const postRequest = async(body: Array<ProjectFormSubmitType>):Promise<ResultFromBackendType |null>=>{
-    console.log(body, "the body")
+    
     try{
         const response = await fetch(`https://my-next-dev-project.onrender.com/database/write-new-project`,{
     method:"POST",

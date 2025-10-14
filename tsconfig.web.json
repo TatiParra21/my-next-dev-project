@@ -5,16 +5,19 @@
     "src/renderer/src/**/*",
     "src/preload/*.d.ts",
     "src/preload/preload.ts",
-    "src/vite-env.d.ts"
-, "src/renderer/setFirebaseClaims.js"  ],
+    "src/vite-env.d.ts",
+    "src/renderer/setFirebaseClaims.js"
+  ],
   "compilerOptions": {
     "composite": true,
     "jsx": "react-jsx",
     "baseUrl": ".",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "skipLibCheck": true,
     "paths": {
-      "@renderer/*": [
-        "src/renderer/src/*"
-      ]
+      "@renderer/*": ["src/renderer/src/*"],
+      "@/*": ["./src/*"]
     }
   }
 }
