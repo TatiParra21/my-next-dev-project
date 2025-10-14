@@ -5,9 +5,7 @@ import { useLocation, NavLink } from "react-router-dom"
 import { useEffect } from "react"
 import { auth, googleProvider } from "../firebaseClient";
 import {
-  getRedirectResult,
   signInWithPopup,
-  signInWithRedirect,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
@@ -17,7 +15,6 @@ declare global {
    authAPI: {
      oauthGoogle: () => Promise<{ success: boolean; url?: string; message?: string }>
     }
-  
   }
 }
 

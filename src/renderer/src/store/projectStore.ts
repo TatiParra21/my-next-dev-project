@@ -22,7 +22,7 @@ export const projectDataStore = create<ProjectDataStoreType>((set)=>({
     error: null,
     setError: (value:string|null)=>set({error:value}),
     updateProjects: async(userId: string)=>{
-      const projects:ProjectType[] |[] = await fetchRequest(userId)
+      const projects:ProjectType[] | [] = await fetchRequest(userId)
          projectDataStore.setState({projects:projects})
 
     }
