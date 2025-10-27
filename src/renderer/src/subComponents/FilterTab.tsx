@@ -1,6 +1,6 @@
 
 import type { OptionOf, ProjectType } from "@renderer/types"
-import { useLocation } from "react-router-dom"
+//import { useLocation } from "react-router-dom"
 import type { AllCategoriesType } from "@renderer/info"
 import { MultiValue } from "react-select"
 import type {  CategoriesTypeObjArr } from "@renderer/types"
@@ -18,7 +18,7 @@ type ProjectFilterSubmitType ={
 export const FilterTab=(form:ProjectFilterSubmitType):JSX.Element=>{
     const projects = projectDataStore(state=>state.projects)
     const [showFilter, setShowFilter] = useState<boolean>(false)
-    
+    console.log(form)
     const showFilterTab =()=>{
         setShowFilter(prev=>!prev)
     }
@@ -29,16 +29,16 @@ export const FilterTab=(form:ProjectFilterSubmitType):JSX.Element=>{
     const giveSelectedOptions =()=>[
         console.log(selectedOptions)
     ]
-const { onSubmit} :ProjectFilterSubmitType = form
-    const location= useLocation()
-    const {selectedOptions, setSelectedOptions,isSuccess, setIsSuccess,isNotActive, setIsNotActive}:FormStoreType = formStore(state=>state)
+//const { onSubmit} :ProjectFilterSubmitType = form
+   // const location= useLocation()
+    const {selectedOptions, setSelectedOptions, isNotActive, setIsNotActive}:FormStoreType = formStore(state=>state)
     //console.log(isSuccess, "issSSucces")
 
-
+/*
     const changeActive =():void=>{
         setIsNotActive(false)
         setIsSuccess({...isSuccess, success:false})
-    }
+    } */
         const handleCategoryChoices =(category:string,values:MultiValue<OptionOf<AllCategoriesType>>):void=>{
            if(isNotActive) setIsNotActive(false)
            
@@ -59,3 +59,4 @@ const { onSubmit} :ProjectFilterSubmitType = form
         </div>
     )
 }
+
