@@ -1,26 +1,22 @@
-import {  FormEvent } from "react"
+
 import type { OptionOf, ProjectType } from "@renderer/types"
 import { useLocation } from "react-router-dom"
 import type { AllCategoriesType } from "@renderer/info"
-import type { ProjectFormSubmitType } from "@renderer/types"
 import { MultiValue } from "react-select"
 import type {  CategoriesTypeObjArr } from "@renderer/types"
 import { OptionComponents } from "./OptionsComponents"
 import { JSX } from "react"
 import { projectDataStore } from "@renderer/store/projectStore"
-import type { ProjectDataStoreType } from "@renderer/store/projectStore"
-import { FormElement } from "./FormElement"
 import { formStore } from "@renderer/store/projectStore"
 import type { FormStoreType } from "@renderer/store/projectStore"
-import { useEffect, useState } from "react"
-import { ProjectFormType } from "./ProjectForm"
-import { ResultFromBackendType } from "./ProjectForm"
+import { useState } from "react"
+
 type ProjectFilterSubmitType ={
     initialValues?: CategoriesTypeObjArr,
     onSubmit: (conditions:CategoriesTypeObjArr) => Promise<ProjectType[] | null>
 }
 export const FilterTab=(form:ProjectFilterSubmitType):JSX.Element=>{
-    const {projects,setFirstTime}:ProjectDataStoreType = projectDataStore(state=>state)
+    const projects = projectDataStore(state=>state.projects)
     const [showFilter, setShowFilter] = useState<boolean>(false)
     
     const showFilterTab =()=>{

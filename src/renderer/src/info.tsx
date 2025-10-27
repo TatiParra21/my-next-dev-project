@@ -17,7 +17,7 @@ const frameworks :string[] =[
   "Angular","Vue.js","Next.js","Nuxt.js","SvelteKit","Ember.js","NestJS","Express.js","Koa","Hapi","Django","Flask",
   "FastAPI","Rails","Spring Boot","Laravel","ASP.NET Core","Meteor","Phoenix","Symfony","CodeIgniter","Struts","Play Framework",
   "Quarkus","Micronaut","Remix","Blitz.js","RedwoodJS","Electron","Capacitor","Ionic","Expo","Gatsby","JHipster","LoopBack","FeathersJS",
-  "AdonisJS","CakePHP","TurboGears"
+  "AdonisJS","CakePHP","TurboGears", "Tailwind CSS"
 ]
 
 

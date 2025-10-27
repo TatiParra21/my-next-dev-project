@@ -3,7 +3,7 @@ import { Outlet, useLocation } from "react-router-dom"
 import { useEffect, JSX } from "react"
 import { RouteShown } from "./RouteShown"
 import type { CategoriesTypeObjArr, ProjectType } from "@renderer/types"
-import {firebaseStore,selectUser, projectDataStore, selectLoading, selectSetLoading, selectSetError,selectSetProjects, selectError, selectProjects, selectLogout, selectUserEmail, selectUpdateProjects } from "@renderer/store/projectStore"
+import {firebaseStore,selectUser, projectDataStore, selectLoading, selectSetLoading, selectSetError, selectError, selectProjects, selectUserEmail} from "@renderer/store/projectStore"
 import { handleError } from "@renderer/functions/handleError"
 import { UserMenu } from "@renderer/subComponents/UserMenu"
 
@@ -16,7 +16,7 @@ export const otherDefault:CategoriesTypeObjArr ={
         projects: ProjectType[],
         setProjects:  React.Dispatch<React.SetStateAction<boolean>>;
     }
-export const Layout =(): JSX.Element=>{
+const Layout =(): JSX.Element=>{
     const user = firebaseStore(selectUser)
     const userId = user?.uid || null;
     const email = firebaseStore(selectUserEmail)
@@ -61,3 +61,5 @@ if(error && !loading){
 </>
     )
 }
+
+export default Layout

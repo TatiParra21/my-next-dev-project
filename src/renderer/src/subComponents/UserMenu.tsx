@@ -2,23 +2,16 @@ import {
   Avatar,
   HStack,
   HoverCard,
-  Icon,
   Link,
   Portal,
-  Box,
-  Strong,
   Stack,
-  Text,useAvatar, Button, 
+  Text, Button, 
 } from "@chakra-ui/react"
 import { firebaseStore, selectLogout } from "@renderer/store/projectStore"
-
-
 export const Logout =({handleLogout}:{handleLogout:  () => Promise<void>}) =>{
-
   return (
     <HStack>
       <Button onClick={handleLogout} >Logout</Button>
-
     </HStack>
   )
 }
@@ -26,13 +19,12 @@ export const Logout =({handleLogout}:{handleLogout:  () => Promise<void>}) =>{
 const AvatarComponent =()=>{
   return(
         <Avatar.Root colorPalette="red">
-                  <Avatar.Fallback />
-                 
+                  <Avatar.Fallback />               
         </Avatar.Root>
   )
 }
 
-export  const UserMenu =({email}:{email:string})=>{
+export const UserMenu =({email}:{email:string})=>{
     const handleLogout = firebaseStore(selectLogout)
     return(
     <HoverCard.Root size="sm">

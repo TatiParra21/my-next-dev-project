@@ -5,7 +5,7 @@ import icon from "../../resources/icon.png?asset";
 
 let mainWindow: BrowserWindow | null = null;
 app.on("web-contents-created", (_, contents) => {
-  contents.on("console-message", (_, level, message) => {
+  contents.on("console-message", (_, __, message) => {
     if (message.includes("Cross-Origin-Opener-Policy")) return; // ignore this warning
     console.log(message); // log everything else normally
   });

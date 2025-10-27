@@ -1,21 +1,19 @@
 
-import React, { useEffect } from 'react'
+import React, { useEffect, Suspense } from 'react'
 import { SectionNotReady } from './components/SectionNotReady'
-import { Layout } from './components/Layout'
 import { createBrowserRouter,RouterProvider } from 'react-router-dom'
 import { SubLayout } from './components/SubLayout'
-import { ProjectSelectionBase } from './components/ProjectSelectionBase'
-import { AddNewProject } from './components/AddNewProject'
-import { ProjectBaseEdit } from './subComponents/ProjectBaseEdit'
 import { LoginForm } from './components/LoginForm'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { LoggedInRoute } from './components/LoggedInRoute'
 import { firebaseStore, selectInitAuth, } from './store/projectStore'
-
+import { LoadingRoller } from './components/LoadingRoller'
+const AddNewProject = React.lazy(()=>import('./components/AddNewProject'))
+const Layout = React.lazy(()=>import('./components/Layout'))
+const ProjectSelectionBase = React.lazy(()=>import('./components/ProjectSelectionBase'))
+const ProjectBaseEdit = React.lazy(()=>import('./subComponents/ProjectBaseEdit'))
 const router =createBrowserRouter([
    {path:"/", element:<LoggedInRoute><LoginForm/> </LoggedInRoute> , errorElement:<SectionNotReady/>},
-   
-  // { path: "/auth/callback", element: <AuthCallback /> },
    {path:"/sign-in", element: <LoggedInRoute> <LoginForm/> </LoggedInRoute>, errorElement:<SectionNotReady/>},
   {path:"/dashboard", element: <ProtectedRoute><Layout/></ProtectedRoute>,
     children:[
@@ -23,7 +21,6 @@ const router =createBrowserRouter([
         children:[
           {index:true,element:<ProjectSelectionBase/>},
           {path:":id",element:<ProjectBaseEdit/>}
-
         ]
       },
       {path:"write-new-project", element:<AddNewProject/>}
@@ -35,15 +32,12 @@ function App(): React.JSX.Element {
  useEffect(()=>{
   initAuth()
  },[])
-
   return (
     <>
-    
-     <RouterProvider router={router}/>
-
-     
+    <Suspense fallback={<LoadingRoller/>}>
+      <RouterProvider router={router}/>
+    </Suspense>     
     </>
   )
 }
-
 export default App

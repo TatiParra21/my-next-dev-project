@@ -6,7 +6,7 @@ import { patchRequest } from "@renderer/functions/requests"
 import type { ProjectType, ProjectFormSubmitType } from "@renderer/types"
 import { compareForms, type CompareResults } from "@renderer/functions/compareForms"
 
-export const ProjectBaseEdit =():JSX.Element=>{
+ const ProjectBaseEdit =():JSX.Element=>{
  const params = useParams()
  const idState :string |undefined = params.id
  if(!idState) throw new Error("no idea param")
@@ -33,3 +33,5 @@ if(!projects) return <>No projects yet</>
     </>
  )
 }
+
+export default ProjectBaseEdit

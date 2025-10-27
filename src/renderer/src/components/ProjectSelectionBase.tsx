@@ -26,7 +26,7 @@ export const SelectionCell =({project,save, show,showInfo}):JSX.Element =>{
                 }    
             </div>)
 }
-export const ProjectSelectionBase =():JSX.Element=>{
+const ProjectSelectionBase =():JSX.Element=>{
     const [show, setShow] = useState<string |null>(null)
     const showInfo =(id:string)=>{
     setShow(prev=> prev == id ?null : id)
@@ -56,3 +56,5 @@ export const ProjectSelectionBase =():JSX.Element=>{
     </>
     )
 }
+
+export default ProjectSelectionBase

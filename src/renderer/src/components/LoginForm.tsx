@@ -1,8 +1,6 @@
 
 import React from "react"
-import { firebaseStore, selectUser } from "@renderer/store/projectStore"
 import { useLocation, NavLink } from "react-router-dom"
-import { useEffect } from "react"
 import { auth, googleProvider } from "../firebaseClient";
 import {
   signInWithPopup,

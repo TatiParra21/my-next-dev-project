@@ -96,8 +96,16 @@ export const firebaseStore = create<FirebaseStoreType>((set) => ({
           userEmail: user.email || "",
           loading: false,
         });
-         const projects:ProjectType[] | null = await fetchRequest(user.uid)
+        try{
+          projectDataStore.setState({loading: true})
+          console.log("loading projects")
+           const projects:ProjectType[] | null = await fetchRequest(user.uid)
          projectDataStore.setState({projects:projects})
+
+        }catch(err){}finally{
+          projectDataStore.setState({loading: false})
+        }
+        
       } else {
         set({
           user: null,

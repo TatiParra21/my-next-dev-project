@@ -7,8 +7,7 @@ export const NavBar =(): JSX.Element=>{
     const styleNav =(isActive :boolean): string=>{
         const chosenStyle: string = isActive ?  "active-style" : "non-active"
         return chosenStyle
-    }
-  
+    } 
     const {setIsSuccess, isSuccess} = formStore(state=>state) 
     const location = useLocation()
 const currentRoute = location.pathname
@@ -16,7 +15,6 @@ const currentRoute = location.pathname
    const save = state?.save
   useEffect(()=>{
     if(currentRoute == "/project-ideas"){
-
         setIsSuccess({...isSuccess, message: "" })
     }
   },[currentRoute])
