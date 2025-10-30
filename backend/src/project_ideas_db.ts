@@ -110,8 +110,10 @@ router.get("/project-ideas/filter",verifyFirebaseUser, async(req: Request, res:R
     try{
       const body = req.body as FilterRequestType
        const user_id = (req as any).userId
-        const result = await pool.query(`SELECT * FROM project_ideas  WHERE 
-                   AND user_id = '${user_id};`)
+         const result = await pool.query(
+      `SELECT * FROM project_ideas WHERE user_id = $1`,
+      [user_id]
+    );
          if(!Array.isArray(result.rows) ||result.rows.length === 0){
        res.status(200).json({message:"Nothing was Found", found:false})
       }else if(Array.isArray(result.rows) && result.rows.length >= 1){
