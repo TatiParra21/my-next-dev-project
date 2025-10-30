@@ -1,7 +1,7 @@
 {
   "name": "my-next-dev-project",
   "productName": "My Next Dev Project",
-  "version": "1.0.0",
+  "version": "1.0.05",
   "description": "An Electron application with React and TypeScript",
   "main": "./out/main/index.js",
   "type": "module",

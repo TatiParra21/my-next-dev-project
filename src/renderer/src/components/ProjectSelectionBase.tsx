@@ -50,6 +50,8 @@ const ProjectSelectionBase =():JSX.Element=>{
     return(<>
         <FilterTab/>
         <div className={clsx("all-project-cells", show && "adjust-cells")}>
+            {!projects && <>NO PROJECTS</>}
+            <p>DI it updarte??</p>
         
             {projectSelection} 
         </div>
