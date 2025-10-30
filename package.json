@@ -1,11 +1,16 @@
 {
-  "name": "horsegame",
+  "name": "my-next-dev-project",
+  "productName": "My Next Dev Project",
   "version": "1.0.0",
   "description": "An Electron application with React and TypeScript",
   "main": "./out/main/index.js",
   "type": "module",
   "author": "example.com",
   "homepage": "https://electron-vite.org",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TatiParra21/my-next-dev-project"
+  },
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache .",
@@ -33,12 +38,15 @@
     "@supabase/supabase-js": "^2.58.0",
     "clsx": "^2.1.1",
     "dotenv": "^17.2.1",
+    "electron-log": "^5.4.3",
     "electron-updater": "^6.3.9",
+    "express": "^4.21.2",
     "firebase": "^12.3.0",
     "firebase-admin": "^13.5.0",
     "framer-motion": "^12.23.24",
     "next-themes": "^0.4.6",
     "nodemon": "^3.1.10",
+    "path": "^0.12.7",
     "pg": "^8.16.3",
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.6.3",
@@ -69,5 +77,21 @@
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3",
     "vite": "^6.2.6"
+  },
+  "build": {
+    "asar": true,
+    "extraResources": [
+      {
+        "from": "node_modules/express",
+        "to": "node_modules/express"
+      }
+    ],
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "TatiParra21",
+        "repo": "my-next-dev-project"
+      }
+    ]
   }
 }

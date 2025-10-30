@@ -3,17 +3,16 @@ import type { OptionOf, ProjectType, CategoriesTypeObjArr, ProjectFormSubmitType
 import { useLocation } from "react-router-dom"
 import type { AllCategoriesType } from "@renderer/info"
 import { MultiValue } from "react-select"
-import { OptionComponents } from "./OptionsComponents"
+import { OptionComponents } from "../../subComponents/OptionsComponents"
 import { projectDataStore,
     firebaseStore,
     formStore, 
     selectIsNotActive, 
-    selectIsSuccess, 
+    selectResultFromBackend, 
     selectSelectedOptions, 
     selectSetIsNotActive, 
-    selectSetIsSuccess, 
+    selectSetResultFromBackend, 
     selectSetSelectedOptions, 
-    selectUserId,
     selectUpdateProjects} from "@renderer/store/projectStore"
 import { FormElement } from "./FormElement"
 export const capitalizeFirstLetter =(value: string):string=>{
@@ -37,11 +36,10 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
     const location= useLocation()
     const selectedOptions = formStore(selectSelectedOptions)
     const setSelectedOptions  = formStore(selectSetSelectedOptions)
-    const isSuccess  = formStore(selectIsSuccess)
-    const setIsSuccess  = formStore(selectSetIsSuccess)
+    const resultFromBackend  = formStore(selectResultFromBackend)
+    const setResultFromBackend  = formStore(selectSetResultFromBackend)
     const isNotActive  = formStore(selectIsNotActive)
     const  setIsNotActive  = formStore(selectSetIsNotActive)
-    const userId = firebaseStore(selectUserId)
     const updateProjects = projectDataStore(selectUpdateProjects)
     useEffect(()=>{ 
         if(initialValues && initialValues.categories){
@@ -53,7 +51,7 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
     },[])
     const changeActive =():void=>{
         setIsNotActive(false)
-        setIsSuccess({...isSuccess, success:false})
+       setResultFromBackend({...resultFromBackend, success:false})
     }
         const handleCategoryChoices =(category:string,values:MultiValue<OptionOf<AllCategoriesType>>):void=>{
            if(isNotActive) setIsNotActive(false)
@@ -62,9 +60,7 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
             setSelectedOptions({...selectedOptions, [categoryVal]:values})  
         }
         const handleSubmit=async(event: FormEvent<HTMLFormElement>): Promise<void>=>{
-           // console.log(initialValues, "init")
             event.preventDefault()
-        
             const formEl = event.currentTarget
             const formData :FormData = new FormData(formEl)
              const isCompleted :boolean = formData.get("is-completed") === "on"
@@ -78,32 +74,26 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
                 description: projectDescription,
                 categories: selectedOptions,
                 completed:isCompleted,
-                user_id: userId!
             }
         const resultFromBackend :ResultFromBackendType |null = await onSubmit([projectFormInfo])
             console.log(resultFromBackend, "back")
              console.log(location.pathname,"path")
             if(resultFromBackend)
                
-        if( resultFromBackend.success && location.pathname == "/dashboard/write-new-project"){
-            
+        if( resultFromBackend.success && location.pathname == "/dashboard/write-new-project"){         
             formEl.reset()
             setSelectedOptions({})
-              setIsSuccess(resultFromBackend )
-            updateProjects(userId!)
-             
+              setResultFromBackend(resultFromBackend )
+            updateProjects()          
         }else if(resultFromBackend.success){
-            updateProjects(userId!)
-            setIsSuccess({...isSuccess, success: true} )
+            updateProjects()
+            setResultFromBackend({...resultFromBackend, success: true} )
             setIsNotActive(true)
             
             }else if(resultFromBackend.message &&!resultFromBackend.success ){
-                setIsSuccess({message: resultFromBackend.message , success: false})
-            }
-            
-        }
-        
-        
+                setResultFromBackend({message: resultFromBackend.message , success: false})
+            }       
+        } 
     return(
         <form className="flex colum" onSubmit={handleSubmit}>
             <FormElement changeActive={changeActive}   name="project-name" classAssigned="colum" type="text" placeholder="My New Project" defaultValue={initialValues?.name ?? ""} required>
@@ -117,7 +107,51 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
                 Completed
             </FormElement>
             <button disabled={isNotActive} className="submit-btn" type="submit">Submit</button>
-            {isSuccess.message && <p>{isSuccess.message}</p> }
+            {resultFromBackend.message && <p>{resultFromBackend.message}</p> }
         </form>
     )
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

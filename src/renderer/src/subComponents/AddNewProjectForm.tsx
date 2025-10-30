@@ -1,7 +1,7 @@
  
 import { JSX } from "react"
 import { postRequest } from "@renderer/functions/requests"
-import { ProjectForm } from "./ProjectForm"
+import { ProjectForm } from "../components/FormComponents/ProjectForm"
 
 const AddNewProjectForm =():JSX.Element=>{  
    return(

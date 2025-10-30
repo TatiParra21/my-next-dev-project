@@ -1,6 +1,6 @@
 import { JSX } from "react"
 import Select from 'react-select'
-import type { OptionComponentProps } from "./ProjectForm";
+import type { OptionComponentProps } from "../components/FormComponents/ProjectForm";
 import type { CategoriesType } from "@renderer/types";
 import type { AllCategoriesType } from "@renderer/info";
 import { MultiValue } from 'react-select';

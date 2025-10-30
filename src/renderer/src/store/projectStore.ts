@@ -1,6 +1,6 @@
 import {create} from "zustand"
 import type { CategoriesTypeObjArr,ProjectType } from "@renderer/types"
-import type { ResultFromBackendType } from "@renderer/subComponents/ProjectForm"
+import type { ResultFromBackendType } from "@renderer/components/FormComponents/ProjectForm"
 import { auth } from "@renderer/firebaseClient";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { fetchRequest } from "@renderer/functions/requests";
@@ -12,7 +12,7 @@ export type ProjectDataStoreType ={
     setLoading: (value:boolean)=>void,
     error: string | null,
     setError: (value: string |null)=>void,
-    updateProjects: (userId: string)=>Promise<void>
+    updateProjects: ()=>Promise<void>
 }
 export const projectDataStore = create<ProjectDataStoreType>((set)=>({
     projects: [], //starting,
@@ -21,8 +21,8 @@ export const projectDataStore = create<ProjectDataStoreType>((set)=>({
     setLoading: (value:boolean)=>set({loading:value}),
     error: null,
     setError: (value:string|null)=>set({error:value}),
-    updateProjects: async(userId: string)=>{
-      const projects:ProjectType[] | [] = await fetchRequest(userId)
+    updateProjects: async()=>{
+      const projects:ProjectType[] | [] = await fetchRequest()
          projectDataStore.setState({projects:projects})
 
     }
@@ -49,23 +49,23 @@ export const warningStore = create<WarningStoreType>((set)=>({
 export type FormStoreType ={
     selectedOptions: CategoriesTypeObjArr,
     setSelectedOptions: (selectedOptions:CategoriesTypeObjArr)=>void,
-    isSuccess: ResultFromBackendType,
-    setIsSuccess:(isSuccess:ResultFromBackendType)=>void,
+    resultFromBackend: ResultFromBackendType,
+    setResultFromBackend:(resultFromBackend:ResultFromBackendType)=>void,
     isNotActive: boolean,
     setIsNotActive: (value:boolean)=>void
 }
 export const formStore = create<FormStoreType>((set)=>({
      selectedOptions: {},
     setSelectedOptions: (selectedOptions:CategoriesTypeObjArr)=>set(({selectedOptions})),
-    isSuccess: {message:"",success:false},
-    setIsSuccess:(isSuccess:ResultFromBackendType)=>set({isSuccess}),
+    resultFromBackend: {message:"",success:false},
+    setResultFromBackend:(resultFromBackend:ResultFromBackendType)=>set({resultFromBackend}),
     isNotActive: true,
     setIsNotActive: (value:boolean)=>set({isNotActive:value})
 }))
 export const selectSelectedOptions= (state:FormStoreType)=>state.selectedOptions
 export const selectSetSelectedOptions= (state:FormStoreType)=>state.setSelectedOptions
-export const selectIsSuccess= (state:FormStoreType)=>state.isSuccess
-export const selectSetIsSuccess= (state:FormStoreType)=>state.setIsSuccess
+export const selectResultFromBackend= (state:FormStoreType)=>state.resultFromBackend
+export const selectSetResultFromBackend =(state:FormStoreType)=>state.setResultFromBackend
 export const selectIsNotActive= (state:FormStoreType)=>state.isNotActive
 export const selectSetIsNotActive= (state:FormStoreType)=>state.setIsNotActive
 
@@ -99,7 +99,7 @@ export const firebaseStore = create<FirebaseStoreType>((set) => ({
         try{
           projectDataStore.setState({loading: true})
           console.log("loading projects")
-           const projects:ProjectType[] | null = await fetchRequest(user.uid)
+           const projects:ProjectType[] | null = await fetchRequest()
          projectDataStore.setState({projects:projects})
 
         }catch(err){}finally{

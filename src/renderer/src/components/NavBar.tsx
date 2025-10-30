@@ -8,14 +8,15 @@ export const NavBar =(): JSX.Element=>{
         const chosenStyle: string = isActive ?  "active-style" : "non-active"
         return chosenStyle
     } 
-    const {setIsSuccess, isSuccess} = formStore(state=>state) 
+    const resultFromBackend = formStore(state=>state.resultFromBackend) 
+    const setResultFromBackend = formStore(state=>state.setResultFromBackend)
     const location = useLocation()
 const currentRoute = location.pathname
     const state = location?.state
    const save = state?.save
   useEffect(()=>{
     if(currentRoute == "/project-ideas"){
-        setIsSuccess({...isSuccess, message: "" })
+        setResultFromBackend({...resultFromBackend, message: "" })
     }
   },[currentRoute])
  

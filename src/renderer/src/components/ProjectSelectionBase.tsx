@@ -5,9 +5,8 @@ import { projectDataStore, selectLoading, selectProjects } from "@renderer/store
 import { ProjectType } from "@renderer/types"
 import { ProjectBase } from "./ProjectBase";
 import { useState, useRef, useEffect, JSX } from "react";
-import { fetchFilteredRequest } from "@renderer/functions/requests";
 import clsx from "clsx";
-import { FilterTab } from "@renderer/subComponents/FilterTab";
+import { FilterTab } from "@renderer/components/FormComponents/FilterTab";
 export const SelectionCell =({project,save, show,showInfo}):JSX.Element =>{
   const projectRef = useRef<HTMLButtonElement | null>(null);
     useEffect(()=>{    
@@ -34,6 +33,7 @@ const ProjectSelectionBase =():JSX.Element=>{
       const location = useLocation()
     const save :string= `${location.pathname}`
     const projects : ProjectType[] | null = projectDataStore(selectProjects)
+    console.log(projects, "seeing")
     const loading :boolean = projectDataStore(selectLoading)
     if(!projects){
          if(loading){
@@ -48,7 +48,7 @@ const ProjectSelectionBase =():JSX.Element=>{
            <SelectionCell show={show} showInfo={showInfo} key={project.id} project={project} save={save}/>)
 })
     return(<>
-        <FilterTab onSubmit={fetchFilteredRequest}/>
+        <FilterTab/>
         <div className={clsx("all-project-cells", show && "adjust-cells")}>
         
             {projectSelection} 

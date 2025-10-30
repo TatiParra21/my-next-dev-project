@@ -1,19 +1,38 @@
 import { app, BrowserWindow, shell } from "electron";
 import { join } from "path";
+import express from "express";
+import { fileURLToPath } from "url";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import icon from "../../resources/icon.png?asset";
 
+const __dirname = join(fileURLToPath(import.meta.url), "..");
 let mainWindow: BrowserWindow | null = null;
-app.on("web-contents-created", (_, contents) => {
-  contents.on("console-message", (_, __, message) => {
-    if (message.includes("Cross-Origin-Opener-Policy")) return; // ignore this warning
-    console.log(message); // log everything else normally
+
+// 🟢 Start a tiny Express server for production
+function startServer(): Promise<number> {
+  return new Promise((resolve) => {
+    const server = express();
+    const port = 3000;
+
+    // Serve your built renderer files
+    server.use(express.static(join(__dirname, "../renderer")));
+
+    // React Router fallback
+    server.get("*", (_, res) => {
+      res.sendFile(join(__dirname, "../renderer/index.html"));
+    });
+
+    server.listen(port, () => {
+      console.log(`✅ Local server running at http://localhost:${port}`);
+      resolve(port);
+    });
   });
-});
-// =======================
-// 🔹 MAIN WINDOW FUNCTION
-// =======================
-function createWindow() {
+}
+
+// 🪟 Create the Electron window
+async function createWindow() {
+  const port = await startServer(); // wait until server is ready
+
   mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
@@ -37,27 +56,42 @@ function createWindow() {
       url.startsWith("https://auth.firebase.com")
     ) {
       shell.openExternal(url);
-      return { action: "deny" }; // Prevent Electron from handling it internally
+      return { action: "deny" };
     }
     return { action: "allow" };
   });
 
-  if (is.dev) mainWindow.webContents.openDevTools({ mode: "detach" });
-
   mainWindow.on("ready-to-show", () => mainWindow?.show());
 
   if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
+    // Development build
     mainWindow.loadURL(process.env["ELECTRON_RENDERER_URL"]);
+    mainWindow.webContents.openDevTools({ mode: "detach" });
   } else {
-    mainWindow.loadFile(join(__dirname, "../renderer/index.html"));
+    // ✅ Production build — served from localhost
+    mainWindow.loadURL(`http://localhost:${port}`);
   }
 
   return mainWindow;
 }
+import pkg from "electron-updater";
+const { autoUpdater } = pkg;
 
-// =======================
-// 🔹 APP EVENTS
-// =======================
+// 🔹 Optional: logs (helpful for debugging)
+import log from "electron-log";
+autoUpdater.logger = log;
+log.transports.file.level = "info";
+
+app.whenReady().then(() => {
+  electronApp.setAppUserModelId("com.electron");
+
+  // Create the main window
+  createWindow();
+
+  // ✅ Check for updates automatically
+  autoUpdater.checkForUpdatesAndNotify();
+});
+// ⚙️ App lifecycle
 app.whenReady().then(() => {
   electronApp.setAppUserModelId("com.electron");
   app.on("browser-window-created", (_, w) => optimizer.watchWindowShortcuts(w));

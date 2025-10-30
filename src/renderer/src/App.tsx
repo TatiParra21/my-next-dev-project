@@ -3,7 +3,7 @@ import React, { useEffect, Suspense } from 'react'
 import { SectionNotReady } from './components/SectionNotReady'
 import { createBrowserRouter,RouterProvider } from 'react-router-dom'
 import { SubLayout } from './components/SubLayout'
-import { LoginForm } from './components/LoginForm'
+import { LoginForm } from './components/FormComponents/LoginForm'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { LoggedInRoute } from './components/LoggedInRoute'
 import { firebaseStore, selectInitAuth, } from './store/projectStore'
@@ -11,7 +11,7 @@ import { LoadingRoller } from './components/LoadingRoller'
 const AddNewProject = React.lazy(()=>import('./components/AddNewProject'))
 const Layout = React.lazy(()=>import('./components/Layout'))
 const ProjectSelectionBase = React.lazy(()=>import('./components/ProjectSelectionBase'))
-const ProjectBaseEdit = React.lazy(()=>import('./subComponents/ProjectBaseEdit'))
+const ProjectBaseEdit = React.lazy(()=>import('./components/FormComponents/ProjectBaseEdit'))
 const router =createBrowserRouter([
    {path:"/", element:<LoggedInRoute><LoginForm/> </LoggedInRoute> , errorElement:<SectionNotReady/>},
    {path:"/sign-in", element: <LoggedInRoute> <LoginForm/> </LoggedInRoute>, errorElement:<SectionNotReady/>},
