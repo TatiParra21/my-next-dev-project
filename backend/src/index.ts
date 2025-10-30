@@ -36,3 +36,5 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
+import listEndpoints from "express-list-endpoints";
+console.log("🧭 Registered routes:", listEndpoints(app));
