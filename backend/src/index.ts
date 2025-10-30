@@ -17,7 +17,7 @@ console.log("tehe static start")
 app.use(express.static(path.join(__dirname, "out/renderer")));
 console.log("the /* route")
 //  Fallback to index.html for React Router
-app.get("/*", (req, res) => {
+app.get(/^\/(?!api|database).*/, (req, res) => {
   res.sendFile(path.join(__dirname, "out/renderer/index.html"));
 });
 
