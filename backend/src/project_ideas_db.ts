@@ -69,6 +69,7 @@ router.post("/write-new-project",verifyFirebaseUser,async(req:Request, res:Respo
           res.status(201).json({result:result.rows, message:"Project was Posted", success:true} )
         }
  }catch(err: any) {
+  console.log("therre was an errror")
       //basically if there is an error code and that error code is in errorResponses object it will send this back
     handleDbError(res,err,"write-new-project")
   }
