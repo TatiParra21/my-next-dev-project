@@ -12,7 +12,7 @@ let mainWindow: BrowserWindow | null = null;
 function startServer(): Promise<number> {
   return new Promise((resolve) => {
     const server = express();
-    const port = 3000;
+    const port = 5123;
 
     // Serve your built renderer files
     server.use(express.static(join(__dirname, "../renderer")));

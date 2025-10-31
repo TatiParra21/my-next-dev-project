@@ -1,10 +1,9 @@
 import {create} from "zustand"
 import type { CategoriesTypeObjArr,ProjectType } from "@renderer/types"
 import type { ResultFromBackendType } from "@renderer/components/FormComponents/ProjectForm"
-import { auth } from "@renderer/firebaseClient";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { fetchRequest } from "@renderer/functions/requests";
-
+import { auth } from "@renderer/firebaseClient";
 export type ProjectDataStoreType ={
     projects: ProjectType[] | [],
     setProjects: (projects:ProjectType[] |[])=>void,
@@ -69,6 +68,7 @@ export const selectSetResultFromBackend =(state:FormStoreType)=>state.setResultF
 export const selectIsNotActive= (state:FormStoreType)=>state.isNotActive
 export const selectSetIsNotActive= (state:FormStoreType)=>state.setIsNotActive
 
+
 type FirebaseStoreType = {
   user: User | null;
   userId: string | null;
@@ -89,6 +89,7 @@ export const firebaseStore = create<FirebaseStoreType>((set) => ({
   // 👇 Replaces supabase.auth.onAuthStateChange()
   initAuth: () => {
     onAuthStateChanged(auth, async(user) => {
+        console.log("change")
       if (user) {
         set({
           user,
@@ -136,3 +137,4 @@ export const selectUserEmail = (state: FirebaseStoreType) => state.userEmail;
 export const selectFirebaseLoading = (state: FirebaseStoreType) => state.loading;
 export const selectInitAuth = (state: FirebaseStoreType) => state.initAuth;
 export const selectLogout = (state: FirebaseStoreType) => state.logout;
+

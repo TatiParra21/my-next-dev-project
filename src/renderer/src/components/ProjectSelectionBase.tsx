@@ -37,7 +37,7 @@ const ProjectSelectionBase =():JSX.Element=>{
     const loading :boolean = projectDataStore(selectLoading)
     if(!projects){
          if(loading){
-    return<div>...Loading</div>
+    return<div>...Loading hello</div>
     }else {
          return<div>No projects yet</div>
         }
@@ -51,7 +51,7 @@ const ProjectSelectionBase =():JSX.Element=>{
         <FilterTab/>
         <div className={clsx("all-project-cells", show && "adjust-cells")}>
             {!projects && <>NO PROJECTS</>}
-            <p>DI it updarte??</p>
+        
         
             {projectSelection} 
         </div>

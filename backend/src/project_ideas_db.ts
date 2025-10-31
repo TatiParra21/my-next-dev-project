@@ -98,7 +98,7 @@ router.patch("/project-ideas/:id/edit",verifyFirebaseUser,async(req:Request,res:
 router.delete("/project-ideas/:id",verifyFirebaseUser,async(req:Request,res:Response)=>{
   try{
      const userId = (req as any).userId
-    const id:string = req.params.id
+    const id:number = Number(req.params.id)
     
     await pool.query(`DELETE FROM project_ideas WHERE id =$1 AND user_id = $2`,[id,userId])
         res.status(200).json({ message: 'Project deleted successfully',success:true });

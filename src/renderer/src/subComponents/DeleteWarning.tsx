@@ -21,7 +21,7 @@ return(<>
         <div className=" flex colum align">
             <h2>Are you sure you want to Delete this project?</h2>
             <div className="delete-options flex row edit-delete-sec">
-                <NavLink state={{save:null}} to="/dashboard">
+                <NavLink state={{save:null}} to="/dashboard/project-ideas">
                     <button onClick={deleteRequestAndReset}>Delete Project</button>
                 </NavLink>
                 <button onClick={setWarning}>Do not Delete Project</button>

@@ -32,7 +32,7 @@ export const ProjectBase =({state, id}): JSX.Element=>{
     const projects: ProjectType[] | null  = projectDataStore(selectProjects)
      console.log(projects, "projects")
     const loading  = projectDataStore(selectLoading)
-    if(!projects || loading)return <h2>...Loading</h2>
+    if(!projects || loading)return <h2>...Loading inn ProjetBa</h2>
           const projectInfo :ProjectType | undefined = projects.find((pro: ProjectType)=>id == pro.id)
     if(!projectInfo )return <h2>...Loading</h2>
   

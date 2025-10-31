@@ -85,6 +85,7 @@ export const patchRequest = async(id:string, body:Record<string,any>):Promise<Re
 }
 export const deleteRequest =async(id:string):Promise<void |null>=>{
     try{
+        console.log(id, "id")
         const auth = await getFirebaseAuthToken()
         if (!auth) return null;
         const res = await fetch(`https://my-next-dev-project.onrender.com/database/project-ideas/${id}}`,
@@ -94,7 +95,7 @@ export const deleteRequest =async(id:string):Promise<void |null>=>{
             }
         })
         const data = await res.json()
-         console.log("Project was deleted")
+         console.log("Project was deleted", data)
         return data
     }catch(err){
          handleError(err,"deleteRequest")
