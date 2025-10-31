@@ -99,8 +99,8 @@ router.delete("/project-ideas/:id",verifyFirebaseUser,async(req:Request,res:Resp
   try{
      const userId = (req as any).userId
     const id:number = Number(req.params.id)
-    
-    await pool.query(`DELETE FROM project_ideas WHERE id =$1 AND user_id = $2`,[id,userId])
+console.log("Deleting:", { id, userId, types: [typeof id, typeof userId] });
+    await pool.query(`DELETE FROM project_ideas WHERE id = $1 AND user_id = $2`,[id,userId])
         res.status(200).json({ message: 'Project deleted successfully',success:true });
   }catch(err: any) {
      handleDbError(res,err,`project-ideas/`)
