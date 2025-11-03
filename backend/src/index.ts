@@ -24,12 +24,6 @@ console.log("server is staring")
 app.use(cors())
 app.use(express.json())
 app.use("/database",router)
-app.use((req: Request,res:Response)=>{
-  res.status(404).json({message:"end point not found"})
-})
-app.get('/', (req:Request, res:Response) => {
-  res.send('Hello from backend!');
-});
 app.get("/auth/redirect", (req, res) => {
   const token = req.query.token;
 
@@ -44,6 +38,13 @@ app.get("/auth/redirect", (req, res) => {
     </html>
   `);
 });
+app.use((req: Request,res:Response)=>{
+  res.status(404).json({message:"end point not found"})
+})
+app.get('/', (req:Request, res:Response) => {
+  res.send('Hello from backend!');
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
