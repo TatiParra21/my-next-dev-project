@@ -30,7 +30,20 @@ app.use((req: Request,res:Response)=>{
 app.get('/', (req:Request, res:Response) => {
   res.send('Hello from backend!');
 });
+app.get("/auth/redirect", (req, res) => {
+  const token = req.query.token;
 
+  res.send(`
+    <html>
+      <body>
+        <script>
+          // Redirect back to your Electron app using a custom scheme
+          window.location.href = "myapp://auth?token=${token}";
+        </script>
+      </body>
+    </html>
+  `);
+});
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

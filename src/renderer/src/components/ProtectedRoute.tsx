@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+
 import { Navigate } from "react-router-dom";
-import { firebaseStore, selectUser,  selectFirebaseLoading, selectUserId, selectSetLoading, projectDataStore } from "@renderer/store/projectStore";
+import { firebaseStore, selectUser, selectUserId } from "@renderer/store/projectStore";
 
 type ProtectedRouteProps = {
   children: React.ReactNode;

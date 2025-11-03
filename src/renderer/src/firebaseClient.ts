@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app"
-import { getAuth, GoogleAuthProvider } from "firebase/auth"
+import { getAuth, GoogleAuthProvider,browserLocalPersistence , setPersistence, } from "firebase/auth"
 
 // Replace with your config from Firebase Console
  const firebaseConfig = {
@@ -14,3 +14,5 @@ export const googleProvider = new GoogleAuthProvider()
 googleProvider.setCustomParameters({
   prompt: "select_account",
 });
+
+setPersistence(auth, browserLocalPersistence);

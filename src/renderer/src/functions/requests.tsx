@@ -4,6 +4,7 @@ import { ResultFromBackendType} from "@renderer/components/FormComponents/Projec
 import { CategoriesTypeObjArr } from "@renderer/types"
 import { firebaseStore } from "@renderer/store/projectStore"
 import {type User } from "firebase/auth"
+
 type UserTokenObjType = {
     user: User,
     token:string
@@ -88,7 +89,7 @@ export const deleteRequest =async(id:string):Promise<void |null>=>{
         console.log(id, "id")
         const auth = await getFirebaseAuthToken()
         if (!auth) return null;
-        const res = await fetch(`https://my-next-dev-project.onrender.com/database/project-ideas/${id}}`,
+        const res = await fetch(`https://my-next-dev-project.onrender.com/database/project-ideas/${id}`,
             {method: "DELETE",
                 headers:{
                 "Authorization": `Bearer ${auth.token}`

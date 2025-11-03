@@ -5,7 +5,6 @@ import type { AllCategoriesType } from "@renderer/info"
 import { MultiValue } from "react-select"
 import { OptionComponents } from "../../subComponents/OptionsComponents"
 import { projectDataStore,
-    firebaseStore,
     formStore, 
     selectIsNotActive, 
     selectResultFromBackend, 

@@ -1,14 +1,13 @@
 
-import type { OptionOf, ProjectType } from "@renderer/types"
-import { useLocation } from "react-router-dom"
+import type { OptionOf } from "@renderer/types"
+
 import type { AllCategoriesType } from "@renderer/info"
 import { MultiValue } from "react-select"
 import type {  CategoriesTypeObjArr } from "@renderer/types"
 import { OptionComponents } from "../../subComponents/OptionsComponents"
 import { FormEvent, JSX } from "react"
-import { projectDataStore,firebaseStore, selectIsNotActive, selectResultFromBackend, selectSelectedOptions, selectSetIsNotActive, selectSetResultFromBackend, selectSetSelectedOptions, selectUserId } from "@renderer/store/projectStore"
+import { projectDataStore,selectIsNotActive, selectResultFromBackend, selectSetIsNotActive, selectSetResultFromBackend } from "@renderer/store/projectStore"
 import { formStore } from "@renderer/store/projectStore"
-import type { FormStoreType } from "@renderer/store/projectStore"
 import { useState } from "react"
 import { FormElement } from "./FormElement"
 import { ResultFromBackendType } from "./ProjectForm"
@@ -20,31 +19,23 @@ type ProjectFilterSubmitType ={
 export const FilterTab=():JSX.Element=>{
     const projects = projectDataStore(state=>state.projects)
     const [showFilter, setShowFilter] = useState<boolean>(false)
-   
     const showFilterTab =()=>{
         setShowFilter(prev=>!prev)
     }
     if(!projects){
         return <div>...Loading</div>
     }
-
 const [selectedFilters, setSelectedFilters] = useState<CategoriesTypeObjArr>({})
-    const location= useLocation()
- 
     const resultFromBackend = formStore(selectResultFromBackend)
     const isNotActive = formStore(selectIsNotActive)
     const setIsNotActive = formStore(selectSetIsNotActive)
     const setResultFromBackend = formStore(selectSetResultFromBackend)
-    const userId = firebaseStore(selectUserId)
-
-
     const changeActive =():void=>{
         setIsNotActive(false)
         setResultFromBackend({...resultFromBackend, success:false})
     } 
     const handleCategoryChoices =(category:string,values:MultiValue<OptionOf<AllCategoriesType>>):void=>{
-        if(isNotActive) setIsNotActive(false)
-           
+        if(isNotActive) setIsNotActive(false)     
         const categoryVal :string = category.toLowerCase()
         setSelectedFilters({...selectedFilters, [categoryVal]:values})  
     }
@@ -56,15 +47,11 @@ const [selectedFilters, setSelectedFilters] = useState<CategoriesTypeObjArr>({})
         console.log(isCompleted, "fooor", selectedFilters)
          const filtersChosen :ProjectFilterSubmitType ={                    
                         categories: selectedFilters,
-                        completed:isCompleted,
-                        
+                        completed:isCompleted,         
                     }
          const resultFromBackend :ResultFromBackendType |[] = await fetchFilteredRequest( filtersChosen)
          console.log(resultFromBackend, "result from filter")
-
-    }
-       
-        
+    }       
     return(
         <form onSubmit={filterProjects} className="">
           <button onClick={showFilterTab}>Filter</button>
@@ -76,8 +63,6 @@ const [selectedFilters, setSelectedFilters] = useState<CategoriesTypeObjArr>({})
           <button disabled={isNotActive} className="submit-btn" type="submit">Search</button>
           
            </>}
-           
-
         </form>
     )
 }

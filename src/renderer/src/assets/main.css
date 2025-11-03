@@ -1,5 +1,7 @@
+/* stylelint-disable at-rule-no-unknown */
 @import './base.css';
-
+@import "tailwindcss";
+/* stylelint-enable at-rule-no-unknown */
 body {
   display: flex;
   justify-content: center;

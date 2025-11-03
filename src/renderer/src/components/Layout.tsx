@@ -53,6 +53,8 @@ if(error && !loading){
     <header>
      <UserMenu email={email}/>
         <RouteShown route={currentRoute2}/> 
+        <h1 className="text-3xl font-bold text-blue-500">Tailwind works!</h1>
+
         <NavBar/>
     </header>
     <section className="full-form flex  colum">
