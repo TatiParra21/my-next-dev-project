@@ -3,6 +3,16 @@ import { electronAPI } from "@electron-toolkit/preload";
 contextBridge.exposeInMainWorld("authAPI", {
   oauthGoogle: () => ipcRenderer.invoke("login-with-google"),
 })
+contextBridge.exposeInMainWorld("electron", {
+  ipcRenderer: {
+    on: (channel, func) => {
+      const validChannels = ["auth-token-url"];
+      if (validChannels.includes(channel)) {
+        ipcRenderer.on(channel, (_, ...args) => func(...args));
+      }
+    },
+  },
+});
 // ✅ Expose only what’s safe for the renderer
 contextBridge.exposeInMainWorld("electronAPI", {
   // Send URL to main process to open Google login window

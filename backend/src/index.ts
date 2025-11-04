@@ -3,7 +3,8 @@
 import dotenv from 'dotenv';
 import path from 'path'
 import { Request, Response } from 'express';
-
+import { getAuth } from "firebase-admin/auth";
+import admin from "firebase-admin";
 // Point to the correct location of .env manually
 dotenv.config({ path: path.resolve(__dirname, '../.env') }) // ✅
 import { router } from './project_ideas_db';
@@ -24,6 +25,24 @@ console.log("server is staring")
 app.use(cors())
 app.use(express.json())
 app.use("/database",router)
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.applicationDefault(),
+  });
+}
+
+app.get("/start-auth", async (req: Request, res: Response) => {
+  try {
+    // Generate a Firebase custom token or session redirect
+    // For example, redirect to Google login page:
+    const redirectUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=https://my-next-dev-project.onrender.com/auth/redirect&response_type=token&scope=email%20profile`;
+
+    res.redirect(redirectUrl);
+  } catch (error) {
+    console.error("🔥 Error starting auth:", error);
+    res.status(500).send("Error starting authentication");
+  }
+});
 app.get("/auth/redirect", (req, res) => {
   const token = req.query.token;
 
@@ -32,7 +51,7 @@ app.get("/auth/redirect", (req, res) => {
       <body>
         <script>
           // Redirect back to your Electron app using a custom scheme
-          window.location.href = "myapp://auth?token=${token}";
+          window.location.href = "mynextdevproject://auth?token=${token}";
         </script>
       </body>
     </html>

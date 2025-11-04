@@ -8,6 +8,8 @@ import { ProtectedRoute } from './components/ProtectedRoute'
 import { LoggedInRoute } from './components/LoggedInRoute'
 import { firebaseStore, selectInitAuth, } from './store/projectStore'
 import { LoadingRoller } from './components/LoadingRoller'
+import { DeepLinkListener } from "./components/DeepLinkListener";
+
 const AddNewProject = React.lazy(()=>import('./components/AddNewProject'))
 const Layout = React.lazy(()=>import('./components/Layout'))
 const ProjectSelectionBase = React.lazy(()=>import('./components/ProjectSelectionBase'))
@@ -34,6 +36,7 @@ function App(): React.JSX.Element {
  },[])
   return (
     <>
+     <DeepLinkListener />
     <Suspense fallback={<LoadingRoller/>}>
       <RouterProvider router={router}/>
     </Suspense>     

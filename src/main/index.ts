@@ -1,97 +1,78 @@
-import { app, BrowserWindow, shell } from "electron";
-import { join } from "path";
-import express from "express";
+// ================================================
+// 🔹 Imports
+// ================================================
+import { app, BrowserWindow, shell, dialog } from "electron";
+import path, { join } from "path";
 import { fileURLToPath } from "url";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import icon from "../../resources/icon.png?asset";
-import http from "http";
-import path from "path";
-import { execSync } from "child_process";
+import log from "electron-log";
+import { autoUpdater } from "electron-updater";
 
-const __dirname = join(fileURLToPath(import.meta.url), "..");
+
+// ================================================
+// 🔹 Globals
+// ================================================
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 let mainWindow: BrowserWindow | null = null;
-let httpServer: http.Server | null = null;
-//mynextdevproject://auth
 
+
+// ================================================
+// 🔹 Custom Protocol Registration
+// ================================================
+// This allows links like mynextdevproject://auth?token=XYZ to open your app
 if (process.defaultApp) {
-  /*process.defaultApp tells you if you’re running Electron directly from the command line 
-  (like when you run electron . during development) instead of as a packaged .exe or .app.
-true means you are runninng the app in development, false means you are running a built app */
+  // Development mode (running via `electron .`)
   if (process.argv.length >= 2) {
-    app.setAsDefaultProtocolClient('mynextdevproject', process.execPath, [path.resolve(process.argv[1])])
+    app.setAsDefaultProtocolClient("mynextdevproject", process.execPath, [
+      path.resolve(process.argv[1]),
+    ]);
   }
 } else {
-  app.setAsDefaultProtocolClient('mynextdevproject')
+  // Production (installed app)
+  app.setAsDefaultProtocolClient("mynextdevproject");
 }
 
 
-// ✅ Prevent multiple instances
+// ================================================
+// 🔹 Prevent Multiple App Instances
+// ================================================
 const gotTheLock = app.requestSingleInstanceLock();
+
 if (!gotTheLock) {
   app.quit();
-  process.exit(0);
 } else {
-  app.on("second-instance", () => {
+  app.on("second-instance", (_event, commandLine) => {
     if (mainWindow) {
       if (mainWindow.isMinimized()) mainWindow.restore();
       mainWindow.focus();
     }
+
+    // Optional: show info when user reopens via deep link
+    const deepLink = commandLine.pop();
+    if (deepLink?.startsWith("mynextdevproject://")) {
+      dialog.showErrorBox("Welcome Back", `You arrived from: ${deepLink}`);
+    }
   });
 }
 
-// 🟢 Start local Express server
-async function startServer(): Promise<number> {
-  const expressApp = express();
- const port = is.dev ? 5123 : 5173; // fixed port for Google OAuth
 
-  // 💥 Try to free the port before starting
-  try {
-    const output = execSync(`netstat -ano | findstr :${port}`).toString();
-    const match = output.match(/LISTENING\s+(\d+)/);
-    if (match && match[1]) {
-      const pid = match[1];
-      console.log(`🧹 Port ${port} in use by PID ${pid}, killing it...`);
-      execSync(`taskkill /PID ${pid} /F`);
-      console.log("✅ Old process killed.");
-    }
-  } catch {
-    // no process found — safe to continue
-  }
-
-  // Serve renderer files (your React build)
-  expressApp.use(express.static(join(__dirname, "../renderer")));
-
-  // React Router fallback
-  expressApp.get("*", (_, res) => {
-    res.sendFile(join(__dirname, "../renderer/index.html"));
-  });
-
-  // Start the server
-  httpServer = expressApp.listen(port, () => {
-    console.log(`✅ Local server running at http://localhost:${port}`);
-  });
-
-  return port;
-}
-
-// 🧹 Close Express server when quitting
-app.on("before-quit", () => {
-  if (httpServer) {
-    console.log("🧹 Closing local server...");
-    try {
-      httpServer.close(() => {
-        console.log("✅ Local server closed.");
-      });
-    } catch (err) {
-      console.error("❌ Failed to close local server:", err);
-    }
+// ================================================
+// 🔹 Handle Deep Link Activation (macOS)
+// ================================================
+app.on("open-url", (event, url) => {
+  event.preventDefault();
+  console.log("🪄 Deep link triggered:", url);
+  if (mainWindow) {
+    mainWindow.webContents.send("auth-token-url", url);
   }
 });
 
-// 🪟 Create Electron window
-async function createWindow() {
-  const port = await startServer(); // Wait for server before loading UI
 
+// ================================================
+// 🔹 Create Main Browser Window
+// ================================================
+async function createWindow() {
   mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
@@ -100,7 +81,7 @@ async function createWindow() {
     ...(process.platform === "linux" ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, "../preload/index.mjs"),
-      sandbox: false, // Needed for Firebase/Google popups
+      sandbox: false,
       contextIsolation: true,
       nodeIntegration: false,
     },
@@ -123,36 +104,36 @@ async function createWindow() {
   mainWindow.on("ready-to-show", () => mainWindow?.show());
 
   if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
-    // Development build
+    // 🧩 Development mode (Vite server)
     mainWindow.loadURL(process.env["ELECTRON_RENDERER_URL"]);
     mainWindow.webContents.openDevTools({ mode: "detach" });
   } else {
-    // ✅ Production build — served from local Express
-    mainWindow.loadURL(`http://localhost:${port}`);
+    // 🧩 Production build (static files)
+    mainWindow.loadFile(join(__dirname, "../renderer/index.html"));
   }
 
   return mainWindow;
 }
 
-// 🧩 Auto-updater + logs
-import pkg from "electron-updater";
-const { autoUpdater } = pkg;
-import log from "electron-log";
-autoUpdater.logger = log;
-log.transports.file.level = "info";
 
-// 🗂 Set custom user data path
-app.setPath("userData", path.join(app.getPath("appData"), "MyNextDevProject"));
-
-// 🚀 Main startup
+// ================================================
+// 🔹 App Lifecycle Events
+// ================================================
 app.whenReady().then(() => {
-  electronApp.setAppUserModelId("com.electron");
+  electronApp.setAppUserModelId("com.mynextdevproject");
   app.on("browser-window-created", (_, w) => optimizer.watchWindowShortcuts(w));
   createWindow();
   autoUpdater.checkForUpdatesAndNotify();
 });
 
-// 🧱 Quit when all windows are closed
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
 });
+
+
+// ================================================
+// 🔹 Auto-Updater Configuration
+// ================================================
+autoUpdater.logger = log;
+log.transports.file.level = "info";
+app.setPath("userData", path.join(app.getPath("appData"), "MyNextDevProject"));

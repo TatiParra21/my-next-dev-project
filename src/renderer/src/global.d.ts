@@ -9,6 +9,10 @@ declare global {
         openExternal:(url:string)=>void
        
      
-    }
+    }, electron: {
+      ipcRenderer: {
+        on: (channel: string, func: (...args: any[]) => void) => void;
+      };
   }
+}
 }
