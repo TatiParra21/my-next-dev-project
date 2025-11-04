@@ -9,8 +9,7 @@ import { LoggedInRoute } from './components/LoggedInRoute'
 import { firebaseStore, selectInitAuth, } from './store/projectStore'
 import { LoadingRoller } from './components/LoadingRoller'
 import { DeepLinkListener } from "./components/DeepLinkListener";
-import { signInWithCustomToken } from 'firebase/auth'
-import { auth } from './firebaseClient'
+
 const AddNewProject = React.lazy(()=>import('./components/AddNewProject'))
 const Layout = React.lazy(()=>import('./components/Layout'))
 const ProjectSelectionBase = React.lazy(()=>import('./components/ProjectSelectionBase'))
@@ -32,12 +31,7 @@ const router =createBrowserRouter([
 ])
 function App(): React.JSX.Element {
  const initAuth = firebaseStore(selectInitAuth)
- useEffect(() => {
-  window.electron.ipcRenderer.on("auth-token-url", async (url) => {
-    const token = new URL(url).searchParams.get("token");
-    if (token) await signInWithCustomToken(auth, token);
-  });
-}, []);
+ 
  useEffect(()=>{
   initAuth()
  },[])

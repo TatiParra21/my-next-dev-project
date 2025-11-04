@@ -17,7 +17,7 @@ import log from "electron-log";
 // ================================================
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 let mainWindow: BrowserWindow | null = null;
-
+let deeplinkUrl: string | null = null;
 
 // ================================================
 // 🔹 Custom Protocol Registration
@@ -69,7 +69,17 @@ app.on("open-url", (event, url) => {
     mainWindow.webContents.send("auth-token-url", url);
   }
 });
+app.on("ready", () => {
+  // Check if launched with a deep link argument
+  const deepLinkArg = process.argv.find((arg) =>
+    arg.startsWith("mynextdevproject://")
+  );
 
+  if (deepLinkArg) {
+    deeplinkUrl = deepLinkArg;
+    console.log("🪄 App launched with deep link:", deeplinkUrl);
+  }
+});
 
 // ================================================
 // 🔹 Create Main Browser Window
@@ -113,7 +123,12 @@ async function createWindow() {
     // 🧩 Production build (static files)
     mainWindow.loadFile(join(__dirname, "../renderer/index.html"));
   }
-
+if (deeplinkUrl) {
+  mainWindow.webContents.once("did-finish-load", () => {
+    console.log("📨 Sending deep link to renderer:", deeplinkUrl);
+    mainWindow?.webContents.send("auth-token-url", deeplinkUrl);
+  });
+}
   return mainWindow;
 }
 

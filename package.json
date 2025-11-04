@@ -96,6 +96,13 @@
         "owner": "TatiParra21",
         "repo": "my-next-dev-project"
       }
-    ]
+    ], "appId": "com.mynextdevproject",
+  "protocols": [
+    {
+      "name": "MyNextDevProject",
+      "schemes": ["mynextdevproject"]
+    }
+  ],
+  "nsis": { "oneClick": false }
   }
 }

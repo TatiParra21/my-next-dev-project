@@ -32,19 +32,60 @@ if (!admin.apps.length) {
 }
 
 
-app.get("/auth/redirect", (req, res) => {
-  const token = req.query.token;
 
-  res.send(`
-    <html>
-      <body>
-        <script>
-          // Redirect back to your Electron app using a custom scheme
-          window.location.href = "mynextdevproject://auth?token=${token}";
-        </script>
-      </body>
-    </html>
-  `);
+// 1) Browser sign-in page (runs Firebase in the browser)
+app.get("/start-auth", (_req, res) => {
+  res.type("html").send(`<!doctype html>
+<html>
+<head><meta charset="utf-8"/></head>
+<body>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+  import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult } 
+    from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+
+  // 🔒 Use the SAME config as your app (safe to embed apiKey etc.)
+  const firebaseConfig = {
+    apiKey: "${process.env.VITE_FIREBASE_API_KEY}",
+    authDomain: "${process.env.VITE_FIREBASE_AUTH_DOMAIN}",
+    projectId: "${process.env.VITE_FIREBASE_PROJECT_ID}",
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  // After returning from Google, Firebase puts the result here:
+  getRedirectResult(auth).then(async (result) => {
+    if (result && result.user) {
+      const idToken = await result.user.getIdToken();
+      // 🔁 Bounce to your deep link bridge page
+      window.location.href = "/auth/redirect?token=" + encodeURIComponent(idToken);
+    } else {
+      // First visit (no result yet) → start Google redirect flow
+      signInWithRedirect(auth, provider);
+    }
+  }).catch((err) => {
+    document.body.innerText = "Auth error: " + (err?.code || err?.message || err);
+  });
+</script>
+</body>
+</html>`);
+});
+
+// 2) Deep link bridge page: converts token → mynextdevproject://…
+app.get("/auth/redirect", (req, res) => {
+  const token = req.query.token || "";
+  res.type("html").send(`<!doctype html>
+<html>
+<body>
+<script>
+  const token = ${JSON.stringify(String(token))};
+  if (!token) document.body.innerText = "Missing token";
+  else window.location.href = "mynextdevproject://auth?token=" + encodeURIComponent(token);
+</script>
+</body>
+</html>`);
 });
 app.use((req: Request,res:Response)=>{
   res.status(404).json({message:"end point not found"})

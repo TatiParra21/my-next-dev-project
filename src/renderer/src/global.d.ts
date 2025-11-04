@@ -1,18 +1,18 @@
-export {}
+export {};
 
 declare global {
   interface Window {
-    electronAPI: {
-      openGoogleLogin: (url: string) => void
-       onCheckSession: (callback: () => void) => void
-        onDeepLink: (callback: (url: string) => void) => void
-        openExternal:(url:string)=>void
-       
-     
-    }, electron: {
+    electron: {
+      openExternal: (url: string) => void;
       ipcRenderer: {
         on: (channel: string, func: (...args: any[]) => void) => void;
+        send: (channel: string, data?: any) => void;
       };
+    };
+
+    authAPI: {
+      oauthGoogle: () => Promise<{ success: boolean; url?: string; message?: string }>;
+    };
   }
 }
-}
+

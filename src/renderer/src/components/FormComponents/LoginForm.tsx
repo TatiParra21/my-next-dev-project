@@ -23,19 +23,22 @@ export const LoginForm =()=>{
   console.log("Current origin is:", window.location.origin); 
   const signInWithGoogle = async () => {
      try {
-    console.log("🟢 Signing in with Google...");
-    const result = await signInWithPopup(auth, googleProvider);
+    const redirectUrl = "https://my-next-dev-project.onrender.com/start-auth";
+  // use your exposed helper or fallback:
+  (window as any).electron?.openExternal?.(redirectUrl) ?? window.open(redirectUrl, "_blank");
 
-    // ✅ Get Firebase ID token for this user
-    const idToken = await result.user.getIdToken();
-
-    // ✅ Open your backend route, passing the token
-    const redirectUrl = `https://my-next-dev-project.onrender.com/auth/redirect?token=${encodeURIComponent(idToken)}`;
-    window.open(redirectUrl, "_blank");
-
-  } catch (err) {
+  } catch (err: any) {
     console.error("❌ Google Sign-In Error:", err);
-    setAuthError("Failed to sign in with Google. Please try again.");
+
+    // 👇 Make sure we show the exact error message
+    const message =
+      err.code || err.message
+        ? `${err.code || ""}: ${err.message || ""}`
+        : "Unknown error";
+
+    // Save to screen and also make a visible alert
+    setAuthError(`Failed to sign in: ${message}`);
+    alert(`Google sign-in failed:\n${message},"Current origin: " + ${window.location.origin}`);
   }
   };
     const handleLogin=async(e: React.FormEvent<HTMLFormElement>)=>{
