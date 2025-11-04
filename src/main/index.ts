@@ -129,10 +129,21 @@ if (deeplinkUrl) {
     mainWindow?.webContents.send("auth-token-url", deeplinkUrl);
   });
 }
+mainWindow.webContents.once("did-finish-load", () => {
+  if (deeplinkUrl) {
+    console.log("📨 Sending deep link to renderer:", deeplinkUrl);
+    mainWindow?.webContents.send("auth-token-url", deeplinkUrl);
+    deeplinkUrl = null; // clear it after sending
+  }
+});
   return mainWindow;
 }
 
-
+const possibleLink = process.argv.find(arg => arg.startsWith("mynextdevproject://"));
+if (possibleLink) {
+  deeplinkUrl = possibleLink;
+  console.log("🚀 App launched with deep link:", deeplinkUrl);
+}
 // ================================================
 // 🔹 App Lifecycle Events
 // ================================================

@@ -1,9 +1,9 @@
 
 import React from "react"
 import { useLocation, NavLink } from "react-router-dom"
-import { auth, googleProvider  } from "@renderer/firebaseClient";
+import { auth,  } from "@renderer/firebaseClient";
 import {
-  signInWithPopup,
+
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
