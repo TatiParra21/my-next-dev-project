@@ -6,9 +6,9 @@ import { SubLayout } from './components/SubLayout'
 import { LoginForm } from './components/FormComponents/LoginForm'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { LoggedInRoute } from './components/LoggedInRoute'
-import { firebaseStore, selectInitAuth, } from './store/projectStore'
+import { googleAuthStore,selectInitAuth, selectUser, selectAuthLoading, selectUserEmail } from './store/projectStore'
 import { LoadingRoller } from './components/LoadingRoller'
-import { DeepLinkListener } from "./components/DeepLinkListener";
+
 
 const AddNewProject = React.lazy(()=>import('./components/AddNewProject'))
 const Layout = React.lazy(()=>import('./components/Layout'))
@@ -30,14 +30,14 @@ const router =createBrowserRouter([
   }
 ])
 function App(): React.JSX.Element {
- const initAuth = firebaseStore(selectInitAuth)
+ const initAuth = googleAuthStore(selectInitAuth)
  
  useEffect(()=>{
   initAuth()
  },[])
   return (
     <>
-     <DeepLinkListener />
+    
     <Suspense fallback={<LoadingRoller/>}>
       <RouterProvider router={router}/>
     </Suspense>     

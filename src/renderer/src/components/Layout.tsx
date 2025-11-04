@@ -3,7 +3,7 @@ import { Outlet, useLocation } from "react-router-dom"
 import { useEffect, JSX } from "react"
 import { RouteShown } from "./RouteShown"
 import type { CategoriesTypeObjArr, ProjectType } from "@renderer/types"
-import {firebaseStore,selectUser, projectDataStore, selectLoading, selectSetLoading, selectSetError, selectError, selectProjects, selectUserEmail} from "@renderer/store/projectStore"
+import {googleAuthStore,selectUser, projectDataStore, selectLoading, selectSetLoading, selectSetError, selectError, selectProjects, selectUserEmail} from "@renderer/store/projectStore"
 import { handleError } from "@renderer/functions/handleError"
 import { UserMenu } from "@renderer/subComponents/UserMenu"
 
@@ -17,9 +17,9 @@ export const otherDefault:CategoriesTypeObjArr ={
         setProjects:  React.Dispatch<React.SetStateAction<boolean>>;
     }
 const Layout =(): JSX.Element=>{
-    const user = firebaseStore(selectUser)
-    const userId = user?.uid || null;
-    const email = firebaseStore(selectUserEmail)
+    const user = googleAuthStore(selectUser)
+    const userId = user || null;
+    const email = googleAuthStore(selectUserEmail)
     const userProjects:ProjectType[] | [] = projectDataStore(selectProjects)
     const loading = projectDataStore(selectLoading)
     const setLoading = projectDataStore(selectSetLoading)

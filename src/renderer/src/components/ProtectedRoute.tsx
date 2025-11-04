@@ -1,15 +1,15 @@
 
 import { Navigate } from "react-router-dom";
-import { firebaseStore, selectUser, selectUserId } from "@renderer/store/projectStore";
+import { googleAuthStore, selectUser,  } from "@renderer/store/projectStore";
 
 type ProtectedRouteProps = {
   children: React.ReactNode;
 };
 export const ProtectedRoute =({children}:ProtectedRouteProps)=>{
-    const user = firebaseStore(selectUser)
-    const userId = firebaseStore(selectUserId)
+    const user = googleAuthStore(selectUser)
+   
   
-    if (!user || !userId) {
+    if (!user) {
     // Not logged in → redirect to login
     return <Navigate to="/" replace />;
   }

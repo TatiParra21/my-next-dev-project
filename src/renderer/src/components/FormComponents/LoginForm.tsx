@@ -1,12 +1,8 @@
 
 import React from "react"
 import { useLocation, NavLink } from "react-router-dom"
-import { auth,  } from "@renderer/firebaseClient";
-import {
 
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+
 import { useState } from "react";
 declare global {
   interface Window {
@@ -23,9 +19,8 @@ export const LoginForm =()=>{
   console.log("Current origin is:", window.location.origin); 
   const signInWithGoogle = async () => {
      try {
-    const redirectUrl = "https://my-next-dev-project.onrender.com/start-auth";
-  // use your exposed helper or fallback:
-  (window as any).electron?.openExternal?.(redirectUrl) ?? window.open(redirectUrl, "_blank");
+     const redirectUrl = "https://my-next-dev-project.onrender.com/auth/google";
+    (window as any).electron?.openExternal?.(redirectUrl) ?? window.open(redirectUrl, "_blank");
 
   } catch (err: any) {
     console.error("❌ Google Sign-In Error:", err);
@@ -42,41 +37,17 @@ export const LoginForm =()=>{
   }
   };
     const handleLogin=async(e: React.FormEvent<HTMLFormElement>)=>{
-     
+     /*
         e.preventDefault()
         const form = e.currentTarget
         const formData = new FormData(form)
         const email = formData.get("email") as string
          const password = formData.get("password") as string
-         try {
-      if (params === "/sign-in") {
-        console.log("🔐 Signing in with email...");
-        await signInWithEmailAndPassword(auth, email, password);
-      } else {
-        console.log("🆕 Signing up new user...");
-        await createUserWithEmailAndPassword(auth, email, password);
-      }
-      // Zustand’s initAuth() will update automatically on success
-    } catch (err: any) {
-      let errorMessage = err.message;
-      switch (err.code) {
-    case "auth/user-not-found":
-      errorMessage = "No account found with this email. Try signing up instead.";
-      break;
-    case "auth/wrong-password":
-      errorMessage = "Incorrect password. Please try again.";
-      break;
-    case "auth/email-already-in-use":
-      errorMessage = "This email is already registered. Please sign in.";
-      break;
-    case "auth/invalid-credential":
-      errorMessage =
-        "This account uses Google sign-in. Please sign in with Google instead.";
-      break;
-  }
-      setAuthError(errorMessage);
-      console.error("❌ Auth error:", err.code, err.message);
-    }
+         */
+      //setAuthError(errorMessage);
+      //console.error("❌ Auth error:", err.code, err.message);
+        e.preventDefault();
+  alert("Email/password login is no longer supported. Please use Google Sign-In instead.");  
 
 }
     return(

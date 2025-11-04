@@ -1,11 +1,11 @@
 import { Navigate } from "react-router-dom";
-import { firebaseStore, selectUser, selectUserId} from "@renderer/store/projectStore";
+import { googleAuthStore, selectUser,} from "@renderer/store/projectStore";
 export const LoggedInRoute =({ children }: { children: React.ReactNode })=>{
-      const user = firebaseStore(selectUser)
-      const userId = firebaseStore(selectUserId)
+      const user = googleAuthStore(selectUser)
+      
   // Redirect if user is already logged in
   console.log("helelo", user)
-  if (user && userId ) {   
+  if (user ) {   
     console.log(user, "there waas user") 
     return <Navigate to="/dashboard" replace />;
   }

@@ -1,9 +1,9 @@
 import {create} from "zustand"
 import type { CategoriesTypeObjArr,ProjectType } from "@renderer/types"
 import type { ResultFromBackendType } from "@renderer/components/FormComponents/ProjectForm"
-import { onAuthStateChanged, signOut, User } from "firebase/auth";
+
 import { fetchRequest } from "@renderer/functions/requests";
-import { auth } from "@renderer/firebaseClient";
+
 export type ProjectDataStoreType ={
     projects: ProjectType[] | [],
     setProjects: (projects:ProjectType[] |[])=>void,
@@ -68,73 +68,108 @@ export const selectSetResultFromBackend =(state:FormStoreType)=>state.setResultF
 export const selectIsNotActive= (state:FormStoreType)=>state.isNotActive
 export const selectSetIsNotActive= (state:FormStoreType)=>state.setIsNotActive
 
+import axios from "axios";
 
-type FirebaseStoreType = {
-  user: User | null;
-  userId: string | null;
-  userEmail: string;
-  loading: boolean;
-  authError: string | null;
-  initAuth: () => void;
-  logout: () => Promise<void>;
+type GoogleUser = {
+  id?: string;
+  email?: string;
+  name?: string;
+  picture?: string;
 };
 
-export const firebaseStore = create<FirebaseStoreType>((set) => ({
+type GoogleAuthStoreType = {
+  user: GoogleUser | null;
+  token: string | null;
+  loading: boolean;
+  authError: string | null;
+  login: () => void;
+  handleRedirect: (url: string) => Promise<void>;
+  initAuth: () => Promise<void>; // ✅ added
+  logout: () => void;
+};
+
+export const googleAuthStore = create<GoogleAuthStoreType>((set) => ({
   user: null,
-  userId: null,
-  userEmail: "",
-  loading: true,
+  token: null,
+  loading: true, // start as loading until we check localStorage
   authError: null,
 
-  // 👇 Replaces supabase.auth.onAuthStateChange()
-  initAuth: () => {
-    onAuthStateChanged(auth, async(user) => {
-        console.log("change")
-      if (user) {
-        set({
-          user,
-          userId: user.uid,
-          userEmail: user.email || "",
-          loading: false,
-        });
-        try{
-          projectDataStore.setState({loading: true})
-          console.log("loading projects")
-           const projects:ProjectType[] | null = await fetchRequest()
-         projectDataStore.setState({projects:projects})
-
-        }catch(err){}finally{
-          projectDataStore.setState({loading: false})
-        }
-        
-      } else {
-        set({
-          user: null,
-          userId: null,
-          userEmail: "",
-          loading: false,
-        });
-        projectDataStore.setState({projects:[]})
-      }
-    });
+  // 🔹 Opens browser for Google sign-in (via backend)
+  login: () => {
+    window.electron.openExternal(
+      "https://my-next-dev-project.onrender.com/auth/google"
+    );
   },
 
-  // 👇 Replaces supabase.auth.signOut()
-  logout: async () => {
+  // 🔹 Handles redirect from Google → deep link
+  handleRedirect: async (url: string) => {
+    const token = new URL(url).searchParams.get("token");
+    if (!token) {
+      set({ authError: "No token found in redirect URL." });
+      return;
+    }
+
     try {
-      await signOut(auth);
-      set({ user: null, userId: null, userEmail: "" });
+      const { data } = await axios.post(
+        "https://my-next-dev-project.onrender.com/verify-token",
+        { token }
+      );
+
+      set({
+        token,
+        user: data.user,
+        authError: null,
+      });
+
+      localStorage.setItem("google_token", token);
     } catch (err: any) {
+      console.error("Redirect handling error:", err);
       set({ authError: err.message });
     }
   },
+
+  // 🔹 Runs once on app start — restores saved token if present
+  initAuth: async () => {
+    const savedToken = localStorage.getItem("google_token");
+    if (!savedToken) {
+      set({ loading: false });
+      return;
+    }
+
+    try {
+      const { data } = await axios.post(
+        "https://my-next-dev-project.onrender.com/verify-token",
+        { token: savedToken }
+      );
+
+      set({
+        user: data.user,
+        token: savedToken,
+        loading: false,
+        authError: null,
+      });
+    } catch (err: any) {
+      console.error("Token verification failed:", err.message);
+      localStorage.removeItem("google_token");
+      set({
+        user: null,
+        token: null,
+        loading: false,
+        authError: "Session expired. Please log in again.",
+      });
+    }
+  },
+
+  // 🔹 Log out completely
+  logout: () => {
+    localStorage.removeItem("google_token");
+    set({ user: null, token: null });
+  },
 }));
 
-// --- Optional selectors (for cleaner imports)
-export const selectUser = (state: FirebaseStoreType) => state.user;
-export const selectUserId = (state: FirebaseStoreType) => state.userId;
-export const selectUserEmail = (state: FirebaseStoreType) => state.userEmail;
-export const selectFirebaseLoading = (state: FirebaseStoreType) => state.loading;
-export const selectInitAuth = (state: FirebaseStoreType) => state.initAuth;
-export const selectLogout = (state: FirebaseStoreType) => state.logout;
 
+export const selectUser = (state: GoogleAuthStoreType) => state.user;
+export const selectUserEmail = (state: GoogleAuthStoreType) => state.user?.email || "";
+export const selectAuthLoading = (state: GoogleAuthStoreType) => state.loading;
+export const selectLogout = (state: GoogleAuthStoreType) => state.logout;
+export const selectInitAuth = (state: GoogleAuthStoreType) => state.initAuth;
