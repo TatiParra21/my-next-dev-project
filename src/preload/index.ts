@@ -1,42 +1,32 @@
 import { contextBridge, ipcRenderer, shell } from "electron";
 import { electronAPI } from "@electron-toolkit/preload";
+
+// ✅ Expose Firebase Auth API
 contextBridge.exposeInMainWorld("authAPI", {
   oauthGoogle: () => ipcRenderer.invoke("login-with-google"),
-})
-contextBridge.exposeInMainWorld("electron", {
+});
+
+// ✅ Merge everything safely under ONE window.electron
+const mergedElectronAPI = {
+  ...electronAPI, // from @electron-toolkit/preload
   ipcRenderer: {
-    on: (channel, func) => {
-      const validChannels = ["auth-token-url"];
+    // ✅ Add your custom IPC listener(s)
+    on: (channel: string, func: (...args: any[]) => void) => {
+      const validChannels = ["auth-token-url", "check-session", "deep-link"];
       if (validChannels.includes(channel)) {
-        ipcRenderer.on(channel, (_, ...args) => func(...args));
+        ipcRenderer.on(channel, (_event, ...args) => func(...args));
       }
     },
+    send: (channel: string, data?: any) => ipcRenderer.send(channel, data),
   },
-});
-// ✅ Expose only what’s safe for the renderer
-contextBridge.exposeInMainWorld("electronAPI", {
-  // Send URL to main process to open Google login window
-  openGoogleLogin: (url: string) => ipcRenderer.send("open-google-login", url),
-
-  // React listens for session re-checks from main process
-  onCheckSession: (callback: () => void) => {
-    ipcRenderer.on("check-session", callback);
-  },
-
-  // Handle deep link events (optional)
-  onDeepLink: (callback: (url: string) => void) => {
-    ipcRenderer.on("deep-link", (_, url) => callback(url));
-  },
-
-  // Open external links in browser
   openExternal: (url: string) => shell.openExternal(url),
-});
+};
 
-// ✅ Expose base Electron API if context isolation is on
+// ✅ Expose everything in one go
 if (process.contextIsolated) {
   try {
-    contextBridge.exposeInMainWorld("electron", electronAPI);
+    contextBridge.exposeInMainWorld("electron", mergedElectronAPI);
   } catch (error) {
-    console.error("Error exposing electronAPI:", error);
+    console.error("Error exposing merged electronAPI:", error);
   }
 }

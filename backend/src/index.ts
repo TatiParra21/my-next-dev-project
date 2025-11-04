@@ -31,18 +31,7 @@ if (!admin.apps.length) {
   });
 }
 
-app.get("/start-auth", async (req: Request, res: Response) => {
-  try {
-    // Generate a Firebase custom token or session redirect
-    // For example, redirect to Google login page:
-    const redirectUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=https://my-next-dev-project.onrender.com/auth/redirect&response_type=token&scope=email%20profile`;
 
-    res.redirect(redirectUrl);
-  } catch (error) {
-    console.error("🔥 Error starting auth:", error);
-    res.status(500).send("Error starting authentication");
-  }
-});
 app.get("/auth/redirect", (req, res) => {
   const token = req.query.token;
 

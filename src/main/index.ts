@@ -1,13 +1,15 @@
 // ================================================
 // 🔹 Imports
 // ================================================
-import { app, BrowserWindow, shell, dialog } from "electron";
+import { app, BrowserWindow, shell } from "electron";
 import path, { join } from "path";
 import { fileURLToPath } from "url";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import icon from "../../resources/icon.png?asset";
+import pkg from "electron-updater";
+const { autoUpdater } = pkg;
+
 import log from "electron-log";
-import { autoUpdater } from "electron-updater";
 
 
 // ================================================
@@ -51,7 +53,7 @@ if (!gotTheLock) {
     // Optional: show info when user reopens via deep link
     const deepLink = commandLine.pop();
     if (deepLink?.startsWith("mynextdevproject://")) {
-      dialog.showErrorBox("Welcome Back", `You arrived from: ${deepLink}`);
+      mainWindow?.webContents.send("auth-token-url", deepLink);
     }
   });
 }

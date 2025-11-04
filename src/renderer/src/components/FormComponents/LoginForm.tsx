@@ -22,11 +22,21 @@ export const LoginForm =()=>{
   const [authError, setAuthError] = useState<string | null>(null);
   console.log("Current origin is:", window.location.origin); 
   const signInWithGoogle = async () => {
-    console.log("🟢 Opening system browser for Google sign-in...");
+     try {
+    console.log("🟢 Signing in with Google...");
+    const result = await signInWithPopup(auth, googleProvider);
 
-    // Open your hosted backend redirect route (Render)
-    const redirectUrl = "https://my-next-dev-project.onrender.com/start-auth";
-    window.open(redirectUrl, "_blank"); // open system browser
+    // ✅ Get Firebase ID token for this user
+    const idToken = await result.user.getIdToken();
+
+    // ✅ Open your backend route, passing the token
+    const redirectUrl = `https://my-next-dev-project.onrender.com/auth/redirect?token=${encodeURIComponent(idToken)}`;
+    window.open(redirectUrl, "_blank");
+
+  } catch (err) {
+    console.error("❌ Google Sign-In Error:", err);
+    setAuthError("Failed to sign in with Google. Please try again.");
+  }
   };
     const handleLogin=async(e: React.FormEvent<HTMLFormElement>)=>{
      
