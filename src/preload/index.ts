@@ -1,16 +1,12 @@
 import { contextBridge, ipcRenderer, shell } from "electron";
 import { electronAPI } from "@electron-toolkit/preload";
 
-// ✅ Expose Firebase Auth API
-contextBridge.exposeInMainWorld("authAPI", {
-  oauthGoogle: () => ipcRenderer.invoke("login-with-google"),
-});
-
-// ✅ Merge everything safely under ONE window.electron
+// ✅ Merge all safe APIs into one object and expose it once
 const mergedElectronAPI = {
-  ...electronAPI, // from @electron-toolkit/preload
+  ...electronAPI, // Built-in Electron toolkit features (already safe)
+
   ipcRenderer: {
-    // ✅ Add your custom IPC listener(s)
+    // ✅ Add limited custom IPC listeners
     on: (channel: string, func: (...args: any[]) => void) => {
       const validChannels = ["auth-token-url", "check-session", "deep-link"];
       if (validChannels.includes(channel)) {
@@ -19,14 +15,31 @@ const mergedElectronAPI = {
     },
     send: (channel: string, data?: any) => ipcRenderer.send(channel, data),
   },
+
+  // ✅ Allow frontend to open external URLs
   openExternal: (url: string) => shell.openExternal(url),
+
+  // ✅ Google OAuth custom API
+  googleLogin: () => ipcRenderer.invoke("google-oauth"),
+  startGoogleLogin: () =>
+    shell.openExternal("https://my-next-dev-project.onrender.com/auth/google"),
+   onAuthToken: (callback) => {
+    ipcRenderer.on("auth-token-url", (_, url) => callback(url));
+  },
+  onOAuthSuccess: (callback: (data: any) => void) =>
+    ipcRenderer.on("oauth-success", (_, data) => callback(data)),
+  onOAuthError: (callback: (msg: string) => void) =>
+    ipcRenderer.on("oauth-error", (_, msg) => callback(msg)),
 };
 
-// ✅ Expose everything in one go
+// ✅ Expose everything safely ONCE
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld("electron", mergedElectronAPI);
   } catch (error) {
-    console.error("Error exposing merged electronAPI:", error);
+    console.error("Error exposing electronAPI:", error);
   }
+} else {
+  // Fallback for disabled context isolation (rare)
+  (window as any).electron = mergedElectronAPI;
 }

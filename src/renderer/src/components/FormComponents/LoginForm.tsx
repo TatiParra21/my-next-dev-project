@@ -3,7 +3,7 @@ import React from "react"
 import { useLocation, NavLink } from "react-router-dom"
 
 
-import { useState } from "react";
+import { useState,useEffect } from "react";
 declare global {
   interface Window {
    authAPI: {
@@ -19,8 +19,7 @@ export const LoginForm =()=>{
   console.log("Current origin is:", window.location.origin); 
   const signInWithGoogle = async () => {
      try {
-     const redirectUrl = "https://my-next-dev-project.onrender.com/auth/google";
-    (window as any).electron?.openExternal?.(redirectUrl) ?? window.open(redirectUrl, "_blank");
+        window.electron.startGoogleLogin();
 
   } catch (err: any) {
     console.error("❌ Google Sign-In Error:", err);
@@ -36,6 +35,17 @@ export const LoginForm =()=>{
     alert(`Google sign-in failed:\n${message},"Current origin: " + ${window.location.origin}`);
   }
   };
+   useEffect(() => {
+    // Listen for deep link event from main process
+    window.electron.onAuthToken((url: string) => {
+      console.log("Received deep link:", url);
+      const tokenParam = new URL(url).searchParams.get("token");
+      if (tokenParam) {
+       
+        alert("✅ Logged in! Token received.");
+      }
+    });
+  }, []);
     const handleLogin=async(e: React.FormEvent<HTMLFormElement>)=>{
      /*
         e.preventDefault()

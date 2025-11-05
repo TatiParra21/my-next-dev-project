@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import path from 'path'
 import { Request, Response } from 'express';
 import { google } from "googleapis";
-import { ParsedQs } from "qs";
+
 // Point to the correct location of .env manually
 dotenv.config({ path: path.resolve(__dirname, '../.env') }) // ✅
 import { router } from './project_ideas_db';
@@ -22,55 +22,66 @@ console.log("server is staring")
 app.use(cors())
 app.use(express.json())
 app.use("/database",router)
-const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const REDIRECT_URI = "https://my-next-dev-project.onrender.com/auth/google/callback";;
+const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
+const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
+const REDIRECT_URI =
+  "https://my-next-dev-project.onrender.com/auth/google/callback"; // hosted redirect
+const SCOPES = ["openid", "email", "profile"];
 
 // Step 1: Redirect to Google login
 const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
 
 // Step 1 – send user to Google Auth page
-router.get("/auth/google", (req, res) => {
-  const url = oAuth2Client.generateAuthUrl({
+app.get("/auth/google", (req, res) => {
+  const authUrl = oAuth2Client.generateAuthUrl({
     access_type: "offline",
-    scope: ["email", "profile"],
+    prompt: "consent",
+    scope: SCOPES,
   });
-  res.redirect(url);
+
+  console.log("🌐 Redirecting to Google:", authUrl);
+  res.redirect(authUrl);
 });
 
 // Step 2 – Google redirects back here
-router.get("/auth/google/callback", async (req: Request, res: Response) => {
+app.get("/auth/google/callback", async (req: Request, res: Response) => {
   try {
-    // ✅ Force TypeScript to treat it as string | undefined
-    const code = Array.isArray(req.query.code)
-      ? (req.query.code[0] as string)
-      : (req.query.code as string | undefined);
+    const code =
+      typeof req.query.code === "string" ? req.query.code : undefined;
 
     if (!code) {
-      return res.status(400).send("Missing code");
+      console.error("❌ Missing authorization code");
+      return res.status(400).send("Missing authorization code");
     }
 
-    // ✅ Now TS knows it's a string
+    // Exchange the code for tokens
     const { tokens } = await oAuth2Client.getToken(code);
     oAuth2Client.setCredentials(tokens);
 
+    // Verify ID token (optional but good for extracting profile info)
     const ticket = await oAuth2Client.verifyIdToken({
       idToken: tokens.id_token!,
-      audience: process.env.GOOGLE_CLIENT_ID!,
+      audience: CLIENT_ID,
     });
-
     const payload = ticket.getPayload();
-    const token = tokens.id_token;
 
-    res.redirect(`mynextdevproject://auth?token=${encodeURIComponent(token!)}`);
+    console.log("✅ User authenticated:", payload?.email);
+
+    // ✅ Redirect back to your Electron app
+    const redirectDeepLink = `mynextdevproject://auth?token=${encodeURIComponent(
+      tokens.id_token!
+    )}`;
+
+    console.log("🔁 Redirecting to:", redirectDeepLink);
+    return res.redirect(redirectDeepLink);
   } catch (err) {
-    console.error("Google Auth Error:", err);
+    console.error("❌ Google Auth Error:", err);
     res.status(500).send("Authentication failed");
   }
 });
 
 // Step 3 – Electron verifies later if needed
-router.post("/verify-token", async (req, res) => {
+app.post("/verify-token", async (req, res) => {
   const { token } = req.body;
   try {
     const ticket = await oAuth2Client.verifyIdToken({
