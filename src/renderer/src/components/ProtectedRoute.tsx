@@ -7,7 +7,6 @@ type ProtectedRouteProps = {
 };
 export const ProtectedRoute =({children}:ProtectedRouteProps)=>{
     const user = googleAuthStore(selectUser)
-   
   
     if (!user) {
     // Not logged in → redirect to login

@@ -29,7 +29,7 @@ const REDIRECT_URI =
 const SCOPES = ["openid", "email", "profile"];
 
 // Step 1: Redirect to Google login
-const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
+export const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
 
 // Step 1 – send user to Google Auth page
 app.get("/auth/google", (req, res) => {
@@ -68,12 +68,25 @@ app.get("/auth/google/callback", async (req: Request, res: Response) => {
     console.log("✅ User authenticated:", payload?.email);
 
     // ✅ Redirect back to your Electron app
-    const redirectDeepLink = `mynextdevproject://auth?token=${encodeURIComponent(
+     const redirectDeepLink = `mynextdevproject://auth?token=${encodeURIComponent(
       tokens.id_token!
     )}`;
 
     console.log("🔁 Redirecting to:", redirectDeepLink);
-    return res.redirect(redirectDeepLink);
+
+    // ✅ Send small HTML that auto-forwards to your Electron app
+    res.send(`
+      <html>
+        <head><title>Logging you in...</title></head>
+        <body style="font-family: sans-serif; text-align: center; margin-top: 40px;">
+          <h2>✅ Login successful!</h2>
+          <p>You can now return to the app.</p>
+          <script>
+            window.location.href = "${redirectDeepLink}";
+          </script>
+        </body>
+      </html>
+    `);
   } catch (err) {
     console.error("❌ Google Auth Error:", err);
     res.status(500).send("Authentication failed");

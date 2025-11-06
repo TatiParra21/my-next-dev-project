@@ -1,8 +1,8 @@
 
 import React from "react"
 import { useLocation, NavLink } from "react-router-dom"
-
-
+import { jwtDecode } from "jwt-decode";
+import { googleAuthStore } from "@renderer/store/projectStore";
 import { useState,useEffect } from "react";
 declare global {
   interface Window {
@@ -37,13 +37,20 @@ export const LoginForm =()=>{
   };
    useEffect(() => {
     // Listen for deep link event from main process
-    window.electron.onAuthToken((url: string) => {
+    window.electron.onAuthToken(async(url: string) => {
       console.log("Received deep link:", url);
-      const tokenParam = new URL(url).searchParams.get("token");
-      if (tokenParam) {
-       
+      const token = new URL(url).searchParams.get("token");
+      if (token) {
+       const decoded = jwtDecode(token);
+       console.log(token,"checking token")
+       await window.secureAuth.saveToken(token);
+       googleAuthStore.setState({ user: decoded, token });
+  
+console.log("🧾 Decoded JWT:", decoded);
+
         alert("✅ Logged in! Token received.");
       }
+      
     });
   }, []);
     const handleLogin=async(e: React.FormEvent<HTMLFormElement>)=>{

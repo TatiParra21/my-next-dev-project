@@ -1,6 +1,8 @@
 import {create} from "zustand"
 import type { CategoriesTypeObjArr,ProjectType } from "@renderer/types"
 import type { ResultFromBackendType } from "@renderer/components/FormComponents/ProjectForm"
+import { jwtDecode } from "jwt-decode";
+
 
 import { fetchRequest } from "@renderer/functions/requests";
 
@@ -78,14 +80,14 @@ type GoogleUser = {
 };
 
 type GoogleAuthStoreType = {
-  user: GoogleUser | null;
+  user: GoogleUser | null |any;
   token: string | null;
   loading: boolean;
   authError: string | null;
   login: () => void;
   handleRedirect: (url: string) => Promise<void>;
   initAuth: () => Promise<void>; // ✅ added
-  logout: () => void;
+  logout: () => Promise<void>;
 };
 
 export const googleAuthStore = create<GoogleAuthStoreType>((set) => ({
@@ -103,66 +105,59 @@ export const googleAuthStore = create<GoogleAuthStoreType>((set) => ({
 
   // 🔹 Handles redirect from Google → deep link
   handleRedirect: async (url: string) => {
-    const token = new URL(url).searchParams.get("token");
-    if (!token) {
-      set({ authError: "No token found in redirect URL." });
-      return;
-    }
+  const token = new URL(url).searchParams.get("token");
+  if (!token) {
+    set({ authError: "No token found in redirect URL." });
+    return;
+  }
 
-    try {
-      const { data } = await axios.post(
-        "https://my-next-dev-project.onrender.com/verify-token",
-        { token }
-      );
+  try {
+    // ✅ Decode token locally
+    const decoded = jwtDecode(token);
+    console.log("🧾 Decoded ID Token:", decoded); // <--- shows Google user data
+    
+    // ✅ Optionally verify with backend
+    const { data } = await axios.post(
+      "https://my-next-dev-project.onrender.com/verify-token",
+      { token }
+    );
 
-      set({
-        token,
-        user: data.user,
-        authError: null,
-      });
+    set({
+      token,
+      user: data.user || decoded,
+      authError: null,
+      loading: false,
+    });
 
-      localStorage.setItem("google_token", token);
-    } catch (err: any) {
-      console.error("Redirect handling error:", err);
-      set({ authError: err.message });
-    }
-  },
+    localStorage.setItem("google_token", token);
+  } catch (err: any) {
+    console.error("Redirect handling error:", err);
+    set({ authError: err.message });
+  }
+},
 
   // 🔹 Runs once on app start — restores saved token if present
   initAuth: async () => {
-    const savedToken = localStorage.getItem("google_token");
-    if (!savedToken) {
-      set({ loading: false });
-      return;
-    }
-
-    try {
-      const { data } = await axios.post(
-        "https://my-next-dev-project.onrender.com/verify-token",
-        { token: savedToken }
-      );
-
-      set({
-        user: data.user,
-        token: savedToken,
-        loading: false,
-        authError: null,
-      });
-    } catch (err: any) {
-      console.error("Token verification failed:", err.message);
-      localStorage.removeItem("google_token");
-      set({
-        user: null,
-        token: null,
-        loading: false,
-        authError: "Session expired. Please log in again.",
-      });
-    }
+    console.log("it ran")
+    const token = await window.secureAuth.getToken();
+    console.log(token, "tokken??/")
+    if(!token)return
+try {
+    const { data } = await axios.post(
+      "https://my-next-dev-project.onrender.com/verify-token",
+      { token }
+    );
+    console.log(data, "data here")
+    set({ user: data.user, token });
+  } catch {
+    await window.secureAuth.clearToken();
+    set({ user: null, token: null });
+  }
   },
 
   // 🔹 Log out completely
-  logout: () => {
-    localStorage.removeItem("google_token");
+  logout: async() => {
+    await window.secureAuth.clearToken()
     set({ user: null, token: null });
   },
 }));

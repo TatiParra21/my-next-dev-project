@@ -10,13 +10,16 @@ import pkg from "electron-updater";
 const { autoUpdater } = pkg;
 import log from "electron-log";
 import { startGoogleLogin, handleAuthCallback } from "./authFlow.js";
+import { saveToken,getToken,clearToken } from "./keytarStore";
 // =================================================
 // 🔹 Globals
 // =================================================
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 let mainWindow: BrowserWindow | null = null;
 let deeplinkUrl: string | null = null;
-
+ipcMain.handle("save-token", async (_, token) => saveToken(token));
+ipcMain.handle("get-token", async () => getToken());
+ipcMain.handle("clear-token", async () => clearToken());
 // =================================================
 // 🔹 Custom Protocol Registration (Deep Links)
 // =================================================

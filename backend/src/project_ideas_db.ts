@@ -1,7 +1,7 @@
 import express from 'express'
 import { pool } from "./db"
 import type { Request,Response, Router } from "express"
-
+import verifyGoogleUser from './verifyGoogleUser'
 export const router: Router = express.Router()
 
 type BodyProjectType ={
@@ -40,7 +40,7 @@ const handleDbError =(res:Response, err:any, place?:string)=>{
     }    
 
       };
-router.get("/project-ideas", async(req: Request, res:Response):Promise<void>=>{
+router.get("/project-ideas",verifyGoogleUser, async(req: Request, res:Response):Promise<void>=>{
   const user = (req as any).userId
     try{
         const result = await pool.query(`SELECT * FROM project_ideas WHERE user_id = $1`,[user])
@@ -55,7 +55,7 @@ router.get("/project-ideas", async(req: Request, res:Response):Promise<void>=>{
   }
 });
 
-router.post("/write-new-project",async(req:Request, res:Response):Promise<void>=>{
+router.post("/write-new-project",verifyGoogleUser,async(req:Request, res:Response):Promise<void>=>{
   const body = req.body[0] as BodyProjectType
    const user_id = (req as any).userId
   try{
@@ -74,7 +74,7 @@ router.post("/write-new-project",async(req:Request, res:Response):Promise<void>=
     handleDbError(res,err,"write-new-project")
   }
 })
-router.patch("/project-ideas/:id/edit",async(req:Request,res:Response):Promise<void>=>{
+router.patch("/project-ideas/:id/edit",verifyGoogleUser,async(req:Request,res:Response):Promise<void>=>{
   const id = Number(req.params.id)
   const updatedData = req.body
    const user = (req as any).userId
@@ -95,7 +95,7 @@ router.patch("/project-ideas/:id/edit",async(req:Request,res:Response):Promise<v
     handleDbError(res,err,`project-ideas/${id}/edit`)
   }
 })
-router.delete("/project-ideas/:id",async(req:Request,res:Response)=>{
+router.delete("/project-ideas/:id",verifyGoogleUser,async(req:Request,res:Response)=>{
   try{
      const userId = (req as any).userId
     const id:number = Number(req.params.id)
@@ -107,7 +107,7 @@ console.log("Deleting:", { id, userId, types: [typeof id, typeof userId] });
   }
 })
 
-router.get("/project-ideas/filter", async(req: Request, res:Response):Promise<void>=>{
+router.get("/project-ideas/filter",verifyGoogleUser, async(req: Request, res:Response):Promise<void>=>{
     try{
       const body = req.body as FilterRequestType
        const user_id = (req as any).userId

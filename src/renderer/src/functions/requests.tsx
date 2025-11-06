@@ -3,14 +3,10 @@ import { handleError } from "./handleError"
 import { ResultFromBackendType} from "@renderer/components/FormComponents/ProjectForm"
 import { CategoriesTypeObjArr } from "@renderer/types"
 
-import {type User } from "firebase/auth"
 
-type UserTokenObjType = {
-    user: User,
-    token:string
-}
-const getAuthToken = (): string | null => {
-  const token = localStorage.getItem("google_token");
+
+const getAuthToken = async(): Promise<string | null> => {
+  const token = await window.secureAuth.getToken();
   if (!token) {
     console.warn("⚠️ No saved Google token found.");
     return null;

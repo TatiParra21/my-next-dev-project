@@ -14,6 +14,11 @@ declare global {
         send: (channel: string, data?: any) => void;
       };
     };
+      secureAuth: {
+      saveToken: (token: string) => Promise<void>;
+      getToken: () => Promise<string | null>;
+      clearToken: () => Promise<void>;
+    };
 
     authAPI: {
       oauthGoogle: () => Promise<{ success: boolean; url?: string; message?: string }>;

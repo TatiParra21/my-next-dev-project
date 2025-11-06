@@ -23,7 +23,7 @@ const mergedElectronAPI = {
   googleLogin: () => ipcRenderer.invoke("google-oauth"),
   startGoogleLogin: () =>
     shell.openExternal("https://my-next-dev-project.onrender.com/auth/google"),
-   onAuthToken: (callback) => {
+   onAuthToken: async(callback) => {
     ipcRenderer.on("auth-token-url", (_, url) => callback(url));
   },
   onOAuthSuccess: (callback: (data: any) => void) =>
@@ -31,6 +31,11 @@ const mergedElectronAPI = {
   onOAuthError: (callback: (msg: string) => void) =>
     ipcRenderer.on("oauth-error", (_, msg) => callback(msg)),
 };
+contextBridge.exposeInMainWorld("secureAuth", {
+  saveToken: (token: string) => ipcRenderer.invoke("save-token", token),
+  getToken: () => ipcRenderer.invoke("get-token"),
+  clearToken: () => ipcRenderer.invoke("clear-token"),
+});
 
 // ✅ Expose everything safely ONCE
 if (process.contextIsolated) {

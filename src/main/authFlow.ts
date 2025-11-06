@@ -1,13 +1,14 @@
 import { shell } from "electron";
-import { OAuth2Client } from "google-auth-library";
+//import { OAuth2Client } from "google-auth-library";
 import 'dotenv/config';
+/*
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
 console.log(CLIENT_ID, "client")
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
 const REDIRECT_URI = "https://my-next-dev-project.onrender.com/auth/google/callback"; // your custom protocol
 const SCOPES = ["openid", "profile", "email"];
 
-const oAuth2Client = new OAuth2Client(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
+const oAuth2Client = new OAuth2Client(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI); */
 //console.log(oAuth2Client)
 /**
  * Step 1: Start login

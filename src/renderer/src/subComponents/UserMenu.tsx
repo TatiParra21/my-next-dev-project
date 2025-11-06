@@ -7,7 +7,7 @@ import {
   Stack,
   Text, Button, 
 } from "@chakra-ui/react"
-import { firebaseStore, selectLogout } from "@renderer/store/projectStore"
+import { googleAuthStore, selectLogout } from "@renderer/store/projectStore"
 export const Logout =({handleLogout}:{handleLogout:  () => Promise<void>}) =>{
   return (
     <HStack>
@@ -25,7 +25,10 @@ const AvatarComponent =()=>{
 }
 
 export const UserMenu =({email}:{email:string})=>{
-    const handleLogout = firebaseStore(selectLogout)
+  const logOut = googleAuthStore(selectLogout)
+    const handleLogout=async()=>{
+      await logOut()
+    }
     return(
     <HoverCard.Root size="sm">
       <HoverCard.Trigger asChild>
@@ -44,7 +47,7 @@ export const UserMenu =({email}:{email:string})=>{
                   <Text textStyle="sm" color="black" fontWeight="semibold">
                     {email}
                   </Text>
-                  <Logout handleLogout={handleLogout} />
+                   <Logout handleLogout={handleLogout} /> 
                 </Stack>
               
               </Stack>
