@@ -12,8 +12,11 @@ import { projectDataStore,
     selectSetIsNotActive, 
     selectSetResultFromBackend, 
     selectSetSelectedOptions, 
-    selectUpdateProjects} from "@renderer/store/projectStore"
+    selectUpdateProjects,
+    googleAuthStore,
+    selectAuthLoading} from "@renderer/store/projectStore"
 import { FormElement } from "./FormElement"
+import { LoadingRoller } from "../LoadingRoller"
 export const capitalizeFirstLetter =(value: string):string=>{
     return value.charAt(0).toUpperCase() + value.slice(1)
   }
@@ -40,6 +43,8 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
     const isNotActive  = formStore(selectIsNotActive)
     const  setIsNotActive  = formStore(selectSetIsNotActive)
     const updateProjects = projectDataStore(selectUpdateProjects)
+    const loading = googleAuthStore(selectAuthLoading)
+    console.log("the form was RENDERED")
     useEffect(()=>{ 
         if(initialValues && initialValues.categories){
             setSelectedOptions(initialValues.categories)
@@ -93,9 +98,14 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
                 setResultFromBackend({message: resultFromBackend.message , success: false})
             }       
         } 
+        console.log("loading??",loading)
+        window.addEventListener("blur", () => console.log("❌ Window blurred"));
+        window.addEventListener("focus", () => console.log("✅ Window focused"));
+        if(loading)return <LoadingRoller/>
     return(
         <form className="flex colum" onSubmit={handleSubmit}>
-            <FormElement changeActive={changeActive}   name="project-name" classAssigned="colum" type="text" placeholder="My New Project" defaultValue={initialValues?.name ?? ""} required>
+          
+            <FormElement onClick={()=>{console.log("formw was lcikked")}} changeActive={changeActive}   name="project-name" classAssigned="colum" type="text" placeholder="My New Project" defaultValue={initialValues?.name ?? ""} required>
                 Project Name:
             </FormElement>
              <OptionComponents  initialValues={selectedOptions} onChange={handleCategoryChoices}/>

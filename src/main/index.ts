@@ -62,25 +62,27 @@ ipcMain.handle("oauth-google-start", async () => {
 
 app.on("open-url", async (event, url) => {
   event.preventDefault();
-  try {
-    const tokens = await handleAuthCallback(url);
-    mainWindow?.webContents.send("oauth-success", tokens);
-  } catch (err: any) {
-    console.error("OAuth Error:", err);
-    mainWindow?.webContents.send("oauth-error", err.message);
-  }
-});
-// =================================================
-// 🔹 macOS Deep Link Support
-// =================================================
-app.on("open-url", (event, url) => {
-  event.preventDefault();
   console.log("🪄 Deep link triggered:", url);
 
-  if (mainWindow) {
-    mainWindow.webContents.send("auth-token-url", url);
-  } else {
+  if (!mainWindow) {
     deeplinkUrl = url;
+    return;
+  }
+
+  // 👇 Focus the Electron window — this fixes your “need to click again” bug
+  if (mainWindow.isMinimized()) mainWindow.restore();
+  mainWindow.show();
+  
+  mainWindow.focus();
+    mainWindow.webContents.focus(); 
+
+  try {
+    // Option 1: if you want to verify token here
+    const tokens = await handleAuthCallback(url);
+    mainWindow.webContents.send("oauth-success", tokens);
+  } catch (err: any) {
+    console.error("OAuth Error:", err);
+    mainWindow.webContents.send("auth-token-url", url); // still forward it to renderer
   }
 });
 

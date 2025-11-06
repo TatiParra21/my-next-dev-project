@@ -6,7 +6,7 @@ import { SubLayout } from './components/SubLayout'
 import { LoginForm } from './components/FormComponents/LoginForm'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { LoggedInRoute } from './components/LoggedInRoute'
-import { googleAuthStore } from './store/projectStore'
+import { googleAuthStore, selectAuthLoading } from './store/projectStore'
 import { LoadingRoller } from './components/LoadingRoller'
 
 
@@ -31,15 +31,18 @@ const router =createBrowserRouter([
 ])
 function App(): React.JSX.Element {
  const initAuth = googleAuthStore((s) => s.initAuth);
+ const loading = googleAuthStore(selectAuthLoading)
 
   useEffect(() => {
     const runInit =async()=>{
+      console.log("hello",loading)
       await initAuth()
 
     }
     runInit()   
     
   }, []);
+    if (loading) return <LoadingRoller />;
   return (
     <>
     

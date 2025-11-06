@@ -83,9 +83,10 @@ type GoogleAuthStoreType = {
   user: GoogleUser | null |any;
   token: string | null;
   loading: boolean;
+ 
   authError: string | null;
   login: () => void;
-  handleRedirect: (url: string) => Promise<void>;
+   handleRedirect: (url:string)=>Promise<void>;
   initAuth: () => Promise<void>; // ✅ added
   logout: () => Promise<void>;
 };
@@ -95,28 +96,21 @@ export const googleAuthStore = create<GoogleAuthStoreType>((set) => ({
   token: null,
   loading: true, // start as loading until we check localStorage
   authError: null,
-
   // 🔹 Opens browser for Google sign-in (via backend)
   login: () => {
     window.electron.openExternal(
       "https://my-next-dev-project.onrender.com/auth/google"
     );
   },
-
-  // 🔹 Handles redirect from Google → deep link
-  handleRedirect: async (url: string) => {
-  const token = new URL(url).searchParams.get("token");
-  if (!token) {
-    set({ authError: "No token found in redirect URL." });
+  handleRedirect:async(url:string)=>{
+     set({ loading: true });
+       const token = new URL(url).searchParams.get("token");
+       if (!token) {
+    set({ authError: "No token found in redirect URL.", loading: false });
     return;
   }
-
-  try {
-    // ✅ Decode token locally
+       try {
     const decoded = jwtDecode(token);
-    console.log("🧾 Decoded ID Token:", decoded); // <--- shows Google user data
-    
-    // ✅ Optionally verify with backend
     const { data } = await axios.post(
       "https://my-next-dev-project.onrender.com/verify-token",
       { token }
@@ -129,29 +123,40 @@ export const googleAuthStore = create<GoogleAuthStoreType>((set) => ({
       loading: false,
     });
 
-    localStorage.setItem("google_token", token);
+    await window.secureAuth.saveToken(token);
+    await projectDataStore.getState().updateProjects();
   } catch (err: any) {
     console.error("Redirect handling error:", err);
-    set({ authError: err.message });
+    set({ authError: err.message, loading: false });
   }
-},
 
+  if (!token) {
+    set({ authError: "No token found in redirect URL.", loading: false });
+    return;
+  }
+
+
+  },
   // 🔹 Runs once on app start — restores saved token if present
   initAuth: async () => {
+    set({ loading: true });
     console.log("it ran")
     const token = await window.secureAuth.getToken();
     console.log(token, "tokken??/")
-    if(!token)return
+    if(!token){
+      set({loading:false})
+      return}
 try {
     const { data } = await axios.post(
       "https://my-next-dev-project.onrender.com/verify-token",
       { token }
     );
     console.log(data, "data here")
-    set({ user: data.user, token });
+    set({ user: data.user, token,loading:false });
+        await projectDataStore.getState().updateProjects();
   } catch {
     await window.secureAuth.clearToken();
-    set({ user: null, token: null });
+    set({ user: null, token: null,loading:false });
   }
   },
 
@@ -159,6 +164,7 @@ try {
   logout: async() => {
     await window.secureAuth.clearToken()
     set({ user: null, token: null });
+    projectDataStore.setState({ projects: [] });
   },
 }));
 

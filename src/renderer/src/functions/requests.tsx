@@ -7,6 +7,7 @@ import { CategoriesTypeObjArr } from "@renderer/types"
 
 const getAuthToken = async(): Promise<string | null> => {
   const token = await window.secureAuth.getToken();
+  console.log("tokeb in re", token)
   if (!token) {
     console.warn("⚠️ No saved Google token found.");
     return null;
@@ -15,7 +16,7 @@ const getAuthToken = async(): Promise<string | null> => {
 };
 export const fetchRequest =async():Promise<ProjectType[] | []>=>{
     try{         
-      const token = getAuthToken();
+      const token = await getAuthToken();
         if (!token) return [];
          const res = await fetch(`https://my-next-dev-project.onrender.com/database/project-ideas`,{
             headers:{
@@ -36,7 +37,7 @@ export const fetchRequest =async():Promise<ProjectType[] | []>=>{
     }
 }
 export const postRequest = async(body: Array<ProjectFormSubmitType>):Promise<ResultFromBackendType |null>=>{
-     const token = getAuthToken();
+     const token = await getAuthToken();
         if (!token) return null;
     try{
         const response = await fetch(`https://my-next-dev-project.onrender.com/database/write-new-project`,{
@@ -59,7 +60,7 @@ export const postRequest = async(body: Array<ProjectFormSubmitType>):Promise<Res
 
 export const patchRequest = async(id:string, body:Record<string,any>):Promise<ResultFromBackendType |null>=>{
     try{ 
-     const token = getAuthToken();
+     const token = await getAuthToken();
         if (!token) return  null;
         console.log(body, "body")
     const response = await fetch(`https://my-next-dev-project.onrender.com/database/project-ideas/${id}/edit`,{
@@ -82,7 +83,7 @@ export const patchRequest = async(id:string, body:Record<string,any>):Promise<Re
 export const deleteRequest =async(id:string):Promise<void |null>=>{
     try{
         console.log(id, "id")
-        const token = getAuthToken();
+        const token = await getAuthToken();
         if (!token) return  null;
         const res = await fetch(`https://my-next-dev-project.onrender.com/database/project-ideas/${id}`,
             {method: "DELETE",
@@ -105,7 +106,7 @@ type ProjectFilterSubmitType ={
 }
 export const fetchFilteredRequest =async(filtersApplied:ProjectFilterSubmitType):Promise<ResultFromBackendType |[]>=>{
     try{
-    const token = getAuthToken();
+    const token = await getAuthToken();
         if (!token) return [];
           const res = await fetch(`https://my-next-dev-project.onrender.com/database/project-ideas/filter`,{
         method:"GET",
