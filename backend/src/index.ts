@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import path from 'path'
 import { Request, Response } from 'express';
 import { google } from "googleapis";
+import  { TokenPayload,LoginTicket } from "google-auth-library";
 
 // Point to the correct location of .env manually
 dotenv.config({ path: path.resolve(__dirname, '../.env') }) // ✅
@@ -27,10 +28,8 @@ const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
 const REDIRECT_URI =
   "https://my-next-dev-project.onrender.com/auth/google/callback"; // hosted redirect
 const SCOPES = ["openid", "email", "profile"];
-
 // Step 1: Redirect to Google login
 export const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
-
 // Step 1 – send user to Google Auth page
 app.get("/auth/google", (req, res) => {
   const authUrl = oAuth2Client.generateAuthUrl({
@@ -38,7 +37,6 @@ app.get("/auth/google", (req, res) => {
     prompt: "consent",
     scope: SCOPES,
   });
-
   console.log("🌐 Redirecting to Google:", authUrl);
   res.redirect(authUrl);
 });
@@ -48,32 +46,38 @@ app.get("/auth/google/callback", async (req: Request, res: Response) => {
   try {
     const code =
       typeof req.query.code === "string" ? req.query.code : undefined;
-
     if (!code) {
       console.error("❌ Missing authorization code");
       return res.status(400).send("Missing authorization code");
     }
-
     // Exchange the code for tokens
     const { tokens } = await oAuth2Client.getToken(code);
     oAuth2Client.setCredentials(tokens);
-
     // Verify ID token (optional but good for extracting profile info)
-    const ticket = await oAuth2Client.verifyIdToken({
+    const ticket  = await oAuth2Client.verifyIdToken({
       idToken: tokens.id_token!,
       audience: CLIENT_ID,
     });
-    const payload = ticket.getPayload();
+    const payload :TokenPayload | undefined = ticket.getPayload();
 
-    console.log("✅ User authenticated:", payload?.email);
-
+ if (!payload) {
+      console.error("❌ Token payload was undefined — possible tampering or decoding error.");
+      return res.send(`
+    <html>
+      <head><title>Login Error</title></head>
+      <body style="font-family: sans-serif; text-align: center; margin-top: 40px; color: red;">
+        <h2>❌ Login Failed</h2>
+        <p>Invalid or corrupted token payload.</p>
+        <p>Please close this tab and try logging in again from the app.</p>
+      </body>
+    </html>
+  `);
+    }
     // ✅ Redirect back to your Electron app
      const redirectDeepLink = `mynextdevproject://auth?token=${encodeURIComponent(
       tokens.id_token!
     )}`;
-
     console.log("🔁 Redirecting to:", redirectDeepLink);
-
     // ✅ Send small HTML that auto-forwards to your Electron app
     res.send(`
       <html>
@@ -101,7 +105,7 @@ app.post("/verify-token", async (req, res) => {
       idToken: token,
       audience: CLIENT_ID,
     });
-    const payload = ticket.getPayload();
+    const payload :TokenPayload | undefined = ticket.getPayload();
     res.json({ user: payload });
   } catch (err) {
     res.status(401).json({ error: "Invalid token" });

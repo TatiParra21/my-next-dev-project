@@ -8,8 +8,6 @@ import { ProtectedRoute } from './components/ProtectedRoute'
 import { LoggedInRoute } from './components/LoggedInRoute'
 import { googleAuthStore, selectAuthLoading } from './store/projectStore'
 import { LoadingRoller } from './components/LoadingRoller'
-
-
 const AddNewProject = React.lazy(()=>import('./components/AddNewProject'))
 const Layout = React.lazy(()=>import('./components/Layout'))
 const ProjectSelectionBase = React.lazy(()=>import('./components/ProjectSelectionBase'))

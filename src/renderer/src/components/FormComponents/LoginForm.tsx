@@ -45,8 +45,6 @@ export const LoginForm =()=>{
         console.error("❌ Deep link handling failed:", err);
         alert("Login failed. Please try again.");
       }
-    
-      
     });
   }, []);
     const handleLogin=async(e: React.FormEvent<HTMLFormElement>)=>{

@@ -17,6 +17,7 @@ return(
             <label  htmlFor={name}>{children}</label>
             {name == "project-description" ?
             <textarea onChange={changeActive}  {...props} id={name} name={name}></textarea> :
+            name =="project-name" ? <input id={name} {...props} name={name} /> :
             <input onChange={changeActive}  id={name} {...props} name={name} />
              }
         </div>

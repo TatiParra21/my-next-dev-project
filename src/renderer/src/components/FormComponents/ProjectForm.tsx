@@ -14,7 +14,8 @@ import { projectDataStore,
     selectSetSelectedOptions, 
     selectUpdateProjects,
     googleAuthStore,
-    selectAuthLoading} from "@renderer/store/projectStore"
+    selectAuthLoading,
+    selectUser} from "@renderer/store/projectStore"
 import { FormElement } from "./FormElement"
 import { LoadingRoller } from "../LoadingRoller"
 export const capitalizeFirstLetter =(value: string):string=>{
@@ -44,6 +45,8 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
     const  setIsNotActive  = formStore(selectSetIsNotActive)
     const updateProjects = projectDataStore(selectUpdateProjects)
     const loading = googleAuthStore(selectAuthLoading)
+    const userTest = googleAuthStore(selectUser)
+    console.log(userTest, "tt")
     console.log("the form was RENDERED")
     useEffect(()=>{ 
         if(initialValues && initialValues.categories){
@@ -70,6 +73,7 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
              const isCompleted :boolean = formData.get("is-completed") === "on"
             const projectDescription = formData.get("project-description")
             const projectName = formData.get("project-name")
+            console.log(projectName, "naem")
            if(typeof projectName !== "string" || typeof projectDescription !== "string"){
                 throw new Error("No project name")
            }

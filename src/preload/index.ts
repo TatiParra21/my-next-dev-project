@@ -4,33 +4,23 @@ import { electronAPI } from "@electron-toolkit/preload";
 // ✅ Merge all safe APIs into one object and expose it once
 const mergedElectronAPI = {
   ...electronAPI, // Built-in Electron toolkit features (already safe)
-
-  ipcRenderer: {
-    // ✅ Add limited custom IPC listeners
-    on: (channel: string, func: (...args: any[]) => void) => {
-      const validChannels = ["auth-token-url", "check-session", "deep-link"];
-      if (validChannels.includes(channel)) {
-        ipcRenderer.on(channel, (_event, ...args) => func(...args));
-      }
-    },
-    send: (channel: string, data?: any) => ipcRenderer.send(channel, data),
-  },
-
+//REMOVED PART
   // ✅ Allow frontend to open external URLs
   openExternal: (url: string) => shell.openExternal(url),
-
-  // ✅ Google OAuth custom API
-  googleLogin: () => ipcRenderer.invoke("google-oauth"),
   startGoogleLogin: () =>
     shell.openExternal("https://my-next-dev-project.onrender.com/auth/google"),
-   onAuthToken: async(callback) => {
+  onAuthToken: async(callback:(url:string)=>void) => {
+    //this is returning anEventListerner
     ipcRenderer.on("auth-token-url", (_, url) => callback(url));
   },
+  /*
   onOAuthSuccess: (callback: (data: any) => void) =>
     ipcRenderer.on("oauth-success", (_, data) => callback(data)),
   onOAuthError: (callback: (msg: string) => void) =>
     ipcRenderer.on("oauth-error", (_, msg) => callback(msg)),
+  */
 };
+
 contextBridge.exposeInMainWorld("secureAuth", {
   saveToken: (token: string) => ipcRenderer.invoke("save-token", token),
   getToken: () => ipcRenderer.invoke("get-token"),
@@ -48,3 +38,16 @@ if (process.contextIsolated) {
   // Fallback for disabled context isolation (rare)
   (window as any).electron = mergedElectronAPI;
 }
+
+/*
+  myIpcRenderer: {
+    // ✅ Add limited custom IPC listeners
+    on: (channel: string, func: (...args: any[]) => void) => {
+      const validChannels = ["auth-token-url", "check-session", "deep-link"];
+      if (validChannels.includes(channel)) {
+        ipcRenderer.on(channel, (_event, ...args) => func(...args));
+      }
+    },
+    send: (channel: string, data?: any) => ipcRenderer.send(channel, data),
+  },
+*/

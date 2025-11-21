@@ -3,6 +3,7 @@ import type { CategoriesTypeObjArr,ProjectType } from "@renderer/types"
 import type { ResultFromBackendType } from "@renderer/components/FormComponents/ProjectForm"
 import { jwtDecode } from "jwt-decode";
 
+import { TokenPayload } from "google-auth-library";
 
 import { fetchRequest } from "@renderer/functions/requests";
 
@@ -81,11 +82,8 @@ type GoogleUser = {
 
 type GoogleAuthStoreType = {
   user: GoogleUser | null |any;
-  token: string | null;
   loading: boolean;
- 
   authError: string | null;
-  login: () => void;
    handleRedirect: (url:string)=>Promise<void>;
   initAuth: () => Promise<void>; // ✅ added
   logout: () => Promise<void>;
@@ -93,15 +91,9 @@ type GoogleAuthStoreType = {
 
 export const googleAuthStore = create<GoogleAuthStoreType>((set) => ({
   user: null,
-  token: null,
   loading: true, // start as loading until we check localStorage
   authError: null,
   // 🔹 Opens browser for Google sign-in (via backend)
-  login: () => {
-    window.electron.openExternal(
-      "https://my-next-dev-project.onrender.com/auth/google"
-    );
-  },
   handleRedirect:async(url:string)=>{
      set({ loading: true });
        const token = new URL(url).searchParams.get("token");
@@ -110,32 +102,26 @@ export const googleAuthStore = create<GoogleAuthStoreType>((set) => ({
     return;
   }
        try {
-    const decoded = jwtDecode(token);
     const { data } = await axios.post(
       "https://my-next-dev-project.onrender.com/verify-token",
       { token }
     );
-
+    if(data.error)throw new Error()
     set({
-      token,
-      user: data.user || decoded,
+      user: data.user,
       authError: null,
       loading: false,
     });
-
     await window.secureAuth.saveToken(token);
     await projectDataStore.getState().updateProjects();
   } catch (err: any) {
     console.error("Redirect handling error:", err);
     set({ authError: err.message, loading: false });
   }
-
   if (!token) {
     set({ authError: "No token found in redirect URL.", loading: false });
     return;
   }
-
-
   },
   // 🔹 Runs once on app start — restores saved token if present
   initAuth: async () => {
@@ -152,18 +138,18 @@ try {
       { token }
     );
     console.log(data, "data here")
-    set({ user: data.user, token,loading:false });
+    set({ user: data.user, loading:false });
         await projectDataStore.getState().updateProjects();
   } catch {
     await window.secureAuth.clearToken();
-    set({ user: null, token: null,loading:false });
+    set({ user: null,loading:false });
   }
   },
 
   // 🔹 Log out completely
   logout: async() => {
     await window.secureAuth.clearToken()
-    set({ user: null, token: null });
+    set({ user: null});
     projectDataStore.setState({ projects: [] });
   },
 }));
