@@ -1,4 +1,4 @@
-import { app,ipcMain, BrowserWindow, shell } from "electron";
+import { app, ipcMain, BrowserWindow, shell } from 'electron';
 import path, { join } from "path";
 import { fileURLToPath } from "url";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
@@ -64,6 +64,7 @@ app.on("open-url", async (event, url) => {
   mainWindow.show();
   mainWindow.focus();
     mainWindow.webContents.focus(); 
+    /*
   try {
     // Option 1: if you want to verify token here
     //const tokens = await handleAuthCallback(url);
@@ -71,7 +72,7 @@ app.on("open-url", async (event, url) => {
   } catch (err: any) {
     console.error("OAuth Error:", err);
    // mainWindow.webContents.send("auth-token-url", url); // still forward it to renderer
-  }
+  } */
 });
 
 app.on("ready", () => {
@@ -85,7 +86,7 @@ app.on("ready", () => {
 });
 // 🔹 Create Browser Window
 // =================================================
-async function createWindow() {
+async function createWindow(): Promise<BrowserWindow> {
   mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
