@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import path from 'path'
 import { Request, Response } from 'express';
 import { google } from "googleapis";
-import  { TokenPayload,LoginTicket } from "google-auth-library";
+import  { TokenPayload} from "google-auth-library";
 
 // Point to the correct location of .env manually
 dotenv.config({ path: path.resolve(__dirname, '../.env') }) // ✅
