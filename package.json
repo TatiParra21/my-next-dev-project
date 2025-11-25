@@ -34,6 +34,7 @@
     "@electron-toolkit/utils": "^4.0.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@mui/material": "^7.3.5",
     "@radix-ui/react-hover-card": "^1.1.15",
     "@supabase/supabase-js": "^2.58.0",
     "axios": "^1.13.1",

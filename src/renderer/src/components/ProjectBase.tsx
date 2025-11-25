@@ -1,13 +1,70 @@
-import { NavLink } from "react-router-dom"
-import { JSX} from "react"
-import type { ProjectType,CategoriesTypeObjArr } from "@renderer/types"
+import {  NavLink } from "react-router-dom"
+import { JSX,useState,useRef} from "react"
+import type { ProjectType,CategoriesTypeObjArr, GoalsChecklistType } from "@renderer/types"
 import { DeleteWarning } from "@renderer/subComponents/DeleteWarning"
 import { projectDataStore,selectLoading, selectProjects, warningStore} from "@renderer/store/projectStore"
 import { capitalizeFirstLetter } from "@renderer/components/FormComponents/ProjectForm"
+import Checkbox from '@mui/material/Checkbox';
+//import FormControl from '@mui/material/FormControl';
+import FormControlLabel from '@mui/material/FormControlLabel';
+//import FormLabel from '@mui/material/FormLabel';
+import FormGroup from '@mui/material/FormGroup';
 type LabelsOnly ={
     languages: Capitalize<string>[] | undefined;
     frameworks: Capitalize<string>[] | undefined;
     libraries: Capitalize<string>[] | undefined;
+}
+
+const AddGoalsDiv =({goals}:{goals: GoalsChecklistType}):JSX.Element=>{
+    const [open, setOpen] =useState<boolean>(false)
+     const inputRef = useRef<HTMLInputElement | null>(null)
+     const [newGoals,setNewGoals] = useState<GoalsChecklistType>(goals)
+     console.log("new gaols",newGoals)
+     const addGoal =():void=>{
+        const newGoal = inputRef.current && inputRef.current.value.length >0 ? inputRef.current.value : ""
+       setNewGoals([...(newGoals ?? []), {desc:newGoal, completed:false}]);
+     }
+     const editBox =(i:number):void=>{
+          setNewGoals(prev =>
+          prev.map((g, index) =>
+            index === i ? { ...g, completed: !g.completed } : g
+          )
+        );
+     }
+        const openChecklistEditor =():void=>{
+            setOpen(prev=>!prev)
+        }
+       const userGoals:JSX.Element = newGoals && newGoals.length >0 ? <FormGroup> {newGoals.map((goal,i)=>{
+        return(<FormControlLabel
+        key={`goal-${i}`}
+       
+  label={goal.desc}
+  control={    <Checkbox
+      checked={goal.completed}
+         onChange={() => {
+        editBox(i)
+      }}
+      sx={{
+        color: "white", // visible outline when unchecked
+        "&.Mui-checked": {
+          color: "#3b82f6", // blue when checked
+        }
+      }}  />}
+  
+/>)
+
+       })}</FormGroup> :<p>No goals yet</p>
+
+    return(
+        <div>
+            {userGoals}
+            <button onClick={openChecklistEditor}>{open ? "close" : "open"}</button>
+            <label htmlFor="write-goal">Set Goal</label>
+            <input ref ={inputRef} type="text" id="write-goal" name="write-goal"/>
+            <button onClick={addGoal} >Add Goal</button>
+        </div>
+    )
+
 }
 const extractLabels =(categories?:CategoriesTypeObjArr):LabelsOnly=>{
         return {
@@ -24,9 +81,9 @@ export const CategoryElements = ({arr}:{arr:LabelsOnly}): JSX.Element=>{
    {labelElements}
    </>
 }
-export const ProjectBase =({state, id}): JSX.Element=>{
-    const warning =  warningStore(state=>state.warning)
-    const setWarning  = warningStore(state=>state.setWarning)
+export const ProjectBase =({state, id}:{state:{save:string}, id:string}): JSX.Element=>{
+    const warning:boolean =  warningStore(s=>s.warning)
+    const setWarning:()=>void  = warningStore(s=>s.setWarning)
     if(!id)throw new Error(" id not found")
      
     const projects: ProjectType[] | null  = projectDataStore(selectProjects)
@@ -35,7 +92,7 @@ export const ProjectBase =({state, id}): JSX.Element=>{
     if(!projects || loading)return <h2>...Loading inn ProjetBa</h2>
           const projectInfo :ProjectType | undefined = projects.find((pro: ProjectType)=>id == pro.id)
     if(!projectInfo )return <h2>...Loading</h2>
-  
+  const projectGoals: GoalsChecklistType = projectInfo.goals
    const labels :LabelsOnly = extractLabels(projectInfo.categories)
     const save :string = state.save  
     return(
@@ -50,6 +107,7 @@ export const ProjectBase =({state, id}): JSX.Element=>{
             <p id="desc" >  {projectInfo.description}</p>
             <p>{`Completed: ${projectInfo.completed ? "YES" : "NO"}`}</p>
             </div>
+            <AddGoalsDiv goals={projectGoals}/>
              <div className="flex row edit-delete-sec">
                 <NavLink className="other-nav"  state={{save:save, from:"/project-ideas"}} to={save}>Edit</NavLink>
                 <button onClick={setWarning} >Delete</button>
@@ -57,3 +115,4 @@ export const ProjectBase =({state, id}): JSX.Element=>{
         </div>
     )
 }
+

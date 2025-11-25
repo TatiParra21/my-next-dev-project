@@ -7,27 +7,35 @@ import { ProjectBase } from "./ProjectBase";
 import { useState, useRef, useEffect, JSX } from "react";
 import clsx from "clsx";
 import { FilterTab } from "@renderer/components/FormComponents/FilterTab";
-export const SelectionCell =({project,save, show,showInfo}):JSX.Element =>{
+export const SelectionCell =({project,save, show,showInfo}:{
+    project:ProjectType,
+    save:string, 
+    show:string | null,
+    showInfo:(id:string)=> void
+}):JSX.Element =>{
   const projectRef = useRef<HTMLButtonElement | null>(null);
     useEffect(()=>{    
         if(show == project.id && projectRef.current){
              projectRef.current.scrollIntoView({ behavior: "smooth", block: "start" })
              projectRef.current.focus()
         }
-    },[show])
+    },[show, project.id])
      return(
             <div  className="project-select-cell flex colum"  >
                 {/* <NavLink state={{save:`${save}/${project.id}`,}} to={`${project.id}`}>{project.name}</NavLink> */}
                 <button ref={projectRef}  tabIndex={-1} className="flex colum select-btn" onClick={()=>showInfo(project.id)}>{project.name}</button>
                 {show == project.id &&
                 
-                    <ProjectBase state={{save:`${save}/${project.id}`,}} id={project.id} />  
+                    <ProjectBase state={{save:`${save}/${project.id}`}} id={project.id} />  
                 }    
             </div>)
 }
 const ProjectSelectionBase =():JSX.Element=>{
+    /* the show is to show the info of the selected cell, ths show value will be set to the id of the chosen cell, if you click the 
+    same cell, it will be set to null closing the cell
+    */
     const [show, setShow] = useState<string |null>(null)
-    const showInfo =(id:string)=>{
+    const showInfo =(id:string): void=>{
     setShow(prev=> prev == id ?null : id)
 }
       const location = useLocation()
@@ -51,8 +59,6 @@ const ProjectSelectionBase =():JSX.Element=>{
         <FilterTab/>
         <div className={clsx("all-project-cells", show && "adjust-cells")}>
             {!projects && <>NO PROJECTS</>}
-        
-        
             {projectSelection} 
         </div>
     </>

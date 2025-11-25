@@ -16,12 +16,17 @@ export type CategoriesTypeObjArr ={
     frameworks?: MultiValue<OptionOf<FrameWorkType>>,
     libraries?: MultiValue<OptionOf<LibrariesType>>
 }
+export type GoalsChecklistType={desc:string, completed:boolean}[] 
+    
+
 export type ProjectType ={
     id:string,
     name: string,
     description: string,
     categories?: CategoriesTypeObjArr,
-    completed: boolean
+    goals:GoalsChecklistType
+    completed: boolean,
+
 } 
 
 export type ProjectFormSubmitType = Omit<ProjectType,"id">

@@ -108,6 +108,7 @@ app.post("/verify-token", async (req, res) => {
     const payload :TokenPayload | undefined = ticket.getPayload();
     res.json({ user: payload });
   } catch (err) {
+    console.log(err)
     res.status(401).json({ error: "Invalid token" });
   }
 });

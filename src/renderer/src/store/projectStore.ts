@@ -1,9 +1,8 @@
 import {create} from "zustand"
 import type { CategoriesTypeObjArr,ProjectType } from "@renderer/types"
 import type { ResultFromBackendType } from "@renderer/components/FormComponents/ProjectForm"
-import { jwtDecode } from "jwt-decode";
 
-import { TokenPayload } from "google-auth-library";
+//import { TokenPayload } from "google-auth-library";
 
 import { fetchRequest } from "@renderer/functions/requests";
 
@@ -31,13 +30,13 @@ export const projectDataStore = create<ProjectDataStoreType>((set)=>({
 
 }))
 
-export const selectProjects = (state:ProjectDataStoreType)=>state.projects
-export const selectSetProjects = (state:ProjectDataStoreType)=>state.setProjects
-export const selectLoading = (state:ProjectDataStoreType)=>state.loading
-export const selectSetLoading = (state:ProjectDataStoreType)=>state.setLoading
-export const selectError = (state:ProjectDataStoreType)=>state.error
-export const selectSetError = (state:ProjectDataStoreType)=>state.setError
-export const selectUpdateProjects = (state:ProjectDataStoreType)=>state.updateProjects
+export const selectProjects = (state:ProjectDataStoreType):ProjectType[] | []=>state.projects
+export const selectSetProjects = (state:ProjectDataStoreType):(projects:ProjectType[] |[])=>void=>state.setProjects
+export const selectLoading = (state:ProjectDataStoreType):boolean=>state.loading
+export const selectSetLoading = (state:ProjectDataStoreType):(value:boolean)=>void=>state.setLoading
+export const selectError = (state:ProjectDataStoreType):string | null=>state.error
+export const selectSetError = (state:ProjectDataStoreType):(value: string |null)=>void=>state.setError
+export const selectUpdateProjects = (state:ProjectDataStoreType):()=>Promise<void>=>state.updateProjects
 export type WarningStoreType ={
     warning: boolean,
     setWarning:()=>void
@@ -64,12 +63,12 @@ export const formStore = create<FormStoreType>((set)=>({
     isNotActive: true,
     setIsNotActive: (value:boolean)=>set({isNotActive:value})
 }))
-export const selectSelectedOptions= (state:FormStoreType)=>state.selectedOptions
-export const selectSetSelectedOptions= (state:FormStoreType)=>state.setSelectedOptions
-export const selectResultFromBackend= (state:FormStoreType)=>state.resultFromBackend
-export const selectSetResultFromBackend =(state:FormStoreType)=>state.setResultFromBackend
-export const selectIsNotActive= (state:FormStoreType)=>state.isNotActive
-export const selectSetIsNotActive= (state:FormStoreType)=>state.setIsNotActive
+export const selectSelectedOptions= (state:FormStoreType):CategoriesTypeObjArr=>state.selectedOptions
+export const selectSetSelectedOptions= (state:FormStoreType): (selectedOptions:CategoriesTypeObjArr)=>void=>state.setSelectedOptions
+export const selectResultFromBackend= (state:FormStoreType):ResultFromBackendType=>state.resultFromBackend
+export const selectSetResultFromBackend =(state:FormStoreType):(resultFromBackend:ResultFromBackendType)=>void=>state.setResultFromBackend
+export const selectIsNotActive= (state:FormStoreType):boolean=>state.isNotActive
+export const selectSetIsNotActive= (state:FormStoreType):(value:boolean)=>void=>state.setIsNotActive
 
 import axios from "axios";
 
@@ -81,7 +80,7 @@ type GoogleUser = {
 };
 
 type GoogleAuthStoreType = {
-  user: GoogleUser | null |any;
+  user: GoogleUser | null ;
   loading: boolean;
   authError: string | null;
    handleRedirect: (url:string)=>Promise<void>;
@@ -114,9 +113,9 @@ export const googleAuthStore = create<GoogleAuthStoreType>((set) => ({
     });
     await window.secureAuth.saveToken(token);
     await projectDataStore.getState().updateProjects();
-  } catch (err: any) {
+  } catch (err) {
     console.error("Redirect handling error:", err);
-    set({ authError: err.message, loading: false });
+    set({ authError: err instanceof Error ? err.message : "An error occurred", loading: false });
   }
   if (!token) {
     set({ authError: "No token found in redirect URL.", loading: false });
@@ -155,8 +154,8 @@ try {
 }));
 
 
-export const selectUser = (state: GoogleAuthStoreType) => state.user;
-export const selectUserEmail = (state: GoogleAuthStoreType) => state.user?.email || "";
-export const selectAuthLoading = (state: GoogleAuthStoreType) => state.loading;
-export const selectLogout = (state: GoogleAuthStoreType) => state.logout;
-export const selectInitAuth = (state: GoogleAuthStoreType) => state.initAuth;
+export const selectUser = (state: GoogleAuthStoreType):GoogleUser | null => state.user;
+export const selectUserEmail = (state: GoogleAuthStoreType):string => state.user?.email || "";
+export const selectAuthLoading = (state: GoogleAuthStoreType):boolean => state.loading;
+export const selectLogout = (state: GoogleAuthStoreType):()=>Promise<void> => state.logout;
+export const selectInitAuth = (state: GoogleAuthStoreType): () => Promise<void> => state.initAuth;

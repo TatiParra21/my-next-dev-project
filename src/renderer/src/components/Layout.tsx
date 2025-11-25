@@ -2,16 +2,12 @@ import { NavBar } from "./NavBar"
 import { Outlet, useLocation } from "react-router-dom"
 import { useEffect, JSX } from "react"
 import { RouteShown } from "./RouteShown"
-import type { CategoriesTypeObjArr, ProjectType } from "@renderer/types"
+import type {  ProjectType } from "@renderer/types"
 import {googleAuthStore,selectUser, projectDataStore, selectLoading, selectSetLoading, selectSetError, selectError, selectProjects, selectUserEmail} from "@renderer/store/projectStore"
 import { handleError } from "@renderer/functions/handleError"
 import { UserMenu } from "@renderer/subComponents/UserMenu"
 
-export const otherDefault:CategoriesTypeObjArr ={
-    languages:[{value:"",label:""}],
-    frameworks:[{value:"",label:""}],
-    libraries:[{value:"",label:""}]
-}
+
    export type ProjectTypeContext ={
         projects: ProjectType[],
         setProjects:  React.Dispatch<React.SetStateAction<boolean>>;
@@ -40,7 +36,7 @@ const Layout =(): JSX.Element=>{
             }
          }
         getData()      
-},[userProjects, userId])
+},[userProjects, userId,setError,setLoading])
 
 if(error && !loading){
     return(

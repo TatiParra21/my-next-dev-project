@@ -18,7 +18,7 @@ const currentRoute = location.pathname
     if(currentRoute == "/project-ideas"){
         setResultFromBackend({...resultFromBackend, message: "" })
     }
-  },[currentRoute])
+  },[currentRoute, resultFromBackend, setResultFromBackend])
  
     return(<>
     {/* <p>{`Current state: ${save ?? "none"}`}</p> */}
