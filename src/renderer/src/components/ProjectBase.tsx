@@ -1,21 +1,25 @@
 import {  NavLink } from "react-router-dom"
 import { JSX,useState,useRef} from "react"
 import type { ProjectType,CategoriesTypeObjArr, GoalsChecklistType } from "@renderer/types"
+import { ResultFromBackendType } from "./FormComponents/ProjectForm"
 import { DeleteWarning } from "@renderer/subComponents/DeleteWarning"
 import { projectDataStore,selectLoading, selectProjects, warningStore} from "@renderer/store/projectStore"
-import { capitalizeFirstLetter } from "@renderer/components/FormComponents/ProjectForm"
+//import { capitalizeFirstLetter } from "@renderer/components/FormComponents/ProjectForm"
+import { patchGoalsRequest } from "@renderer/functions/requests"
 import Checkbox from '@mui/material/Checkbox';
 //import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
 //import FormLabel from '@mui/material/FormLabel';
 import FormGroup from '@mui/material/FormGroup';
+const capitalizeFirstLetter =(value: string):string=>{
+    return value.charAt(0).toUpperCase() + value.slice(1)
+  }
 type LabelsOnly ={
     languages: Capitalize<string>[] | undefined;
     frameworks: Capitalize<string>[] | undefined;
     libraries: Capitalize<string>[] | undefined;
 }
-
-const AddGoalsDiv =({goals}:{goals: GoalsChecklistType}):JSX.Element=>{
+export const AddGoalsDiv =({goals, id}:{goals: GoalsChecklistType, id:string}):JSX.Element=>{
     const [open, setOpen] =useState<boolean>(false)
      const inputRef = useRef<HTMLInputElement | null>(null)
      const [newGoals,setNewGoals] = useState<GoalsChecklistType>(goals)
@@ -25,8 +29,7 @@ const AddGoalsDiv =({goals}:{goals: GoalsChecklistType}):JSX.Element=>{
        setNewGoals([...(newGoals ?? []), {desc:newGoal, completed:false}]);
      }
      const editBox =(i:number):void=>{
-          setNewGoals(prev =>
-          prev.map((g, index) =>
+          setNewGoals(prev =>prev.map((g, index) =>
             index === i ? { ...g, completed: !g.completed } : g
           )
         );
@@ -34,14 +37,14 @@ const AddGoalsDiv =({goals}:{goals: GoalsChecklistType}):JSX.Element=>{
         const openChecklistEditor =():void=>{
             setOpen(prev=>!prev)
         }
+       
        const userGoals:JSX.Element = newGoals && newGoals.length >0 ? <FormGroup> {newGoals.map((goal,i)=>{
         return(<FormControlLabel
-        key={`goal-${i}`}
-       
-  label={goal.desc}
-  control={    <Checkbox
-      checked={goal.completed}
-         onChange={() => {
+        key={`goal-${i}`}   
+        label={goal.desc}
+        control={    <Checkbox
+        checked={goal.completed}
+        onChange={() => {
         editBox(i)
       }}
       sx={{
@@ -52,9 +55,12 @@ const AddGoalsDiv =({goals}:{goals: GoalsChecklistType}):JSX.Element=>{
       }}  />}
   
 />)
-
        })}</FormGroup> :<p>No goals yet</p>
+    const submitGoals =async():Promise<void>=>{
+        const res :ResultFromBackendType | null= await patchGoalsRequest(id,newGoals)
+        console.log(res)
 
+    }
     return(
         <div>
             {userGoals}
@@ -62,9 +68,10 @@ const AddGoalsDiv =({goals}:{goals: GoalsChecklistType}):JSX.Element=>{
             <label htmlFor="write-goal">Set Goal</label>
             <input ref ={inputRef} type="text" id="write-goal" name="write-goal"/>
             <button onClick={addGoal} >Add Goal</button>
+            <button onClick={submitGoals}>Submit Goals</button>
+            
         </div>
     )
-
 }
 const extractLabels =(categories?:CategoriesTypeObjArr):LabelsOnly=>{
         return {
@@ -107,7 +114,7 @@ export const ProjectBase =({state, id}:{state:{save:string}, id:string}): JSX.El
             <p id="desc" >  {projectInfo.description}</p>
             <p>{`Completed: ${projectInfo.completed ? "YES" : "NO"}`}</p>
             </div>
-            <AddGoalsDiv goals={projectGoals}/>
+            <AddGoalsDiv id={id} goals={projectGoals}/>
              <div className="flex row edit-delete-sec">
                 <NavLink className="other-nav"  state={{save:save, from:"/project-ideas"}} to={save}>Edit</NavLink>
                 <button onClick={setWarning} >Delete</button>

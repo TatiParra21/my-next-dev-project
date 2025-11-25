@@ -17,10 +17,10 @@ export type CompareResults ={
         name?: string,
         description?: string,
         categories?: CategoriesTypeObjArr,
-        completed: boolean,
+        completed: boolean, 
     }
 export const compareForms=({original,updated}:CompareFormsType):CompareResults=>{
-    let updatedData :CompareResults ={completed: updated.completed ?? original.completed}
+    const updatedData :CompareResults ={completed: updated.completed ?? original.completed}
     const isSameName : boolean= original.name == updated.name
     if(!isSameName) updatedData.name = updated.name
     const isSameDescription : boolean= original.description == updated.description

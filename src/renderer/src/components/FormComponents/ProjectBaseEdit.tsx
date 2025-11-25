@@ -16,11 +16,11 @@ if(!projects) return <>No projects yet</>
      const projectInfo :ProjectType |undefined = projects.find((pro: ProjectType)=>idState == pro.id)
      if(!projectInfo || loading)return<h2>...Loading Project</h2>
       const { id, ...projectWithoutId}=projectInfo
+     // console.log(id, idState, "seeing whcih to replace")
       const patchRequestCheck =async(body: Array<ProjectFormSubmitType> ):Promise<ResultFromBackendType |null>=>{
       const mainBody :ProjectFormSubmitType = body[0]
         const updatedResults : CompareResults= compareForms({original:projectWithoutId,updated:mainBody})
-        const request: Promise<ResultFromBackendType | null> = patchRequest(idState, updatedResults )
-          
+        const request: Promise<ResultFromBackendType | null> = patchRequest(id, updatedResults )      
           return request 
 }    
  return(

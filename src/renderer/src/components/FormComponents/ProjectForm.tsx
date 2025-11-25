@@ -15,12 +15,14 @@ import { projectDataStore,
     selectUpdateProjects,
     googleAuthStore,
     selectAuthLoading,
-    selectUser} from "@renderer/store/projectStore"
+    } from "@renderer/store/projectStore"
 import { FormElement } from "./FormElement"
 import { LoadingRoller } from "../LoadingRoller"
+
+/*
 export const capitalizeFirstLetter =(value: string):string=>{
     return value.charAt(0).toUpperCase() + value.slice(1)
-  }
+  } */
 export type OptionComponentProps={
     initialValues?: CategoriesTypeObjArr, 
     onChange: (category:string,values: MultiValue<OptionOf<AllCategoriesType>>) => void,
@@ -45,9 +47,8 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
     const  setIsNotActive  = formStore(selectSetIsNotActive)
     const updateProjects = projectDataStore(selectUpdateProjects)
     const loading = googleAuthStore(selectAuthLoading)
-    const userTest = googleAuthStore(selectUser)
-    console.log(userTest, "tt")
-    console.log("the form was RENDERED")
+    //const userTest = googleAuthStore(selectUser)
+
     useEffect(()=>{ 
         if(initialValues && initialValues.categories){
             setSelectedOptions(initialValues.categories)
@@ -79,6 +80,7 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
            }
             const projectFormInfo : ProjectFormSubmitType={
                 name: projectName,
+                goals:[],
                 description: projectDescription,
                 categories: selectedOptions,
                 completed:isCompleted,
@@ -119,6 +121,7 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
             <FormElement changeActive={changeActive} name="is-completed" classAssigned="row check-box-sec" type="checkbox" defaultChecked={initialValues?.completed ?? false}>
                 Completed
             </FormElement>
+           
             <button disabled={isNotActive} className="submit-btn" type="submit">Submit</button>
             {resultFromBackend.message && <p>{resultFromBackend.message}</p> }
         </form>

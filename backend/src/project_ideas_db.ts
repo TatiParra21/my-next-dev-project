@@ -78,7 +78,7 @@ router.patch("/project-ideas/:id/edit",verifyGoogleUser,async(req:Request,res:Re
   const id = Number(req.params.id)
   const updatedData = req.body
    const user = req.userId
-  const allowedFields = ["name", "description","categories","completed"]
+  const allowedFields = ["name", "description","categories","goals_checklist","completed"]
   const fieldsChosen = allowedFields.filter(field=> Object.keys(updatedData).includes(field))
   const clauses = fieldsChosen.map((field, index) => `${field} = $${index + 1}`).join(", ")
   const values = fieldsChosen.map(field =>{ 
@@ -126,3 +126,18 @@ router.get("/project-ideas/filter",verifyGoogleUser, async(req: Request, res:Res
   }
 });
 
+router.patch("/project-ideas/:id/goals",verifyGoogleUser,async(req:Request,res:Response):Promise<void>=>{
+  const id = Number(req.params.id)
+  const updatedData = req.body
+   const user = req.userId
+  try{
+      const query = `UPDATE project_ideas
+                   SET goals_checklist = $1
+                   WHERE id = ${id}
+                   AND user_id = '${user}'`;
+      await pool.query(query,updatedData)
+      res.status(200).json({ message: 'Project updated successfully', success:true });
+  }catch(err) {
+    handleDbError(res,err as Error & {code?:string},`project-ideas/${id}/edit`)
+  }
+})

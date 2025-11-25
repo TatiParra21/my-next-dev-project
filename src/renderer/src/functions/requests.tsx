@@ -2,7 +2,7 @@ import type { ProjectFormSubmitType, ProjectType } from "@renderer/types"
 import { handleError } from "./handleError"
 import { ResultFromBackendType} from "@renderer/components/FormComponents/ProjectForm"
 import { CategoriesTypeObjArr } from "@renderer/types"
-
+import { GoalsChecklistType } from "@renderer/types"
 
 
 const getAuthToken = async(): Promise<string | null> => {
@@ -57,8 +57,7 @@ export const postRequest = async(body: Array<ProjectFormSubmitType>):Promise<Res
         return null
     }
 }
-
-export const patchRequest = async(id:string, body:Record<string,any>):Promise<ResultFromBackendType |null>=>{
+export const patchRequest = async(id:string, body:Record<string, unknown>):Promise<ResultFromBackendType |null>=>{
     try{ 
      const token = await getAuthToken();
         if (!token) return  null;
@@ -67,8 +66,28 @@ export const patchRequest = async(id:string, body:Record<string,any>):Promise<Re
         method:"PATCH",
         headers:{
         "Content-Type":"application/json",
-        "Authorization": `Bearer ${token}`,
-        
+        "Authorization": `Bearer ${token}`,    
+    },
+        body:JSON.stringify(body)
+})
+    const data = await response.json()
+    console.log(data, "datalogged")
+    return data
+    }catch(err){
+        handleError(err,"patchRequest")
+        return null
+    }
+}
+export const patchGoalsRequest = async(id:string, body:GoalsChecklistType):Promise<ResultFromBackendType |null>=>{
+    try{ 
+     const token = await getAuthToken();
+        if (!token) return  null;
+        console.log(body, "body")
+    const response = await fetch(`https://my-next-dev-project.onrender.com/database/project-ideas/${id}/goals`,{
+        method:"PATCH",
+        headers:{
+        "Content-Type":"application/json",
+        "Authorization": `Bearer ${token}`,    
     },
         body:JSON.stringify(body)
 })
