@@ -8,7 +8,7 @@ import { ProtectedRoute } from './components/ProtectedRoute'
 import { LoggedInRoute } from './components/LoggedInRoute'
 import { googleAuthStore, selectAuthLoading } from './store/projectStore'
 import { LoadingRoller } from './components/LoadingRoller'
-const AddNewProject = React.lazy(()=>import('./components/AddNewProject'))
+const AddNewProjectForm = React.lazy(()=>import('./components/AddNewProjectForm'))
 const Layout = React.lazy(()=>import('./components/Layout'))
 const ProjectSelectionBase = React.lazy(()=>import('./components/ProjectSelectionBase'))
 const ProjectBaseEdit = React.lazy(()=>import('./components/FormComponents/ProjectBaseEdit'))
@@ -23,7 +23,7 @@ const router =createBrowserRouter([
           {path:":id",element:<ProjectBaseEdit/>}
         ]
       },
-      {path:"write-new-project", element:<AddNewProject/>}
+      {path:"write-new-project", element:<AddNewProjectForm/>}
     ]
   }
 ])

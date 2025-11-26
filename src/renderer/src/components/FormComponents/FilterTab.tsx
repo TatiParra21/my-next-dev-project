@@ -6,7 +6,7 @@ import { MultiValue } from "react-select"
 import type {  CategoriesTypeObjArr } from "@renderer/types"
 import { OptionComponents } from "../../subComponents/OptionsComponents"
 import { FormEvent, JSX } from "react"
-import { projectDataStore,selectIsNotActive, selectResultFromBackend, selectSetIsNotActive, selectSetResultFromBackend } from "@renderer/store/projectStore"
+import { projectDataStore,selectIsNotActive, selectSetIsNotActive, } from "@renderer/store/projectStore"
 import { formStore } from "@renderer/store/projectStore"
 import { useState } from "react"
 import { FormElement } from "./FormElement"
@@ -19,17 +19,18 @@ type ProjectFilterSubmitType ={
 export const FilterTab=():JSX.Element=>{
     const projects = projectDataStore(state=>state.projects)
     const [showFilter, setShowFilter] = useState<boolean>(false)
-    const showFilterTab =()=>{
+    const [selectedFilters, setSelectedFilters] = useState<CategoriesTypeObjArr>({})
+    const [resultFromBackend,setResultFromBackend] = useState<ResultFromBackendType>({message:"",success:false})
+    const showFilterTab =():void=>{
         setShowFilter(prev=>!prev)
     }
     if(!projects){
         return <div>...Loading</div>
     }
-const [selectedFilters, setSelectedFilters] = useState<CategoriesTypeObjArr>({})
-    const resultFromBackend = formStore(selectResultFromBackend)
+
     const isNotActive = formStore(selectIsNotActive)
     const setIsNotActive = formStore(selectSetIsNotActive)
-    const setResultFromBackend = formStore(selectSetResultFromBackend)
+
     const changeActive =():void=>{
         setIsNotActive(false)
         setResultFromBackend({...resultFromBackend, success:false})
@@ -39,7 +40,7 @@ const [selectedFilters, setSelectedFilters] = useState<CategoriesTypeObjArr>({})
         const categoryVal :string = category.toLowerCase()
         setSelectedFilters({...selectedFilters, [categoryVal]:values})  
     }
-    const filterProjects=async(e: FormEvent<HTMLFormElement>)=>{
+    const filterProjects=async(e: FormEvent<HTMLFormElement>):Promise<void>=>{
         e.preventDefault()
         const form = e.currentTarget
         const formData :FormData = new FormData(form)

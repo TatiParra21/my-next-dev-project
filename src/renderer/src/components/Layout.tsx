@@ -1,9 +1,9 @@
 import { NavBar } from "./NavBar"
 import { Outlet, useLocation } from "react-router-dom"
-import { useEffect, JSX } from "react"
+import { useEffect, JSX, useState } from "react"
 import { RouteShown } from "./RouteShown"
 import type {  ProjectType } from "@renderer/types"
-import {googleAuthStore,selectUser, projectDataStore, selectLoading, selectSetLoading, selectSetError, selectError, selectProjects, selectUserEmail} from "@renderer/store/projectStore"
+import {googleAuthStore,selectUser, projectDataStore, selectLoading, selectSetLoading, selectProjects, selectUserEmail} from "@renderer/store/projectStore"
 import { handleError } from "@renderer/functions/handleError"
 import { UserMenu } from "@renderer/subComponents/UserMenu"
 
@@ -19,8 +19,9 @@ const Layout =(): JSX.Element=>{
     const userProjects:ProjectType[] | [] = projectDataStore(selectProjects)
     const loading = projectDataStore(selectLoading)
     const setLoading = projectDataStore(selectSetLoading)
-    const error = projectDataStore(selectError)
-    const  setError = projectDataStore(selectSetError)
+const [error,setError] = useState<string | null>(null)
+    //const error = projectDataStore(selectError)
+    //const  setError = projectDataStore(selectSetError)
     const location = useLocation()
     const currentRoute2 = location.pathname
     useEffect(()=>{          

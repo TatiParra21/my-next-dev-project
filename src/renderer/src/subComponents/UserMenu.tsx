@@ -8,15 +8,16 @@ import {
   Text, Button, 
 } from "@chakra-ui/react"
 import { googleAuthStore, selectLogout } from "@renderer/store/projectStore"
-export const Logout =({handleLogout}:{handleLogout:  () => Promise<void>}) =>{
+import { JSX } from "react"
+export const Logout =({handleLogout}:{handleLogout:  () => Promise<void>}):JSX.Element =>{
   return (
     <HStack>
       <Button onClick={handleLogout} >Logout</Button>
     </HStack>
   )
 }
-"use client"
-const AvatarComponent =()=>{
+//"use client"
+const AvatarComponent =():JSX.Element=>{
   return(
         <Avatar.Root colorPalette="red">
                   <Avatar.Fallback />               
@@ -24,9 +25,9 @@ const AvatarComponent =()=>{
   )
 }
 
-export const UserMenu =({email}:{email:string})=>{
+export const UserMenu =({email}:{email:string}):JSX.Element=>{
   const logOut = googleAuthStore(selectLogout)
-    const handleLogout=async()=>{
+    const handleLogout=async():Promise<void>=>{
       await logOut()
     }
     return(

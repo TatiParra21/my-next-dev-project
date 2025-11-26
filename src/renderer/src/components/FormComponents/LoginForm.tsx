@@ -1,5 +1,5 @@
 
-import React from "react"
+import React, { JSX } from "react"
 import { useLocation, NavLink } from "react-router-dom"
 import { googleAuthStore } from "@renderer/store/projectStore";
 import { useState,useEffect } from "react";
@@ -11,23 +11,22 @@ declare global {
   }
 }
 
-export const LoginForm =()=>{
+export const LoginForm =():JSX.Element=>{
   const location = useLocation()
   const params = location.pathname
   const [authError, setAuthError] = useState<string | null>(null);
   console.log("Current origin is:", window.location.origin); 
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = async ():Promise<void> => {
      try {
         window.electron.startGoogleLogin();
 
-  } catch (err: any) {
+  } catch (err) {
     console.error("❌ Google Sign-In Error:", err);
 
-    // 👇 Make sure we show the exact error message
-    const message =
-      err.code || err.message
-        ? `${err.code || ""}: ${err.message || ""}`
-        : "Unknown error";
+    // 👇 Make sure we show the exact error message err as Error & {code?:string}
+  const message = err && typeof err === "object"
+  ? `${(err as Error & {code?:string}).code ?? ""}: ${(err as Error).message ?? ""}`
+  : String(err);
 
     // Save to screen and also make a visible alert
     setAuthError(`Failed to sign in: ${message}`);
@@ -47,7 +46,7 @@ export const LoginForm =()=>{
       }
     });
   }, []);
-    const handleLogin=async(e: React.FormEvent<HTMLFormElement>)=>{
+    const handleLogin=async(e: React.FormEvent<HTMLFormElement>):Promise<void>=>{
      /*
         e.preventDefault()
         const form = e.currentTarget

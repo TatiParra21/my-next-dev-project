@@ -1,10 +1,10 @@
 
-import { JSX } from "react"
+import { JSX,  } from "react"
 import { deleteRequest } from "@renderer/functions/requests"
-import {projectDataStore, warningStore, selectUpdateProjects} from "@renderer/store/projectStore"
+import {projectDataStore, selectUpdateProjects} from "@renderer/store/projectStore"
 import { NavLink } from "react-router-dom";
-export const DeleteWarning =({on, id}:{on:boolean, id:string}): JSX.Element =>{
-    const setWarning = warningStore(state=>state.setWarning)
+export const DeleteWarning =({on, id, toggleWarning}:{on:boolean, id:string, toggleWarning:()=>void}): JSX.Element =>{
+     
     const updateProject = projectDataStore(selectUpdateProjects)
     const loading= projectDataStore(state=>state.loading)
     if(loading){
@@ -13,7 +13,7 @@ export const DeleteWarning =({on, id}:{on:boolean, id:string}): JSX.Element =>{
     const deleteRequestAndReset =async():Promise<void>=>{
        await deleteRequest(id)
        await updateProject()     
-         setWarning()
+         toggleWarning()
     }
 return(<>
  {on && 
@@ -24,7 +24,7 @@ return(<>
                 <NavLink state={{save:null}} to="/dashboard/project-ideas">
                     <button onClick={deleteRequestAndReset}>Delete Project</button>
                 </NavLink>
-                <button onClick={setWarning}>Do not Delete Project</button>
+                <button onClick={toggleWarning}>Do not Delete Project</button>
             </div>
         </div>
     </div>

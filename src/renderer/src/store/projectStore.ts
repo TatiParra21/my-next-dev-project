@@ -1,9 +1,5 @@
 import {create} from "zustand"
 import type { CategoriesTypeObjArr,ProjectType } from "@renderer/types"
-import type { ResultFromBackendType } from "@renderer/components/FormComponents/ProjectForm"
-
-//import { TokenPayload } from "google-auth-library";
-
 import { fetchRequest } from "@renderer/functions/requests";
 
 export type ProjectDataStoreType ={
@@ -11,8 +7,6 @@ export type ProjectDataStoreType ={
     setProjects: (projects:ProjectType[] |[])=>void,
     loading:boolean,
     setLoading: (value:boolean)=>void,
-    error: string | null,
-    setError: (value: string |null)=>void,
     updateProjects: ()=>Promise<void>
 }
 export const projectDataStore = create<ProjectDataStoreType>((set)=>({
@@ -20,12 +14,9 @@ export const projectDataStore = create<ProjectDataStoreType>((set)=>({
     setProjects: (projects: ProjectType[] | [])=>set({projects:projects}),
     loading: true,
     setLoading: (value:boolean)=>set({loading:value}),
-    error: null,
-    setError: (value:string|null)=>set({error:value}),
     updateProjects: async()=>{
       const projects:ProjectType[] | [] = await fetchRequest()
          projectDataStore.setState({projects:projects})
-
     }
 
 }))
@@ -34,39 +25,22 @@ export const selectProjects = (state:ProjectDataStoreType):ProjectType[] | []=>s
 export const selectSetProjects = (state:ProjectDataStoreType):(projects:ProjectType[] |[])=>void=>state.setProjects
 export const selectLoading = (state:ProjectDataStoreType):boolean=>state.loading
 export const selectSetLoading = (state:ProjectDataStoreType):(value:boolean)=>void=>state.setLoading
-export const selectError = (state:ProjectDataStoreType):string | null=>state.error
-export const selectSetError = (state:ProjectDataStoreType):(value: string |null)=>void=>state.setError
 export const selectUpdateProjects = (state:ProjectDataStoreType):()=>Promise<void>=>state.updateProjects
-export type WarningStoreType ={
-    warning: boolean,
-    setWarning:()=>void
-}
-
-export const warningStore = create<WarningStoreType>((set)=>({
-    warning:false,
-    setWarning:()=>set((state)=>({warning: !state.warning}))
-}))
 
 export type FormStoreType ={
     selectedOptions: CategoriesTypeObjArr,
     setSelectedOptions: (selectedOptions:CategoriesTypeObjArr)=>void,
-    resultFromBackend: ResultFromBackendType,
-    setResultFromBackend:(resultFromBackend:ResultFromBackendType)=>void,
     isNotActive: boolean,
     setIsNotActive: (value:boolean)=>void
 }
 export const formStore = create<FormStoreType>((set)=>({
      selectedOptions: {},
     setSelectedOptions: (selectedOptions:CategoriesTypeObjArr)=>set(({selectedOptions})),
-    resultFromBackend: {message:"",success:false},
-    setResultFromBackend:(resultFromBackend:ResultFromBackendType)=>set({resultFromBackend}),
     isNotActive: true,
     setIsNotActive: (value:boolean)=>set({isNotActive:value})
 }))
 export const selectSelectedOptions= (state:FormStoreType):CategoriesTypeObjArr=>state.selectedOptions
 export const selectSetSelectedOptions= (state:FormStoreType): (selectedOptions:CategoriesTypeObjArr)=>void=>state.setSelectedOptions
-export const selectResultFromBackend= (state:FormStoreType):ResultFromBackendType=>state.resultFromBackend
-export const selectSetResultFromBackend =(state:FormStoreType):(resultFromBackend:ResultFromBackendType)=>void=>state.setResultFromBackend
 export const selectIsNotActive= (state:FormStoreType):boolean=>state.isNotActive
 export const selectSetIsNotActive= (state:FormStoreType):(value:boolean)=>void=>state.setIsNotActive
 

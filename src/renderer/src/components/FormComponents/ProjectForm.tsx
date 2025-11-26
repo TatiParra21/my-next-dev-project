@@ -1,4 +1,4 @@
-import {  FormEvent, JSX, useEffect } from "react"
+import {  FormEvent, JSX, useEffect, useState } from "react"
 import type { OptionOf, ProjectType, CategoriesTypeObjArr, ProjectFormSubmitType } from "@renderer/types"
 import { useLocation } from "react-router-dom"
 import type { AllCategoriesType } from "@renderer/info"
@@ -7,10 +7,8 @@ import { OptionComponents } from "../../subComponents/OptionsComponents"
 import { projectDataStore,
     formStore, 
     selectIsNotActive, 
-    selectResultFromBackend, 
     selectSelectedOptions, 
-    selectSetIsNotActive, 
-    selectSetResultFromBackend, 
+    selectSetIsNotActive,  
     selectSetSelectedOptions, 
     selectUpdateProjects,
     googleAuthStore,
@@ -41,8 +39,7 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
     const location= useLocation()
     const selectedOptions = formStore(selectSelectedOptions)
     const setSelectedOptions  = formStore(selectSetSelectedOptions)
-    const resultFromBackend  = formStore(selectResultFromBackend)
-    const setResultFromBackend  = formStore(selectSetResultFromBackend)
+    const [resultFromBackend,setResultFromBackend] = useState<ResultFromBackendType>({message:"",success:false})
     const isNotActive  = formStore(selectIsNotActive)
     const  setIsNotActive  = formStore(selectSetIsNotActive)
     const updateProjects = projectDataStore(selectUpdateProjects)
@@ -55,15 +52,14 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
         }else{
             setSelectedOptions({})
         }
-            console.log(location.state, "FROm")
-    },[])
+            //console.log(location.state, "FROm")
+    },[initialValues,setSelectedOptions])
     const changeActive =():void=>{
         setIsNotActive(false)
        setResultFromBackend({...resultFromBackend, success:false})
     }
         const handleCategoryChoices =(category:string,values:MultiValue<OptionOf<AllCategoriesType>>):void=>{
            if(isNotActive) setIsNotActive(false)
-            console.log(initialValues, "init")
             const categoryVal :string = category.toLowerCase()
             setSelectedOptions({...selectedOptions, [categoryVal]:values})  
         }

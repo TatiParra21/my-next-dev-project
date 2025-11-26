@@ -1,25 +1,17 @@
 import { NavLink } from "react-router-dom"
 import { useLocation } from "react-router-dom"
-import { JSX, useEffect } from "react"
+import { JSX } from "react"
 
-import { formStore } from "@renderer/store/projectStore"
+//import { formStore } from "@renderer/store/projectStore"
 export const NavBar =(): JSX.Element=>{
     const styleNav =(isActive :boolean): string=>{
         const chosenStyle: string = isActive ?  "active-style" : "non-active"
         return chosenStyle
     } 
-    const resultFromBackend = formStore(state=>state.resultFromBackend) 
-    const setResultFromBackend = formStore(state=>state.setResultFromBackend)
+  
     const location = useLocation()
-const currentRoute = location.pathname
     const state = location?.state
    const save = state?.save
-  useEffect(()=>{
-    if(currentRoute == "/project-ideas"){
-        setResultFromBackend({...resultFromBackend, message: "" })
-    }
-  },[currentRoute, resultFromBackend, setResultFromBackend])
- 
     return(<>
     {/* <p>{`Current state: ${save ?? "none"}`}</p> */}
     <nav className="navigation">
