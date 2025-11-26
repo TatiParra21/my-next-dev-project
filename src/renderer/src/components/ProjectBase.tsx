@@ -19,10 +19,12 @@ type LabelsOnly ={
     frameworks: Capitalize<string>[] | undefined;
     libraries: Capitalize<string>[] | undefined;
 }
+
+type GoalsArray = {desc:string, completed:boolean}[]
 export const AddGoalsDiv =({goals, id}:{goals: GoalsChecklistType, id:string}):JSX.Element=>{
     const [open, setOpen] =useState<boolean>(false)
      const inputRef = useRef<HTMLInputElement | null>(null)
-     const [newGoals,setNewGoals] = useState<GoalsChecklistType>(goals)
+     const [newGoals,setNewGoals] = useState<GoalsArray>(goals.goals)
      console.log("new gaols",newGoals, goals)
      const addGoal =():void=>{
         const newGoal = inputRef.current && inputRef.current.value.length >0 ? inputRef.current.value : ""
@@ -57,7 +59,7 @@ export const AddGoalsDiv =({goals, id}:{goals: GoalsChecklistType, id:string}):J
 />)
        })}</FormGroup> :<p>No goals yet</p>
     const submitGoals =async():Promise<void>=>{
-        const res :ResultFromBackendType | null= await patchGoalsRequest(id,newGoals)
+        const res :ResultFromBackendType | null= await patchGoalsRequest(id,{goals:newGoals})
         console.log(res)
 
     }
@@ -100,7 +102,7 @@ export const ProjectBase =({state, id}:{state:{save:string}, id:string}): JSX.El
           const projectInfo :ProjectType | undefined = projects.find((pro: ProjectType)=>id == pro.id)
     if(!projectInfo )return <h2>...Loading</h2>
   const projectGoals: GoalsChecklistType = projectInfo.goals_checklist
-  console.log( "PRoJETC0", projectDataStore)
+ 
    const labels :LabelsOnly = extractLabels(projectInfo.categories)
     const save :string = state.save  
     return(

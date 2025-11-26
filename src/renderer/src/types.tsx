@@ -16,7 +16,14 @@ export type CategoriesTypeObjArr ={
     frameworks?: MultiValue<OptionOf<FrameWorkType>>,
     libraries?: MultiValue<OptionOf<LibrariesType>>
 }
-export type GoalsChecklistType={desc:string, completed:boolean}[] 
+
+export type GoalsChecklistType={
+   goals: {desc:string, completed:boolean}[]
+
+    
+}
+
+    
     
 
 export type ProjectType ={
@@ -24,7 +31,7 @@ export type ProjectType ={
     name: string,
     description: string,
     categories?: CategoriesTypeObjArr,
-    goals_checklist:GoalsChecklistType
+    goals_checklist:GoalsChecklistType 
     completed: boolean,
 
 } 

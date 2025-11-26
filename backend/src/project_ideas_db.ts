@@ -12,6 +12,7 @@ type BodyProjectType ={
       frameworks: {label: Capitalize<string>, value:Lowercase<string>}[],
       libraries: {label: Capitalize<string>, value:Lowercase<string>}[],
     },
+    goals_checklist:{goals:{desc:string,completed:boolean}[]}
   completed: boolean, 
   user_id:string 
 };
@@ -60,9 +61,9 @@ router.post("/write-new-project",verifyGoogleUser,async(req:Request, res:Respons
    const user_id = req.userId
   try{
       if(!body)throw new Error('there was a problem with the body')
-        const query = `INSERT INTO project_ideas (name,description,categories,completed, user_id) VALUES ($1,$2,$3,$4,$5) RETURNING *;`
-        const {name, description ,categories,completed} = body
-        const values = [name, description,categories,completed, user_id]       
+        const query = `INSERT INTO project_ideas (name,description,categories,goals_checklist,completed, user_id) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *;`
+        const {name, description ,categories,goals_checklist,completed} = body
+        const values = [name, description,categories,goals_checklist,completed, user_id]       
         const result = await pool.query(query,values)
         if(result.rows.length ===0){throw new Error("results too short")}
         else{
