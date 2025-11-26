@@ -80,7 +80,7 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
            }
             const projectFormInfo : ProjectFormSubmitType={
                 name: projectName,
-                goals:[],
+                goals_checklist:[],
                 description: projectDescription,
                 categories: selectedOptions,
                 completed:isCompleted,

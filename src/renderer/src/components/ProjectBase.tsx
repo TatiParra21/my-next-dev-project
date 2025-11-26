@@ -23,7 +23,7 @@ export const AddGoalsDiv =({goals, id}:{goals: GoalsChecklistType, id:string}):J
     const [open, setOpen] =useState<boolean>(false)
      const inputRef = useRef<HTMLInputElement | null>(null)
      const [newGoals,setNewGoals] = useState<GoalsChecklistType>(goals)
-     console.log("new gaols",newGoals)
+     console.log("new gaols",newGoals, goals)
      const addGoal =():void=>{
         const newGoal = inputRef.current && inputRef.current.value.length >0 ? inputRef.current.value : ""
        setNewGoals([...(newGoals ?? []), {desc:newGoal, completed:false}]);
@@ -99,7 +99,8 @@ export const ProjectBase =({state, id}:{state:{save:string}, id:string}): JSX.El
     if(!projects || loading)return <h2>...Loading inn ProjetBa</h2>
           const projectInfo :ProjectType | undefined = projects.find((pro: ProjectType)=>id == pro.id)
     if(!projectInfo )return <h2>...Loading</h2>
-  const projectGoals: GoalsChecklistType = projectInfo.goals
+  const projectGoals: GoalsChecklistType = projectInfo.goals_checklist
+  console.log( "PRoJETC0", projectDataStore)
    const labels :LabelsOnly = extractLabels(projectInfo.categories)
     const save :string = state.save  
     return(

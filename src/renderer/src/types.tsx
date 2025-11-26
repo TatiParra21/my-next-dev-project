@@ -24,7 +24,7 @@ export type ProjectType ={
     name: string,
     description: string,
     categories?: CategoriesTypeObjArr,
-    goals:GoalsChecklistType
+    goals_checklist:GoalsChecklistType
     completed: boolean,
 
 } 
