@@ -33,6 +33,7 @@ type FilterRequestType ={
       };
 
 const handleDbError =(res:Response, err:Error & {code?: string}, place?:string):void=>{
+  console.log("the errror", err)
          if (err.code && errorResponses[err.code]){
       res.status(200).json({ message:errorResponses[err.code].message,  success:false });
     }else{
