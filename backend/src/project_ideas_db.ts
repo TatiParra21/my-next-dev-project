@@ -133,12 +133,14 @@ router.patch("/project-ideas/:id/goals",verifyGoogleUser,async(req:Request,res:R
    const user = req.userId
   try{
       const query = `UPDATE project_ideas
-                   SET goals_checklist 
+                   SET goals_checklist = $1
                    WHERE id = ${id}
                    AND user_id = '${user}'`;
       await pool.query(query,updatedData)
+
       res.status(200).json({ message: 'Project updated successfully', success:true });
   }catch(err) {
+    console.log(updatedData, "hello?")
     handleDbError(res,err as Error & {code?:string},`project-ideas/${id}/goals`)
   }
 })
