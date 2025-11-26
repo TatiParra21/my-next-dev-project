@@ -82,7 +82,7 @@ export const patchGoalsRequest = async(id:string, body:GoalsChecklistType):Promi
     try{ 
      const token = await getAuthToken();
         if (!token) return  null;
-        console.log(body, "body")
+        console.log(body, "body goals")
     const response = await fetch(`https://my-next-dev-project.onrender.com/database/project-ideas/${id}/goals`,{
         method:"PATCH",
         headers:{

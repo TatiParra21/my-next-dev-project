@@ -60,7 +60,7 @@ export const AddGoalsDiv =({goals, id}:{goals: GoalsChecklistType, id:string}):J
        })}</FormGroup> :<p>No goals yet</p>
     const submitGoals =async():Promise<void>=>{
         const res :ResultFromBackendType | null= await patchGoalsRequest(id,{goals:newGoals})
-        console.log(res)
+        console.log(res, "res form submit")
 
     }
     return(
