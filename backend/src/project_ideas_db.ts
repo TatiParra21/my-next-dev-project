@@ -137,7 +137,7 @@ router.patch("/project-ideas/:id/goals",verifyGoogleUser,async(req:Request,res:R
                    SET goals_checklist = $1
                    WHERE id = ${id}
                    AND user_id = '${user}'`;
-      await pool.query(query,updatedData)
+      await pool.query(query,[updatedData])
 
       res.status(200).json({ message: 'Project updated successfully', success:true });
   }catch(err) {
