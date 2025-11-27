@@ -20,22 +20,12 @@ export type CompareResults ={
         completed: boolean, 
     }
 export const compareForms=({original,updated}:CompareFormsType):CompareResults=>{
-    const updatedData :CompareResults ={completed: updated.completed ?? original.completed}
-    const isSameName : boolean= original.name == updated.name
-    if(!isSameName) updatedData.name = updated.name
-    const isSameDescription : boolean= original.description == updated.description
-    if(!isSameDescription) updatedData.description = updated.description
-     const keys: (keyof CategoriesTypeObjArr)[] = ["languages", "frameworks", "libraries"];
-   keys.forEach((key:keyof CategoriesTypeObjArr)=>{
-    const originalValues :string = original?.categories?.[key]?.map(val=>val.value).sort().join(" ") ?? ""
-    const updatedValues :string = updated?.categories?.[key]?.map(val=>val.value).sort().join(" ") ?? ""
-    if(originalValues !== updatedValues) {
-         if (!updatedData.categories) updatedData.categories = {};
-       updatedData.categories[key] = updated.categories?.[key]
-        }else{
-            if (!updatedData.categories) updatedData.categories = {};
-             updatedData.categories[key] = original.categories?.[key]
-        }
-   })
-   return updatedData
+    const fieldsToSend: CompareResults = {completed: updated.completed ?? original.completed}
+    
+    
+    if(original.name !== updated.name) fieldsToSend.name = updated.name
+   
+    if(original.description !== updated.description) fieldsToSend.description = updated.description
+if(JSON.stringify(updated.categories !== original.categories)) fieldsToSend.categories = updated.categories
+   return fieldsToSend
 }

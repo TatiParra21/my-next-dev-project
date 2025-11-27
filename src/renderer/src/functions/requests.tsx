@@ -14,7 +14,35 @@ const getAuthToken = async(): Promise<string | null> => {
   }
   return token;
 };
-export const fetchRequest =async():Promise<ProjectType[] | []>=>{
+const api = async <T,>( url: string, options: RequestInit = {}, requestName:string): Promise<T | null> => {
+  const token = await getAuthToken();
+  if (!token) return null; // this line was fine
+  try{
+    const res = await fetch(`https://my-next-dev-project.onrender.com${url}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      // This spreads any headers the caller passed (important!)
+      ...(options.headers ?? {}),
+    },
+  });
+  if (!res.ok) {
+    console.error("API error", res.status, await res.text());
+    return null;
+  }
+  return (await res.json()) as T;
+  }catch(err){
+    handleError(err, requestName);
+    return null;
+  } 
+};
+
+const fetchRequest =async():Promise<ProjectType[]>=>{
+    await api<ProjectType[]>()}
+
+/*
+export const fetchRequest =async():Promise<ProjectType[]>=>{
     try{         
       const token = await getAuthToken();
         if (!token) return [];
@@ -35,7 +63,7 @@ export const fetchRequest =async():Promise<ProjectType[] | []>=>{
         handleError(err,"fetchRequest")
         return []     
     }
-}
+} */
 export const postRequest = async(body: Array<ProjectFormSubmitType>):Promise<ResultFromBackendType |null>=>{
      const token = await getAuthToken();
         if (!token) return null;
@@ -145,3 +173,4 @@ export const fetchFilteredRequest =async(filtersApplied:ProjectFilterSubmitType)
         
     }
 }
+
