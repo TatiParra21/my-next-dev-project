@@ -3,37 +3,58 @@
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import Checkbox from '@mui/material/Checkbox';
-import type { GoalsChecklistType } from "@renderer/types";
-import { JSX,useState,useRef} from "react"
-import { projectDataStore } from "@renderer/store/projectStore";
+
+import { JSX,useState,useRef, useEffect} from "react"
+//import { projectDataStore } from "@renderer/store/projectStore";
 type GoalsArray = {desc:string, completed:boolean}[]
 
-export const AddGoalsDiv =({goals, editFunc}:{goals: GoalsChecklistType, id?:string, editFunc?:(()=>void) |((goals:GoalsArray)=>void) }):JSX.Element=>{
+export const AddGoalsDiv =({goals, editFunc, source}:{goals: GoalsArray,source:string, editFunc:(goals:GoalsArray)=>void }):JSX.Element=>{
     const [open, setOpen] =useState<boolean>(false)
      const inputRef = useRef<HTMLInputElement | null>(null)
       const currentEditRef = useRef<HTMLInputElement | null>(null)
-     const [newGoals,setNewGoals] = useState<GoalsArray>(goals.goals)
+     const [newGoals,setNewGoals] = useState<GoalsArray>(goals)
      
      const [editGoalNum,setEditGoalNum]= useState<number|null>(null)
+     const [saveButtonActive, setSaveButtonActive] = useState<boolean>(true)
      const removeGoal =(i:number):void=>{
-      const removedGoals  = newGoals.splice(i,1)
-      setNewGoals(removedGoals)
+      setNewGoals(prev=>{
+        const copy = [...prev]
+        copy.splice(i,1)
+        return copy
+
+        })
+        setSaveButtonActive(false)
      }
      const editGoal =():void=>{
        const editedGoalText = currentEditRef.current && currentEditRef.current.value.length >0 ? currentEditRef.current.value : ""
       const goalsEdited = newGoals.map((goal,index)=>index==editGoalNum ? {...goal,desc:editedGoalText}:goal)
       setNewGoals(goalsEdited)
       setEditGoalNum(null)
+      setSaveButtonActive(false)
      }
      const addGoal =():void=>{
         const newGoal = inputRef.current && inputRef.current.value.length >0 ? inputRef.current.value : ""
+        
        setNewGoals([...(newGoals ?? []), {desc:newGoal, completed:false}]);
+       if(inputRef.current && inputRef.current.value.length >0)inputRef.current.value = ""
+       setSaveButtonActive(false)
      }
+
+     useEffect(()=>{
+       if(source == "project-form"){
+        editFunc(newGoals)
+       }
+console.log("new goals updated")
+
+     },[newGoals,source,editFunc])
+
+    
      const editBox =(i:number):void=>{
           setNewGoals(prev =>prev.map((g, index) =>
             index === i ? { ...g, completed: !g.completed } : g
           )
         );
+        setSaveButtonActive(false)
      }
         const openChecklistEditor =():void=>{
             setOpen(prev=>!prev)
@@ -45,8 +66,8 @@ export const AddGoalsDiv =({goals, editFunc}:{goals: GoalsChecklistType, id?:str
           {i == editGoalNum ?
           <div>
              <input ref={currentEditRef} type="text" defaultValue={goal.desc}></input>
-             <button onClick={editGoal}>save</button>
-             <button onClick={()=>setEditGoalNum(null)}>cancel</button>     
+             <button type="button" onClick={editGoal}>save</button>
+             <button type="button" onClick={()=>setEditGoalNum(null)}>cancel</button>     
              </div>
           :
           <div>
@@ -64,8 +85,9 @@ export const AddGoalsDiv =({goals, editFunc}:{goals: GoalsChecklistType, id?:str
         }
       }}  />} 
       />
-      <button onClick={()=>{setEditGoalNum(i)}} >Edit</button>
-      <button onClick={()=>removeGoal(i)} >X</button> 
+      <button type="button" onClick={()=>{setEditGoalNum(i)}} >Edit</button>
+      <button type="button" onClick={()=>removeGoal(i)} >X</button> 
+      <p>{`id: ${i}`}</p>
     </div>         }      
  </div>)
        })}</FormGroup>  :<p>No goals yet</p>
@@ -73,11 +95,12 @@ export const AddGoalsDiv =({goals, editFunc}:{goals: GoalsChecklistType, id?:str
     return(
         <div>
             {userGoals}
-            <button onClick={openChecklistEditor}>{open ? "close" : "open"}</button>
+            <button type="button" onClick={openChecklistEditor}>{open ? "close" : "open"}</button>
             <label htmlFor="write-goal">Set Goal</label>
             <input ref ={inputRef} type="text" id="write-goal" name="write-goal"/>
-            <button onClick={addGoal} >Add Goal</button>
-            <button onClick={()=>editFunc(newGoals)}>Save Changes</button>
+            <button type="button" onClick={addGoal} >Add Goal</button>
+            {source  == "project-base" && <button className='submit-btn' disabled={saveButtonActive} type="button" onClick={()=>{editFunc(newGoals); setSaveButtonActive(true)} }>Save Changes</button>}
+            
             
         </div>
     )

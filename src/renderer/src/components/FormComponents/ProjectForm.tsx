@@ -14,7 +14,7 @@ import { projectDataStore,
     } from "@renderer/store/projectStore"
 import { FormElement } from "./FormElement"
 import { LoadingRoller } from "../LoadingRoller"
-import { GoalsChecklistType } from "@renderer/types"
+//import { GoalsChecklistType } from "@renderer/types"
 import { AddGoalsDiv } from "@renderer/subComponents/AddGoalsDiv"
 type GoalsArray = {desc:string, completed:boolean}[]
 export type OptionComponentProps={
@@ -60,9 +60,13 @@ const [newGoals,setNewGoals] = useState<GoalsArray | undefined>(initialValues?.g
             const categoryVal :string = category.toLowerCase()
             setSelectedOptions({...selectedOptions, [categoryVal]:values})  
         }
-         const addGoal =(goals:GoalsArray):void=>{
-       
-       console.log(goals)
+         const updateGoals =(goals:GoalsArray):void=>{
+            if(goals !== newGoals){
+                 if(isNotActive) setIsNotActive(false)
+
+            }
+            
+            setNewGoals(goals)      
      }
         const handleSubmit=async(event: FormEvent<HTMLFormElement>): Promise<void>=>{
             event.preventDefault()
@@ -77,7 +81,7 @@ const [newGoals,setNewGoals] = useState<GoalsArray | undefined>(initialValues?.g
            }
             const projectFormInfo : ProjectFormSubmitType={
                 name: projectName,
-                goals_checklist:{goals:[]},
+                goals_checklist:newGoals ? {goals:newGoals}: {goals:[]},
                 description: projectDescription,
                 categories: selectedOptions,
                 completed:isCompleted,
@@ -118,7 +122,7 @@ const [newGoals,setNewGoals] = useState<GoalsArray | undefined>(initialValues?.g
             <FormElement changeActive={changeActive} name="is-completed" classAssigned="row check-box-sec" type="checkbox" defaultChecked={initialValues?.completed ?? false}>
                 Completed
             </FormElement>
-           <AddGoalsDiv/>
+           <AddGoalsDiv source="project-form" goals={newGoals ?? []} editFunc={updateGoals}/>
             <button disabled={isNotActive} className="submit-btn" type="submit">Submit</button>
             {resultFromBackend.message && <p>{resultFromBackend.message}</p> }
         </form>

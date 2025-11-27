@@ -25,7 +25,7 @@ if(!projects) return <>No projects yet</>
 }    
  return(
     <>
-    <NavLink state={{save:null}} to="/dashboard">
+    <NavLink state={{save:null}} to="/dashboard/project-ideas">
                     <button>X</button>
                 </NavLink>
       <ProjectForm onSubmit={patchRequestCheck} initialValues={projectWithoutId} />

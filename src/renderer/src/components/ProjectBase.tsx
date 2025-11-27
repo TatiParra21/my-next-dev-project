@@ -67,7 +67,7 @@ export const ProjectBase =({state, id}:{state:{save:string}, id:string}): JSX.El
             <p id="desc" >  {projectInfo.description}</p>
             <p>{`Completed: ${projectInfo.completed ? "YES" : "NO"}`}</p>
             </div>
-            <AddGoalsDiv editFunc={submitGoals} goals={projectGoals}/>
+            <AddGoalsDiv source="project-base" editFunc={submitGoals} goals={projectGoals.goals}/>
              <div className="flex row edit-delete-sec">
                 <NavLink className="other-nav"  state={{save:save, from:"/project-ideas"}} to={save}>Edit</NavLink>
                 <button onClick={toggleWarning} >Delete</button>
