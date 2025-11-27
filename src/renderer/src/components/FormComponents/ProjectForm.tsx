@@ -7,20 +7,16 @@ import { OptionComponents } from "../../subComponents/OptionsComponents"
 import { projectDataStore,
     formStore, 
     selectIsNotActive, 
-    selectSelectedOptions, 
     selectSetIsNotActive,  
-    selectSetSelectedOptions, 
     selectUpdateProjects,
     googleAuthStore,
     selectAuthLoading,
     } from "@renderer/store/projectStore"
 import { FormElement } from "./FormElement"
 import { LoadingRoller } from "../LoadingRoller"
-
-/*
-export const capitalizeFirstLetter =(value: string):string=>{
-    return value.charAt(0).toUpperCase() + value.slice(1)
-  } */
+import { GoalsChecklistType } from "@renderer/types"
+import { AddGoalsDiv } from "@renderer/subComponents/AddGoalsDiv"
+type GoalsArray = {desc:string, completed:boolean}[]
 export type OptionComponentProps={
     initialValues?: CategoriesTypeObjArr, 
     onChange: (category:string,values: MultiValue<OptionOf<AllCategoriesType>>) => void,
@@ -37,8 +33,9 @@ export type ProjectFormType ={
 export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
     const {initialValues, onSubmit} :ProjectFormType = form
     const location= useLocation()
-    const selectedOptions = formStore(selectSelectedOptions)
-    const setSelectedOptions  = formStore(selectSetSelectedOptions)
+const [newGoals,setNewGoals] = useState<GoalsArray | undefined>(initialValues?.goals_checklist.goals)
+    const [selectedOptions, setSelectedOptions] = useState<CategoriesTypeObjArr>({})
+   
     const [resultFromBackend,setResultFromBackend] = useState<ResultFromBackendType>({message:"",success:false})
     const isNotActive  = formStore(selectIsNotActive)
     const  setIsNotActive  = formStore(selectSetIsNotActive)
@@ -63,6 +60,10 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
             const categoryVal :string = category.toLowerCase()
             setSelectedOptions({...selectedOptions, [categoryVal]:values})  
         }
+         const addGoal =(goals:GoalsArray):void=>{
+       
+       console.log(goals)
+     }
         const handleSubmit=async(event: FormEvent<HTMLFormElement>): Promise<void>=>{
             event.preventDefault()
             const formEl = event.currentTarget
@@ -117,7 +118,7 @@ export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
             <FormElement changeActive={changeActive} name="is-completed" classAssigned="row check-box-sec" type="checkbox" defaultChecked={initialValues?.completed ?? false}>
                 Completed
             </FormElement>
-           
+           <AddGoalsDiv/>
             <button disabled={isNotActive} className="submit-btn" type="submit">Submit</button>
             {resultFromBackend.message && <p>{resultFromBackend.message}</p> }
         </form>

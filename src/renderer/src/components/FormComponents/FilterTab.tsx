@@ -1,6 +1,6 @@
 
 import type { OptionOf } from "@renderer/types"
-
+import type { ProjectType } from "@renderer/types"
 import type { AllCategoriesType } from "@renderer/info"
 import { MultiValue } from "react-select"
 import type {  CategoriesTypeObjArr } from "@renderer/types"
@@ -50,7 +50,7 @@ export const FilterTab=():JSX.Element=>{
                         categories: selectedFilters,
                         completed:isCompleted,         
                     }
-         const resultFromBackend :ResultFromBackendType |[] = await fetchFilteredRequest( filtersChosen)
+         const resultFromBackend :ResultFromBackendType |null | ProjectType[] = await fetchFilteredRequest( filtersChosen)
          console.log(resultFromBackend, "result from filter")
     }       
     return(

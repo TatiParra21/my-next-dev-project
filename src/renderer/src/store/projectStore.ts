@@ -1,5 +1,5 @@
 import {create} from "zustand"
-import type { CategoriesTypeObjArr,ProjectType } from "@renderer/types"
+import type { ProjectType } from "@renderer/types"
 import { fetchRequest } from "@renderer/functions/requests";
 
 export type ProjectDataStoreType ={
@@ -28,19 +28,19 @@ export const selectSetLoading = (state:ProjectDataStoreType):(value:boolean)=>vo
 export const selectUpdateProjects = (state:ProjectDataStoreType):()=>Promise<void>=>state.updateProjects
 
 export type FormStoreType ={
-    selectedOptions: CategoriesTypeObjArr,
-    setSelectedOptions: (selectedOptions:CategoriesTypeObjArr)=>void,
+   // selectedOptions: CategoriesTypeObjArr,
+   // setSelectedOptions: (selectedOptions:CategoriesTypeObjArr)=>void,
     isNotActive: boolean,
     setIsNotActive: (value:boolean)=>void
 }
 export const formStore = create<FormStoreType>((set)=>({
-     selectedOptions: {},
-    setSelectedOptions: (selectedOptions:CategoriesTypeObjArr)=>set(({selectedOptions})),
+   //  selectedOptions: {},
+   // setSelectedOptions: (selectedOptions:CategoriesTypeObjArr)=>set(({selectedOptions})),
     isNotActive: true,
     setIsNotActive: (value:boolean)=>set({isNotActive:value})
 }))
-export const selectSelectedOptions= (state:FormStoreType):CategoriesTypeObjArr=>state.selectedOptions
-export const selectSetSelectedOptions= (state:FormStoreType): (selectedOptions:CategoriesTypeObjArr)=>void=>state.setSelectedOptions
+//export const selectSelectedOptions= (state:FormStoreType):CategoriesTypeObjArr=>state.selectedOptions
+//export const selectSetSelectedOptions= (state:FormStoreType): (selectedOptions:CategoriesTypeObjArr)=>void=>state.setSelectedOptions
 export const selectIsNotActive= (state:FormStoreType):boolean=>state.isNotActive
 export const selectSetIsNotActive= (state:FormStoreType):(value:boolean)=>void=>state.setIsNotActive
 

@@ -13,12 +13,6 @@ const mergedElectronAPI = {
     //this is returning anEventListerner
     ipcRenderer.on("auth-token-url", (_, url) => callback(url));
   },
-  /*
-  onOAuthSuccess: (callback: (data: any) => void) =>
-    ipcRenderer.on("oauth-success", (_, data) => callback(data)),
-  onOAuthError: (callback: (msg: string) => void) =>
-    ipcRenderer.on("oauth-error", (_, msg) => callback(msg)),
-  */
 };
 
 contextBridge.exposeInMainWorld("secureAuth", {
@@ -36,18 +30,7 @@ if (process.contextIsolated) {
   }
 } else {
   // Fallback for disabled context isolation (rare)
-  (window as any).electron = mergedElectronAPI;
+  //from my understanding typescript won't let you change the built in window type so 
+  // we must first erase its type (unknown) before reasserting a version that includes our custom Electron APIs.
+  (window as unknown as { electron: typeof mergedElectronAPI }).electron = mergedElectronAPI;
 }
-
-/*
-  myIpcRenderer: {
-    // ✅ Add limited custom IPC listeners
-    on: (channel: string, func: (...args: any[]) => void) => {
-      const validChannels = ["auth-token-url", "check-session", "deep-link"];
-      if (validChannels.includes(channel)) {
-        ipcRenderer.on(channel, (_event, ...args) => func(...args));
-      }
-    },
-    send: (channel: string, data?: any) => ipcRenderer.send(channel, data),
-  },
-*/
