@@ -1,22 +1,16 @@
-import {  FormEvent, JSX, useEffect, useState } from "react"
+import {  JSX,} from "react"
 import type { OptionOf, ProjectType, CategoriesTypeObjArr, ProjectFormSubmitType } from "@renderer/types"
-import { useLocation } from "react-router-dom"
+
 import type { AllCategoriesType } from "@renderer/info"
 import { MultiValue } from "react-select"
 import { OptionComponents } from "../../subComponents/OptionsComponents"
-import { projectDataStore,
-    formStore, 
-    selectIsNotActive, 
-    selectSetIsNotActive,  
-    selectUpdateProjects,
-    googleAuthStore,
-    selectAuthLoading,
+import { 
     } from "@renderer/store/projectStore"
 import { FormElement } from "./FormElement"
 import { LoadingRoller } from "../LoadingRoller"
 //import { GoalsChecklistType } from "@renderer/types"
 import { AddGoalsDiv } from "@renderer/subComponents/AddGoalsDiv"
-type GoalsArray = {desc:string, completed:boolean}[]
+
 export type OptionComponentProps={
     initialValues?: CategoriesTypeObjArr, 
     onChange: (category:string,values: MultiValue<OptionOf<AllCategoriesType>>) => void,
@@ -31,80 +25,7 @@ export type ProjectFormType ={
     onSubmit: (projectData: Array<ProjectFormSubmitType>) => Promise<ResultFromBackendType |null>
 }
 export const ProjectForm=(form:ProjectFormType):JSX.Element=>{
-    const {initialValues, onSubmit} :ProjectFormType = form
-    const location= useLocation()
-const [newGoals,setNewGoals] = useState<GoalsArray | undefined>(initialValues?.goals_checklist.goals)
-    const [selectedOptions, setSelectedOptions] = useState<CategoriesTypeObjArr>({})
-   
-    const [resultFromBackend,setResultFromBackend] = useState<ResultFromBackendType>({message:"",success:false})
-    const isNotActive  = formStore(selectIsNotActive)
-    const  setIsNotActive  = formStore(selectSetIsNotActive)
-    const updateProjects = projectDataStore(selectUpdateProjects)
-    const loading = googleAuthStore(selectAuthLoading)
-    //const userTest = googleAuthStore(selectUser)
-
-    useEffect(()=>{ 
-        if(initialValues && initialValues.categories){
-            setSelectedOptions(initialValues.categories)
-        }else{
-            setSelectedOptions({})
-        }
-            //console.log(location.state, "FROm")
-    },[initialValues,setSelectedOptions])
-    const changeActive =():void=>{
-        setIsNotActive(false)
-       setResultFromBackend({...resultFromBackend, success:false})
-    }
-        const handleCategoryChoices =(category:string,values:MultiValue<OptionOf<AllCategoriesType>>):void=>{
-           if(isNotActive) setIsNotActive(false)
-            const categoryVal :string = category.toLowerCase()
-            setSelectedOptions({...selectedOptions, [categoryVal]:values})  
-        }
-         const updateGoals =(goals:GoalsArray):void=>{
-            if(goals !== newGoals){
-                 if(isNotActive) setIsNotActive(false)
-
-            }
-            
-            setNewGoals(goals)      
-     }
-        const handleSubmit=async(event: FormEvent<HTMLFormElement>): Promise<void>=>{
-            event.preventDefault()
-            const formEl = event.currentTarget
-            const formData :FormData = new FormData(formEl)
-             const isCompleted :boolean = formData.get("is-completed") === "on"
-            const projectDescription = formData.get("project-description")
-            const projectName = formData.get("project-name")
-            console.log(projectName, "naem")
-           if(typeof projectName !== "string" || typeof projectDescription !== "string"){
-                throw new Error("No project name")
-           }
-            const projectFormInfo : ProjectFormSubmitType={
-                name: projectName,
-                goals_checklist:newGoals ? {goals:newGoals}: {goals:[]},
-                description: projectDescription,
-                categories: selectedOptions,
-                completed:isCompleted,
-            }
-        const resultFromBackend :ResultFromBackendType |null = await onSubmit([projectFormInfo])
-            console.log(resultFromBackend, "back")
-             console.log(location.pathname,"path")
-            if(resultFromBackend)
-               
-        if( resultFromBackend.success && location.pathname == "/dashboard/write-new-project"){         
-            formEl.reset()
-            setSelectedOptions({})
-              setResultFromBackend(resultFromBackend )
-            updateProjects()          
-        }else if(resultFromBackend.success){
-            updateProjects()
-            setResultFromBackend({...resultFromBackend, success: true} )
-            setIsNotActive(true)
-            
-            }else if(resultFromBackend.message &&!resultFromBackend.success ){
-                setResultFromBackend({message: resultFromBackend.message , success: false})
-            }       
-        } 
+    const {loading,handleSubmit,changeActive,selectedOptions,handleCategoryChoices,initialValues, newGoals,updateGoals,isNotActive,resultFromBackend}
         console.log("loading??",loading)
         window.addEventListener("blur", () => console.log("❌ Window blurred"));
         window.addEventListener("focus", () => console.log("✅ Window focused"));
