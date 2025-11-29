@@ -94,12 +94,16 @@ console.log("new goals updated")
     
     return(
         <div>
-            {userGoals}
-            <button type="button" onClick={openChecklistEditor}>{open ? "close" : "open"}</button>
+            <button type="button" onClick={openChecklistEditor}>{open ? "Hide Goals" : "Show Goals"}</button>
+            {open &&<> {userGoals}
             <label htmlFor="write-goal">Set Goal</label>
             <input ref ={inputRef} type="text" id="write-goal" name="write-goal"/>
             <button type="button" onClick={addGoal} >Add Goal</button>
-            {source  == "project-base" && <button className='submit-btn' disabled={saveButtonActive} type="button" onClick={()=>{editFunc(newGoals); setSaveButtonActive(true)} }>Save Changes</button>}
+            {source  == "project-base" && 
+            <button className='submit-btn' disabled={saveButtonActive} 
+            type="button" 
+            onClick={()=>{editFunc(newGoals); setSaveButtonActive(true)} }>Save Changes</button>} </> }
+            
             
             
         </div>

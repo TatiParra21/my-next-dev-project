@@ -25,7 +25,7 @@ export const FilterTab=():JSX.Element=>{
         setShowFilter(prev=>!prev)
     }
     if(!projects){
-        return <div>...Loading</div>
+        return <div>...Loading from filter</div>
     }
 
     const isNotActive = formStore(selectIsNotActive)

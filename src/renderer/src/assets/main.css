@@ -200,9 +200,9 @@ button{
   background-color: gray;
 }
 
-.select-btn{
+/* .select-btn{
   padding:1em;
-}
+} */
 /* Extra large devices (large desktops, 1200px and up) */
 @media (min-width: 1200px) { 
   /* styles */

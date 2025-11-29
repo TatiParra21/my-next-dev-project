@@ -26,7 +26,7 @@ export const SelectionCell =({project,save, show,showInfo}:{
                 <button ref={projectRef}  tabIndex={-1} className="flex colum select-btn" onClick={()=>showInfo(project.id)}>{project.name}</button>
                 {show == project.id &&
                 
-                    <ProjectBase state={{save:`${save}/${project.id}`}} id={project.id} />  
+                    <ProjectBase projectInfo={project} state={{save:`${save}/${project.id}`}} />  
                 }    
             </div>)
 }
@@ -40,7 +40,7 @@ const ProjectSelectionBase =():JSX.Element=>{
 }
       const location = useLocation()
     const save :string= `${location.pathname}`
-    const projects : ProjectType[] | null = projectDataStore(selectProjects)
+    const projects : ProjectType[] | [] = projectDataStore(selectProjects)
     console.log(projects, "seeing")
     const loading :boolean = projectDataStore(selectLoading)
     if(!projects){
@@ -49,8 +49,7 @@ const ProjectSelectionBase =():JSX.Element=>{
     }else {
          return<div>No projects yet</div>
         }
-    }
-   
+    }  
    const projectSelection :JSX.Element[] = projects.map((project:ProjectType)=>{
         return(
            <SelectionCell show={show} showInfo={showInfo} key={project.id} project={project} save={save}/>)
@@ -58,7 +57,7 @@ const ProjectSelectionBase =():JSX.Element=>{
     return(<>
         <FilterTab/>
         <div className={clsx("all-project-cells", show && "adjust-cells")}>
-            {!projects && <>NO PROJECTS</>}
+            {projects.length == 0 && <>NO PROJECTS</>}
             {projectSelection} 
         </div>
     </>

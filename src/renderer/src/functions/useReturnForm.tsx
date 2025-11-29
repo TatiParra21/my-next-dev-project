@@ -12,9 +12,6 @@ import { projectDataStore,
     googleAuthStore,
     selectAuthLoading,
     } from "@renderer/store/projectStore"
-
-//import { GoalsChecklistType } from "@renderer/types"
-
 type GoalsArray = {desc:string, completed:boolean}[]
 export type OptionComponentProps={
     initialValues?: CategoriesTypeObjArr, 
@@ -30,7 +27,20 @@ export type ProjectFormType ={
     onSubmit: (projectData: Array<ProjectFormSubmitType>) => Promise<ResultFromBackendType |null>
 }
 
-export const useReturnForm =(form:ProjectFormType)=>{
+export type UseFormReturnType ={
+    loading: boolean;
+    handleSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>;
+    changeActive: () => void;
+    selectedOptions: CategoriesTypeObjArr;
+    handleCategoryChoices: (category: string, values: MultiValue<OptionOf<AllCategoriesType>>) => void;
+    initialValues: ProjectFormSubmitType |undefined;
+    newGoals: GoalsArray | undefined;
+    updateGoals: (goals: GoalsArray) => void;
+    isNotActive: boolean;
+    resultFromBackend: ResultFromBackendType;
+}
+
+export const useReturnForm =(form:ProjectFormType):UseFormReturnType=>{
         const {initialValues, onSubmit} :ProjectFormType = form
     const location= useLocation()
 const [newGoals,setNewGoals] = useState<GoalsArray | undefined>(initialValues?.goals_checklist.goals)
@@ -59,10 +69,12 @@ const [newGoals,setNewGoals] = useState<GoalsArray | undefined>(initialValues?.g
            if(isNotActive) setIsNotActive(false)
             const categoryVal :string = category.toLowerCase()
             setSelectedOptions({...selectedOptions, [categoryVal]:values})  
+            setResultFromBackend({message:"",success:false})
         }
          const updateGoals =(goals:GoalsArray):void=>{
             if(goals !== newGoals){
                  if(isNotActive) setIsNotActive(false)
+                    setResultFromBackend({message:"",success:false})
 
             }
             

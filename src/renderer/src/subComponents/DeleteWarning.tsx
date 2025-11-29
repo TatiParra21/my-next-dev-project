@@ -3,13 +3,8 @@ import { JSX,  } from "react"
 import { deleteRequest } from "@renderer/functions/requests"
 import {projectDataStore, selectUpdateProjects} from "@renderer/store/projectStore"
 import { NavLink } from "react-router-dom";
-export const DeleteWarning =({on, id, toggleWarning}:{on:boolean, id:string, toggleWarning:()=>void}): JSX.Element =>{
-     
-    const updateProject = projectDataStore(selectUpdateProjects)
-    const loading= projectDataStore(state=>state.loading)
-    if(loading){
-        return <div>...Loading</div>
-    }
+export const DeleteWarning =({on, id, toggleWarning}:{on:boolean, id:string, toggleWarning:()=>void}): JSX.Element =>{   
+    const updateProject = projectDataStore(selectUpdateProjects)   
     const deleteRequestAndReset =async():Promise<void>=>{
        await deleteRequest(id)
        await updateProject()     

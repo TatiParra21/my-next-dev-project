@@ -3,44 +3,43 @@ import type { ProjectType } from "@renderer/types"
 import { fetchRequest } from "@renderer/functions/requests";
 
 export type ProjectDataStoreType ={
-    projects: ProjectType[] | [],
+    projects: ProjectType[] ,
     setProjects: (projects:ProjectType[] |[])=>void,
     loading:boolean,
     setLoading: (value:boolean)=>void,
+    openedProject: ProjectType | null,
+    setOpenedProject:(project:ProjectType | null)=>void
     updateProjects: ()=>Promise<void>
 }
 export const projectDataStore = create<ProjectDataStoreType>((set)=>({
     projects: [], //starting,
-    setProjects: (projects: ProjectType[] | [])=>set({projects:projects}),
+    setProjects: (projects: ProjectType[])=>set({projects:projects}),
     loading: true,
     setLoading: (value:boolean)=>set({loading:value}),
+    openedProject: null,
+    setOpenedProject:(openedProject:ProjectType | null)=>set({openedProject:openedProject}),
     updateProjects: async()=>{
-      const projects:ProjectType[] | [] = await fetchRequest()
+      const projects:ProjectType[] = await fetchRequest()
          projectDataStore.setState({projects:projects})
     }
 
 }))
 
 export const selectProjects = (state:ProjectDataStoreType):ProjectType[] | []=>state.projects
-export const selectSetProjects = (state:ProjectDataStoreType):(projects:ProjectType[] |[])=>void=>state.setProjects
+export const selectSetProjects = (state:ProjectDataStoreType):(projects:ProjectType[] )=>void=>state.setProjects
 export const selectLoading = (state:ProjectDataStoreType):boolean=>state.loading
 export const selectSetLoading = (state:ProjectDataStoreType):(value:boolean)=>void=>state.setLoading
 export const selectUpdateProjects = (state:ProjectDataStoreType):()=>Promise<void>=>state.updateProjects
 
 export type FormStoreType ={
-   // selectedOptions: CategoriesTypeObjArr,
-   // setSelectedOptions: (selectedOptions:CategoriesTypeObjArr)=>void,
     isNotActive: boolean,
     setIsNotActive: (value:boolean)=>void
 }
 export const formStore = create<FormStoreType>((set)=>({
-   //  selectedOptions: {},
-   // setSelectedOptions: (selectedOptions:CategoriesTypeObjArr)=>set(({selectedOptions})),
     isNotActive: true,
     setIsNotActive: (value:boolean)=>set({isNotActive:value})
 }))
-//export const selectSelectedOptions= (state:FormStoreType):CategoriesTypeObjArr=>state.selectedOptions
-//export const selectSetSelectedOptions= (state:FormStoreType): (selectedOptions:CategoriesTypeObjArr)=>void=>state.setSelectedOptions
+
 export const selectIsNotActive= (state:FormStoreType):boolean=>state.isNotActive
 export const selectSetIsNotActive= (state:FormStoreType):(value:boolean)=>void=>state.setIsNotActive
 

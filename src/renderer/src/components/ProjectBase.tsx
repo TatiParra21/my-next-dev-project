@@ -3,7 +3,7 @@ import { JSX,useState} from "react"
 import type { ProjectType,CategoriesTypeObjArr, GoalsChecklistType } from "@renderer/types"
 import { AddGoalsDiv } from "@renderer/subComponents/AddGoalsDiv"
 import { DeleteWarning } from "@renderer/subComponents/DeleteWarning"
-import { projectDataStore,selectLoading, selectProjects} from "@renderer/store/projectStore"
+import { projectDataStore} from "@renderer/store/projectStore"
 import { patchGoalsRequest } from "@renderer/functions/requests"
 import { ResultFromBackendType } from "./FormComponents/ProjectForm"
 
@@ -15,8 +15,6 @@ type LabelsOnly ={
     frameworks: Capitalize<string>[] | undefined;
     libraries: Capitalize<string>[] | undefined;
 }
-
-
 const extractLabels =(categories?:CategoriesTypeObjArr):LabelsOnly=>{
         return {
         languages: categories?.languages?.map(val=>val.label) ,
@@ -33,43 +31,38 @@ export const CategoryElements = ({arr}:{arr:LabelsOnly}): JSX.Element=>{
    </>
 }
 type GoalsArray = {desc:string, completed:boolean}[]
-export const ProjectBase =({state, id}:{state:{save:string}, id:string}): JSX.Element=>{
+export const ProjectBase =({state, projectInfo}:{state:{save:string}, projectInfo:ProjectType}): JSX.Element=>{
     const [warning, setWarning] = useState<boolean>(false)
     const updateProjects = projectDataStore(s=>s.updateProjects)
+    const setOpenedProject = projectDataStore(s=>s.setOpenedProject)
     const toggleWarning =():void=>{
       setWarning(prev=>!prev)
     }
-    if(!id)throw new Error(" id not found") 
-    const projects: ProjectType[] | null  = projectDataStore(selectProjects)
-     console.log(projects, "projects")
-    const loading  = projectDataStore(selectLoading)
-    if(!projects || loading)return <h2>...Loading inn ProjetBa</h2>
-          const projectInfo :ProjectType | undefined = projects.find((pro: ProjectType)=>id == pro.id)
-    if(!projectInfo )return <h2>...Loading</h2>
   const projectGoals: GoalsChecklistType = projectInfo.goals_checklist
    const labels :LabelsOnly = extractLabels(projectInfo.categories)
     const save :string = state.save  
 
     const submitGoals =async(newGoals:GoalsArray):Promise<void>=>{
-        const res :ResultFromBackendType | null= await patchGoalsRequest(id,{goals:newGoals})
+        const res :ResultFromBackendType | null= await patchGoalsRequest(projectInfo.id,{goals:newGoals})
         console.log(res, "res form submit")
         if(res && res.success)updateProjects()
     }
     return(
         <div className="flex colum">
-             <DeleteWarning toggleWarning={toggleWarning} on={warning} id={id} />    
+             <DeleteWarning toggleWarning={toggleWarning} on={warning} id={projectInfo.id} />    
            <div className="middle-part flex colum">
             <div>
                 <h2><span className="category-class">Name:</span>{` ${projectInfo.name}`}</h2>
                 <CategoryElements arr={labels}/>
             </div>
             <label className="category-class" htmlFor="desc">Description: </label>
-            <p id="desc" >  {projectInfo.description}</p>
             <p>{`Completed: ${projectInfo.completed ? "YES" : "NO"}`}</p>
+            <p id="desc" >  {projectInfo.description}</p>
+            
             </div>
             <AddGoalsDiv source="project-base" editFunc={submitGoals} goals={projectGoals.goals}/>
              <div className="flex row edit-delete-sec">
-                <NavLink className="other-nav"  state={{save:save, from:"/project-ideas"}} to={save}>Edit</NavLink>
+                <NavLink onClick={()=>{ setOpenedProject(projectInfo)}} className="other-nav"  state={{save:save, from:"/project-ideas"}} to={save}>Edit</NavLink>
                 <button onClick={toggleWarning} >Delete</button>
             </div>
         </div>

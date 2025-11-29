@@ -1,35 +1,33 @@
-import { JSX } from "react"
-import {useParams, NavLink } from "react-router-dom"
-import { projectDataStore} from "@renderer/store/projectStore"
+import { JSX, useRef } from "react"
+import { NavLink } from "react-router-dom"
 import { ProjectForm, type ResultFromBackendType } from "./ProjectForm"
 import { patchRequest } from "@renderer/functions/requests"
 import type { ProjectType, ProjectFormSubmitType } from "@renderer/types"
 import { compareForms, type CompareResults } from "@renderer/functions/compareForms"
+import { projectDataStore } from "@renderer/store/projectStore"
+import { useScrollToComponent } from "@renderer/functions/useScrollToComponent"
+const ProjectBaseEdit =():JSX.Element=>{
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  useScrollToComponent(containerRef)
 
- const ProjectBaseEdit =():JSX.Element=>{
- const params = useParams()
- const idState :string |undefined = params.id
- if(!idState) throw new Error("no idea param")
-  const projects = projectDataStore(state=>state.projects)
-const  loading = projectDataStore(state=>state.loading)
-if(!projects) return <>No projects yet</>
-     const projectInfo :ProjectType |undefined = projects.find((pro: ProjectType)=>idState == pro.id)
-     if(!projectInfo || loading)return<h2>...Loading Project</h2>
+ const projectInfo: ProjectType | null = projectDataStore(s=>s.openedProject)
+ const setOpenedProject = projectDataStore(s=>s.setOpenedProject)
+  if(!projectInfo)return <p>...Loading Project information</p>
       const { id, ...projectWithoutId}=projectInfo
-     // console.log(id, idState, "seeing whcih to replace")
       const patchRequestCheck =async(body: Array<ProjectFormSubmitType> ):Promise<ResultFromBackendType |null>=>{
       const mainBody :ProjectFormSubmitType = body[0]
-        const updatedResults : CompareResults= compareForms({original:projectWithoutId,updated:mainBody})
-        const request: Promise<ResultFromBackendType | null> = patchRequest(id, updatedResults )      
-          return request 
-}    
- return(
-    <>
-    <NavLink state={{save:null}} to="/dashboard/project-ideas">
+      const updatedResults : CompareResults= compareForms({original:projectWithoutId,updated:mainBody})
+      const request: Promise<ResultFromBackendType | null> = patchRequest(id, updatedResults )      
+        return request 
+  }    
+
+ return(  
+    <div ref={containerRef}>
+    <NavLink onClick={()=>{setOpenedProject(null)}} state={{save:null}} to="/dashboard/project-ideas">
                     <button>X</button>
                 </NavLink>
       <ProjectForm onSubmit={patchRequestCheck} initialValues={projectWithoutId} />
-    </>
+    </div>
  )
 }
 

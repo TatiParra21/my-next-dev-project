@@ -1,14 +1,10 @@
 
 import { JSX } from "react";
-
-
 type FormElementType ={
-    changeActive: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>)=>void,
-    
+    changeActive: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>)=>void,   
     name:string,
     classAssigned:string
-    children: React.ReactNode,
-    
+    children: React.ReactNode,   
 }& React.InputHTMLAttributes<HTMLInputElement>  & React.TextareaHTMLAttributes<HTMLTextAreaElement>
 export const FormElement =({changeActive, name, children,classAssigned, ...props}:FormElementType):JSX.Element=>{
 

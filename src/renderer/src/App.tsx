@@ -32,13 +32,10 @@ function App(): React.JSX.Element {
  const loading = googleAuthStore(selectAuthLoading)
 
   useEffect(() => {
-    const runInit =async():Promise<void>=>{
-     
+    const runInit =async():Promise<void>=>{  
       await initAuth()
-
     }
     runInit()   
-    
   }, [initAuth]);
     if (loading) return <LoadingRoller />;
   return (
