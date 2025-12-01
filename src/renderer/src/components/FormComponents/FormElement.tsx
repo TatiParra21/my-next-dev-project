@@ -8,7 +8,7 @@ type FormElementType ={
 }& React.InputHTMLAttributes<HTMLInputElement>  & React.TextareaHTMLAttributes<HTMLTextAreaElement>
 export const FormElement =({changeActive, name, children,classAssigned, ...props}:FormElementType):JSX.Element=>{
 
-return(
+    return(
         <div className={`flex ${classAssigned}`}>
             <label  htmlFor={name}>{children}</label>
             {name == "project-description" ?

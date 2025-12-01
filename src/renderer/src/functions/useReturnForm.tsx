@@ -1,4 +1,4 @@
-import {  FormEvent,  useEffect, useState } from "react"
+import {  FormEvent,useState } from "react"
 import type { OptionOf, ProjectType, CategoriesTypeObjArr, ProjectFormSubmitType } from "@renderer/types"
 import { useLocation } from "react-router-dom"
 import type { AllCategoriesType } from "@renderer/info"
@@ -41,10 +41,10 @@ export type UseFormReturnType ={
 }
 
 export const useReturnForm =(form:ProjectFormType):UseFormReturnType=>{
-        const {initialValues, onSubmit} :ProjectFormType = form
+    const {initialValues, onSubmit} :ProjectFormType = form
     const location= useLocation()
-const [newGoals,setNewGoals] = useState<GoalsArray | undefined>(initialValues?.goals_checklist.goals)
-    const [selectedOptions, setSelectedOptions] = useState<CategoriesTypeObjArr>({})
+    const [newGoals,setNewGoals] = useState<GoalsArray | undefined>(initialValues?.goals_checklist.goals)
+    const [selectedOptions, setSelectedOptions] = useState<CategoriesTypeObjArr>(initialValues &&initialValues.categories ? initialValues.categories : {})
    
     const [resultFromBackend,setResultFromBackend] = useState<ResultFromBackendType>({message:"",success:false})
     const isNotActive  = formStore(selectIsNotActive)
@@ -52,7 +52,8 @@ const [newGoals,setNewGoals] = useState<GoalsArray | undefined>(initialValues?.g
     const updateProjects = projectDataStore(selectUpdateProjects)
     const loading = googleAuthStore(selectAuthLoading)
     //const userTest = googleAuthStore(selectUser)
-
+    
+/*
     useEffect(()=>{ 
         if(initialValues && initialValues.categories){
             setSelectedOptions(initialValues.categories)
@@ -60,7 +61,7 @@ const [newGoals,setNewGoals] = useState<GoalsArray | undefined>(initialValues?.g
             setSelectedOptions({})
         }
             //console.log(location.state, "FROm")
-    },[initialValues,setSelectedOptions])
+    },[initialValues,setSelectedOptions]) */
     const changeActive =():void=>{
         setIsNotActive(false)
        setResultFromBackend({...resultFromBackend, success:false})
@@ -75,7 +76,6 @@ const [newGoals,setNewGoals] = useState<GoalsArray | undefined>(initialValues?.g
             if(goals !== newGoals){
                  if(isNotActive) setIsNotActive(false)
                     setResultFromBackend({message:"",success:false})
-
             }
             
             setNewGoals(goals)      

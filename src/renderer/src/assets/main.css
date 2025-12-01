@@ -1,7 +1,9 @@
 /* stylelint-disable at-rule-no-unknown */
-@import './base.css';
 @import "tailwindcss";
 /* stylelint-enable at-rule-no-unknown */
+
+@import './base.css';
+
 body {
   display: flex;
   justify-content: center;
@@ -13,11 +15,7 @@ body {
   overflow-y: scroll;
 }
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing: border-box;
-}
+
 
 #root {
   display: flex;
@@ -61,6 +59,7 @@ a.other-nav:visited  {
   align-items: center;
 
 }
+
 .delete-warning-div{
   
   align-items: center;
@@ -147,10 +146,6 @@ color:white;
   
 }
 
-
-button{
-  padding: 0 1rem;
-}
 .other-nav{
   background: black;
   color: darkgreen;

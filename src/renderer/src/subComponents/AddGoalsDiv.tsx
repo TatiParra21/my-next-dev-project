@@ -3,7 +3,7 @@
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import Checkbox from '@mui/material/Checkbox';
-
+import { FaEdit } from "react-icons/fa";
 import { JSX,useState,useRef, useEffect} from "react"
 //import { projectDataStore } from "@renderer/store/projectStore";
 type GoalsArray = {desc:string, completed:boolean}[]
@@ -21,7 +21,6 @@ export const AddGoalsDiv =({goals, editFunc, source}:{goals: GoalsArray,source:s
         const copy = [...prev]
         copy.splice(i,1)
         return copy
-
         })
         setSaveButtonActive(false)
      }
@@ -33,18 +32,17 @@ export const AddGoalsDiv =({goals, editFunc, source}:{goals: GoalsArray,source:s
       setSaveButtonActive(false)
      }
      const addGoal =():void=>{
-        const newGoal = inputRef.current && inputRef.current.value.length >0 ? inputRef.current.value : ""
-        
+        const newGoal = inputRef.current && inputRef.current.value.length >0 ? inputRef.current.value : ""       
        setNewGoals([...(newGoals ?? []), {desc:newGoal, completed:false}]);
        if(inputRef.current && inputRef.current.value.length >0)inputRef.current.value = ""
        setSaveButtonActive(false)
      }
-
+     ///this updates the newGoals in baseEdit, 
      useEffect(()=>{
        if(source == "project-form"){
         editFunc(newGoals)
        }
-console.log("new goals updated")
+      console.log("new goals updated")
 
      },[newGoals,source,editFunc])
 
@@ -65,9 +63,9 @@ console.log("new goals updated")
         <div  key={`goal-${i}`}  >
           {i == editGoalNum ?
           <div>
-             <input ref={currentEditRef} type="text" defaultValue={goal.desc}></input>
+             <input className=' bg-white '  ref={currentEditRef} type="text" defaultValue={goal.desc}></input>
              <button type="button" onClick={editGoal}>save</button>
-             <button type="button" onClick={()=>setEditGoalNum(null)}>cancel</button>     
+             <button className='border-solid border-green-500 border-2 text-sm p-0' type="button" onClick={()=>setEditGoalNum(null)}>X</button>     
              </div>
           :
           <div>
@@ -85,19 +83,19 @@ console.log("new goals updated")
         }
       }}  />} 
       />
-      <button type="button" onClick={()=>{setEditGoalNum(i)}} >Edit</button>
+      <button type="button" onClick={()=>{setEditGoalNum(i)}} ><FaEdit/></button>
       <button type="button" onClick={()=>removeGoal(i)} >X</button> 
-      <p>{`id: ${i}`}</p>
+    
     </div>         }      
  </div>)
        })}</FormGroup>  :<p>No goals yet</p>
     
     return(
-        <div>
+        <div className=' border-2 p-4 border-white-400'>
             <button type="button" onClick={openChecklistEditor}>{open ? "Hide Goals" : "Show Goals"}</button>
             {open &&<> {userGoals}
-            <label htmlFor="write-goal">Set Goal</label>
-            <input ref ={inputRef} type="text" id="write-goal" name="write-goal"/>
+            <label  className=' text-gray-100' htmlFor="write-goal">New Goal:</label>
+            <input className=' bg-white '  ref ={inputRef} type="text" id="write-goal" name="write-goal"/>
             <button type="button" onClick={addGoal} >Add Goal</button>
             {source  == "project-base" && 
             <button className='submit-btn' disabled={saveButtonActive} 

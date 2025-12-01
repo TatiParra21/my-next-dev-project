@@ -102,6 +102,7 @@ export const googleAuthStore = create<GoogleAuthStoreType>((set) => ({
     const token = await window.secureAuth.getToken();
     console.log(token, "tokken??/")
     if(!token){
+      console.log("npp tokken found")
       set({loading:false})
       return}
 try {

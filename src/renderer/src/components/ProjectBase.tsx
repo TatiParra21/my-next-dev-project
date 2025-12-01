@@ -62,8 +62,8 @@ export const ProjectBase =({state, projectInfo}:{state:{save:string}, projectInf
             </div>
             <AddGoalsDiv source="project-base" editFunc={submitGoals} goals={projectGoals.goals}/>
              <div className="flex row edit-delete-sec">
-                <NavLink onClick={()=>{ setOpenedProject(projectInfo)}} className="other-nav"  state={{save:save, from:"/project-ideas"}} to={save}>Edit</NavLink>
-                <button onClick={toggleWarning} >Delete</button>
+                <NavLink onClick={()=>{ setOpenedProject(projectInfo)}} className="other-nav "  state={{save:save, from:"/project-ideas"}} to={save}>Edit</NavLink>
+                <button className="text-red-400 border-2 border-red-400 py-0 px-2" onClick={toggleWarning} >Delete</button>
             </div>
         </div>
     )
