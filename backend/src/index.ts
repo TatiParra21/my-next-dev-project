@@ -12,6 +12,9 @@ import { router } from './project_ideas_db';
 import cors from 'cors';
 import express from 'express'
 import listEndpoints from "express-list-endpoints";
+import { generateCodeVerifier } from './EncryptFunctions';
+
+import {type CodeChallengeMethod } from "google-auth-library";
 const app = express();
 const PORT = 3000
 // 👇 Serve your built React files
@@ -32,10 +35,14 @@ const SCOPES = ["openid", "email", "profile"];
 export const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
 // Step 1 – send user to Google Auth page
 app.get("/auth/google", (req, res) => {
+  const { codeVerifier, codeChallenge } =
+    generateCodeVerifier();
   const authUrl = oAuth2Client.generateAuthUrl({
     access_type: "offline",
     prompt: "consent",
     scope: SCOPES,
+    code_challenge: codeChallenge,
+    code_challenge_method: "S256" as CodeChallengeMethod,
   });
   console.log("🌐 Redirecting to Google:", authUrl);
   res.redirect(authUrl);
