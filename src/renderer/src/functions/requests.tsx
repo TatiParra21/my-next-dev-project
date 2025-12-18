@@ -4,24 +4,24 @@ import { ResultFromBackendType} from "@renderer/components/FormComponents/Projec
 import { CategoriesTypeObjArr } from "@renderer/types"
 import { GoalsChecklistType } from "@renderer/types"
 
-const getAuthToken = async(): Promise<string | null> => {
-  const token = await window.secureAuth.getToken();
-  console.log("tokeb in re", token)
-  if (!token) {
-    console.warn("⚠️ No saved Google token found.");
-    return null;
-  }
-  return token;
-};
+// const getAuthToken = async(): Promise<string | null> => {
+//   const token = await window.secureAuth.getToken();
+//   console.log("tokeb in re", token)
+//   if (!token) {
+//     console.warn("⚠️ No saved Google token found.");
+//     return null;
+//   }
+//   return token;
+// };
 const api = async <T,>( url: string, options: RequestInit = {}, requestName:string): Promise<T | null> => {
-  const token = await getAuthToken();
-  if (!token) return null; // this line was fine
+  //const token = await getAuthToken();
+ // if (!token) return null; // this line was fine
   try{
     const hasBody = options.body || ["POST", "PATCH", "PUT"].includes(options.method || "");
     const res = await fetch(`https://my-next-dev-project.onrender.com${url}`, {
     ...options,
     headers: {
-      Authorization: `Bearer ${token}`,
+     // Authorization: `Bearer ${token}`,
       ...hasBody ? { "Content-Type": "application/json" } : {},
       // This spreads any headers the caller passed (important!)
       ...(options.headers ?? {}),

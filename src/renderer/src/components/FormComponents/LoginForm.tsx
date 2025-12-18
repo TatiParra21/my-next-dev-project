@@ -1,8 +1,7 @@
 
 import React, { JSX } from "react"
 import { useLocation, NavLink } from "react-router-dom"
-import { googleAuthStore } from "@renderer/store/projectStore";
-import { useState,useEffect } from "react";
+
 declare global {
   interface Window {
    authAPI: {
@@ -10,42 +9,33 @@ declare global {
     }
   }
 }
+export interface GoogleAuthResult {
+  access_token: string;
+  refresh_token: string;
+  expires_in?: number;
+  token_type?: string;
+}
+
+import { generatePKCEPair } from "@renderer/functions/generatePKCEPair";
 
 export const LoginForm =():JSX.Element=>{
   const location = useLocation()
   const params = location.pathname
-  const [authError, setAuthError] = useState<string | null>(null);
+  //const [authError, setAuthError] = useState<string | null>(null);
   console.log("Current origin is:", window.location.origin); 
   const signInWithGoogle = async ():Promise<void> => {
-     try {
-        window.electron.startGoogleLogin();
+      const { codeVerifier, codeChallenge } = await generatePKCEPair();
+    const result = await window.api.startGoogleLogin(
+      codeVerifier,
+      codeChallenge
+    );
 
-  } catch (err) {
-    console.error("❌ Google Sign-In Error:", err);
-
-    // 👇 Make sure we show the exact error message err as Error & {code?:string}
-  const message = err && typeof err === "object"
-  ? `${(err as Error & {code?:string}).code ?? ""}: ${(err as Error).message ?? ""}`
-  : String(err);
-
-    // Save to screen and also make a visible alert
-    setAuthError(`Failed to sign in: ${message}`);
-    alert(`Google sign-in failed:\n${message},"Current origin: " + ${window.location.origin}`);
-  }
+    if (result?.access_token) {
+     console.log(result?.access_token)
+    }
   };
-   useEffect(() => {
-    // Listen for deep link event from main process
-    window.electron.onAuthToken(async(url: string) => {
-      console.log("Received deep link:", url);
-     try {
-        await googleAuthStore.getState().handleRedirect(url);
-       // alert("✅ Logged in successfully!");
-      } catch (err) {
-        console.error("❌ Deep link handling failed:", err);
-        alert("Login failed. Please try again.");
-      }
-    });
-  }, []);
+  
+
     const handleLogin=async(e: React.FormEvent<HTMLFormElement>):Promise<void>=>{
      /*
         e.preventDefault()
@@ -82,7 +72,7 @@ export const LoginForm =():JSX.Element=>{
         <button onClick={signInWithGoogle}>Sign in With Google</button>
         {params == "/" && <p>{`Already have an account?`}<NavLink to="sign-in">Sign In</NavLink></p>}
          {params == "/sign-in" && <p>{`Don't have an account?`}<NavLink to="/">Sign Up</NavLink></p>}     
-        {authError && <p>{authError}</p>}
+        
         </>
     )
 }

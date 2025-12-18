@@ -14,7 +14,23 @@ const mergedElectronAPI = {
     ipcRenderer.on("auth-token-url", (_, url) => callback(url));
   },
 };
+import { GoogleAuthResult } from "../main";
+import { GoogleUserProfile } from "../main";
+contextBridge.exposeInMainWorld("api", {
+  startGoogleLogin: (
+    codeVerifier: string,
+    codeChallenge: string
+  ): Promise<GoogleAuthResult> =>
+    ipcRenderer.invoke("google-login", {
+      codeVerifier,
+      codeChallenge,
+    }),
 
+  logout: (): Promise<boolean> => ipcRenderer.invoke("logout"),
+  isLoggedIn: (): Promise<boolean> => ipcRenderer.invoke("is-logged-in"),
+  getAccessToken: (): Promise<string> => ipcRenderer.invoke("get-access-token"),
+  getProfile: ():  Promise<GoogleUserProfile | null> => ipcRenderer.invoke("get-profile"),
+});
 contextBridge.exposeInMainWorld("secureAuth", {
   saveToken: (token: string) => ipcRenderer.invoke("save-token", token),
   getToken: () => ipcRenderer.invoke("get-token"),

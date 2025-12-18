@@ -3,8 +3,7 @@
 import dotenv from 'dotenv';
 import path from 'path'
 import { Request, Response } from 'express';
-import { google } from "googleapis";
-import  { TokenPayload} from "google-auth-library";
+import axios from "axios";
 
 // Point to the correct location of .env manually
 dotenv.config({ path: path.resolve(__dirname, '../.env') }) // ✅
@@ -12,9 +11,7 @@ import { router } from './project_ideas_db';
 import cors from 'cors';
 import express from 'express'
 import listEndpoints from "express-list-endpoints";
-import { generateCodeVerifier } from './EncryptFunctions';
 
-import {type CodeChallengeMethod } from "google-auth-library";
 const app = express();
 const PORT = 3000
 // 👇 Serve your built React files
@@ -29,94 +26,113 @@ app.use("/database",router)
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
 const REDIRECT_URI =
-  "https://my-next-dev-project.onrender.com/auth/google/callback"; // hosted redirect
-const SCOPES = ["openid", "email", "profile"];
-// Step 1: Redirect to Google login
-export const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
-// Step 1 – send user to Google Auth page
+  "http://localhost:4000/oauth2callback"; // hosted redirect
+
 app.get("/auth/google", (req, res) => {
-  const { codeVerifier, codeChallenge } =
-    generateCodeVerifier();
-  const authUrl = oAuth2Client.generateAuthUrl({
-    access_type: "offline",
-    prompt: "consent",
-    scope: SCOPES,
-    code_challenge: codeChallenge,
-    code_challenge_method: "S256" as CodeChallengeMethod,
-  });
-  console.log("🌐 Redirecting to Google:", authUrl);
-  res.redirect(authUrl);
+  const code_challenge = req.query.code_challenge;
+
+  if (!code_challenge) return res.status(400).send("Missing code_challenge");
+
+  const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+    `client_id=${CLIENT_ID}` +
+    `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
+    `&response_type=code` +
+    `&scope=openid%20profile%20email` +
+    `&code_challenge=${code_challenge}` +
+    `&code_challenge_method=S256` +
+    `&access_type=offline`;
+
+  res.json({ authUrl });
 });
 
-// Step 2 – Google redirects back here
-app.get("/auth/google/callback", async (req: Request, res: Response) => {
-  try {
-    const code =
-      typeof req.query.code === "string" ? req.query.code : undefined;
-    if (!code) {
-      console.error("❌ Missing authorization code");
-      return res.status(400).send("Missing authorization code");
-    }
-    // Exchange the code for tokens
-    const { tokens } = await oAuth2Client.getToken(code);
-    oAuth2Client.setCredentials(tokens);
-    // Verify ID token (optional but good for extracting profile info)
-    const ticket  = await oAuth2Client.verifyIdToken({
-      idToken: tokens.id_token!,
-      audience: CLIENT_ID,
-    });
-    const payload :TokenPayload | undefined = ticket.getPayload();
+app.get("/refresh-token", async (req, res) => {
+  const refresh_token = req.query.refresh_token;
 
- if (!payload) {
-      console.error("❌ Token payload was undefined — possible tampering or decoding error.");
-      return res.send(`
-    <html>
-      <head><title>Login Error</title></head>
-      <body style="font-family: sans-serif; text-align: center; margin-top: 40px; color: red;">
-        <h2>❌ Login Failed</h2>
-        <p>Invalid or corrupted token payload.</p>
-        <p>Please close this tab and try logging in again from the app.</p>
-      </body>
-    </html>
-  `);
-    }
-    // ✅ Redirect back to your Electron app
-     const redirectDeepLink = `mynextdevproject://auth?token=${encodeURIComponent(
-      tokens.id_token!
-    )}`;
-    console.log("🔁 Redirecting to:", redirectDeepLink);
-    // ✅ Send small HTML that auto-forwards to your Electron app
-    res.send(`
-      <html>
-        <head><title>Logging you in...</title></head>
-        <body style="font-family: sans-serif; text-align: center; margin-top: 40px;">
-          <h2>✅ Login successful!</h2>
-          <p>You can now return to the app.</p>
-          <script>
-            window.location.href = "${redirectDeepLink}";
-          </script>
-        </body>
-      </html>
-    `);
+ if (typeof refresh_token !== "string") {
+    return res.status(400).send("Missing or invalid refresh token");
+  }
+
+  try {
+    const params = new URLSearchParams();
+    params.append("client_id", CLIENT_ID);
+    params.append("client_secret", CLIENT_SECRET);
+    params.append("refresh_token", refresh_token);
+    params.append("grant_type", "refresh_token");
+
+    const tokenRes = await axios.post(
+      "https://oauth2.googleapis.com/token",
+      params.toString(),
+      { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+    );
+
+    res.json(tokenRes.data); // returns new access_token
   } catch (err) {
-    console.error("❌ Google Auth Error:", err);
-    res.status(500).send("Authentication failed");
+   // console.error(err.response?.data || err.message);
+   console.error(err)
+    res.status(500).json({ error: "Failed to refresh token" });
   }
 });
+import { OAuth2Client } from "google-auth-library";
 
-// Step 3 – Electron verifies later if needed
-app.post("/verify-token", async (req, res) => {
-  const { token } = req.body;
+const oAuth2Client = new OAuth2Client(CLIENT_ID);
+app.get("/oauth2callback", async (req, res) => {
+  const code = req.query.code;
+  const code_verifier = req.query.code_verifier;
+
+  if (!code || !code_verifier)
+    return res.status(400).send("Missing code or verifier");
+if (typeof code !== "string" || typeof code_verifier !== "string") {
+    return res.status(400).send("Missing code or verifier");
+  }
   try {
-    const ticket = await oAuth2Client.verifyIdToken({
-      idToken: token,
-      audience: CLIENT_ID,
-    });
-    const payload :TokenPayload | undefined = ticket.getPayload();
-    res.json({ user: payload });
+    const params = new URLSearchParams();
+    params.append("client_id", CLIENT_ID);
+    params.append("client_secret", CLIENT_SECRET); // Optional for PKCE
+    params.append("code", code);
+    params.append("code_verifier", code_verifier);
+    params.append("redirect_uri", REDIRECT_URI);
+    params.append("grant_type", "authorization_code");
+
+    const tokenRes = await axios.post(
+      "https://oauth2.googleapis.com/token",
+      params.toString(),
+      {
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      }
+    );
+   const { id_token, access_token, refresh_token } = tokenRes.data;
+
+if (!id_token) {
+  return res.status(401).json({ error: "No ID token returned" });
+}
+
+const ticket = await oAuth2Client.verifyIdToken({
+  idToken: id_token,
+  audience: CLIENT_ID,
+});
+
+const payload = ticket.getPayload();
+
+if (!payload) {
+  return res.status(401).json({ error: "Invalid ID token" });
+}
+
+// ✅ USER IS VERIFIED HERE
+res.json({
+  user: {
+    id: payload.sub,
+    email: payload.email,
+    name: payload.name,
+    picture: payload.picture,
+  },
+  access_token,
+  refresh_token,
+})
   } catch (err) {
-    console.log(err)
-    res.status(401).json({ error: "Invalid token" });
+   // console.error("Token exchange failed:", err.response?.data || err.message);
+    res
+      .status(500)
+      .json({ error: "Token exchange failed", details: err });
   }
 });
 app.use((req: Request,res:Response)=>{

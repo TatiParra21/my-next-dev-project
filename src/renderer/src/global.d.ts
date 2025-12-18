@@ -19,3 +19,18 @@ declare global {
   }
 }
 
+declare global {
+  interface Window {
+    api: {
+      startGoogleLogin: (
+        codeVerifier: string,
+        codeChallenge: string
+      ) => Promise<GoogleAuthResult>;
+
+      logout: () => Promise<boolean>;
+      isLoggedIn: () => Promise<boolean>;
+      getAccessToken: () => Promise<string>;
+      getProfile:()=>Promise<GoogleUserProfile | null>
+    };
+  }
+}

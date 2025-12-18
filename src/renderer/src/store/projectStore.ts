@@ -43,7 +43,7 @@ export const formStore = create<FormStoreType>((set)=>({
 export const selectIsNotActive= (state:FormStoreType):boolean=>state.isNotActive
 export const selectSetIsNotActive= (state:FormStoreType):(value:boolean)=>void=>state.setIsNotActive
 
-import axios from "axios";
+//import axios from "axios";
 
 type GoogleUser = {
   id?: string;
@@ -51,12 +51,21 @@ type GoogleUser = {
   name?: string;
   picture?: string;
 };
-
+export interface GoogleUserProfile {
+  id: string;
+  email: string;
+  verified_email: boolean;
+  name: string;
+  given_name?: string;
+  family_name?: string;
+  picture: string;
+  locale?: string;
+}
 type GoogleAuthStoreType = {
   user: GoogleUser | null ;
   loading: boolean;
   authError: string | null;
-   handleRedirect: (url:string)=>Promise<void>;
+   //handleRedirect: (url:string)=>Promise<void>;
   initAuth: () => Promise<void>; // ✅ added
   logout: () => Promise<void>;
 };
@@ -66,62 +75,40 @@ export const googleAuthStore = create<GoogleAuthStoreType>((set) => ({
   loading: true, // start as loading until we check localStorage
   authError: null,
   // 🔹 Opens browser for Google sign-in (via backend)
-  handleRedirect:async(url:string)=>{
-     set({ loading: true });
-       const token = new URL(url).searchParams.get("token");
-       if (!token) {
-    set({ authError: "No token found in redirect URL.", loading: false });
-    return;
-  }
-       try {
-    const { data } = await axios.post(
-      "https://my-next-dev-project.onrender.com/verify-token",
-      { token }
-    );
-    if(data.error)throw new Error()
-    set({
-      user: data.user,
-      authError: null,
-      loading: false,
-    });
-    await window.secureAuth.saveToken(token);
-    await projectDataStore.getState().updateProjects();
-  } catch (err) {
-    console.error("Redirect handling error:", err);
-    set({ authError: err instanceof Error ? err.message : "An error occurred", loading: false });
-  }
-  if (!token) {
-    set({ authError: "No token found in redirect URL.", loading: false });
-    return;
-  }
-  },
   // 🔹 Runs once on app start — restores saved token if present
   initAuth: async () => {
     set({ loading: true });
     console.log("it ran")
-    const token = await window.secureAuth.getToken();
+    const token = await window.api.getAccessToken();
     console.log(token, "tokken??/")
     if(!token){
       console.log("npp tokken found")
       set({loading:false})
       return}
 try {
-    const { data } = await axios.post(
-      "https://my-next-dev-project.onrender.com/verify-token",
-      { token }
-    );
-    console.log(data, "data here")
-    set({ user: data.user, loading:false });
+    const profile =await window.api.getProfile();
+     if (!profile) {
+      set({ user: null, loading: false });
+      return;
+    }
+   set({
+      user: {
+        email: profile.email,
+        name: profile.name,
+        picture: profile.picture,
+      },
+      loading: false,
+    });
         await projectDataStore.getState().updateProjects();
   } catch {
-    await window.secureAuth.clearToken();
+   // await window.secureAuth.clearToken();
     set({ user: null,loading:false });
   }
   },
 
   // 🔹 Log out completely
   logout: async() => {
-    await window.secureAuth.clearToken()
+    await window.api.logout()
     set({ user: null});
     projectDataStore.setState({ projects: [] });
   },

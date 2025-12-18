@@ -1,7 +1,7 @@
 import express from 'express'
 import { pool } from "./db"
 import type { Request,Response, Router } from "express"
-import verifyGoogleUser from './verifyGoogleUser'
+
 export const router: Router = express.Router()
 
 type BodyProjectType ={
@@ -42,7 +42,7 @@ const handleDbError =(res:Response, err:Error & {code?: string}, place?:string):
     }    
 
       };
-router.get("/project-ideas",verifyGoogleUser, async(req: Request, res:Response):Promise<void>=>{
+router.get("/project-ideas", async(req: Request, res:Response):Promise<void>=>{
   const user = req.userId
     try{
         const result = await pool.query(`SELECT * FROM project_ideas WHERE user_id = $1`,[user])
@@ -57,7 +57,7 @@ router.get("/project-ideas",verifyGoogleUser, async(req: Request, res:Response):
   }
 });
 
-router.post("/write-new-project",verifyGoogleUser,async(req:Request, res:Response):Promise<void>=>{
+router.post("/write-new-project",async(req:Request, res:Response):Promise<void>=>{
   const body = req.body[0] as BodyProjectType
    const user_id = req.userId
   try{
@@ -76,7 +76,7 @@ router.post("/write-new-project",verifyGoogleUser,async(req:Request, res:Respons
     handleDbError(res,err as Error & {code?:string},"write-new-project")
   }
 })
-router.patch("/project-ideas/:id/edit",verifyGoogleUser,async(req:Request,res:Response):Promise<void>=>{
+router.patch("/project-ideas/:id/edit",async(req:Request,res:Response):Promise<void>=>{
   const id = Number(req.params.id)
   const updatedData = req.body
    const user = req.userId
@@ -97,7 +97,7 @@ router.patch("/project-ideas/:id/edit",verifyGoogleUser,async(req:Request,res:Re
     handleDbError(res,err as Error & {code?:string},`project-ideas/${id}/edit`)
   }
 })
-router.delete("/project-ideas/:id",verifyGoogleUser,async(req:Request,res:Response)=>{
+router.delete("/project-ideas/:id",async(req:Request,res:Response)=>{
   try{
      const userId = req.userId
     const id:number = Number(req.params.id)
@@ -109,7 +109,7 @@ console.log("Deleting:", { id, userId, types: [typeof id, typeof userId] });
   }
 })
 
-router.get("/project-ideas/filter",verifyGoogleUser, async(req: Request, res:Response):Promise<void>=>{
+router.get("/project-ideas/filter", async(req: Request, res:Response):Promise<void>=>{
     try{
       const body = req.body as FilterRequestType
       console.log(body)
@@ -128,7 +128,7 @@ router.get("/project-ideas/filter",verifyGoogleUser, async(req: Request, res:Res
   }
 });
 
-router.patch("/project-ideas/:id/goals",verifyGoogleUser,async(req:Request,res:Response):Promise<void>=>{
+router.patch("/project-ideas/:id/goals",async(req:Request,res:Response):Promise<void>=>{
   const id = Number(req.params.id)
   const updatedData = req.body
    const user = req.userId
