@@ -72,9 +72,9 @@ app.get("/refresh-token", async (req, res) => {
     res.status(500).json({ error: "Failed to refresh token" });
   }
 });
-import { OAuth2Client } from "google-auth-library";
+//import { OAuth2Client } from "google-auth-library";
 
-const oAuth2Client = new OAuth2Client(CLIENT_ID);
+
 app.get("/oauth2callback", async (req, res) => {
   const code = req.query.code;
   const code_verifier = req.query.code_verifier;
@@ -100,34 +100,9 @@ if (typeof code !== "string" || typeof code_verifier !== "string") {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       }
     );
-   const { id_token, access_token, refresh_token } = tokenRes.data;
+   
 
-if (!id_token) {
-  return res.status(401).json({ error: "No ID token returned" });
-}
-
-const ticket = await oAuth2Client.verifyIdToken({
-  idToken: id_token,
-  audience: CLIENT_ID,
-});
-
-const payload = ticket.getPayload();
-
-if (!payload) {
-  return res.status(401).json({ error: "Invalid ID token" });
-}
-
-// ✅ USER IS VERIFIED HERE
-res.json({
-  user: {
-    id: payload.sub,
-    email: payload.email,
-    name: payload.name,
-    picture: payload.picture,
-  },
-  access_token,
-  refresh_token,
-})
+    res.json(tokenRes.data);
   } catch (err) {
    // console.error("Token exchange failed:", err.response?.data || err.message);
     res

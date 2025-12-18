@@ -5,8 +5,8 @@ import path from 'node:path';
 import { ipcMain, } from "electron";
 import axios from "axios";
 
-declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string | undefined
-declare const MAIN_WINDOW_VITE_NAME: string
+///declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string | undefined
+//declare const MAIN_WINDOW_VITE_NAME: string
 
 const store = new Conf<Record<string, string>>({
   name: "secure-tokens",
@@ -77,7 +77,7 @@ const createWindow = ():void => {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, "../preload/index.mjs"),
        sandbox: false,
       contextIsolation: true,
       nodeIntegration: false,
@@ -85,13 +85,15 @@ const createWindow = ():void => {
   });
 
   // and load the index.html of the app.
-  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
-  } else {
-    mainWindow.loadFile(
-      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
-    );
-  }
+const isDev = process.env.NODE_ENV === "development";
+
+if (isDev) {
+  mainWindow.loadURL("http://localhost:5173");
+} else {
+  mainWindow.loadFile(
+    path.join(__dirname, "../renderer/index.html")
+  );
+}
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();

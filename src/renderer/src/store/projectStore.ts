@@ -79,12 +79,7 @@ export const googleAuthStore = create<GoogleAuthStoreType>((set) => ({
   initAuth: async () => {
     set({ loading: true });
     console.log("it ran")
-    const token = await window.api.getAccessToken();
-    console.log(token, "tokken??/")
-    if(!token){
-      console.log("npp tokken found")
-      set({loading:false})
-      return}
+   
 try {
     const profile =await window.api.getProfile();
      if (!profile) {
