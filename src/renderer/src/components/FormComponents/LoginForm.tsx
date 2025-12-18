@@ -21,6 +21,7 @@ import { generatePKCEPair } from "@renderer/functions/generatePKCEPair";
 export const LoginForm =():JSX.Element=>{
   const location = useLocation()
   const params = location.pathname
+  console.log("startGoogleLogin:", window.api?.startGoogleLogin);
   //const [authError, setAuthError] = useState<string | null>(null);
   console.log("Current origin is:", window.location.origin); 
   const signInWithGoogle = async ():Promise<void> => {
@@ -29,6 +30,7 @@ export const LoginForm =():JSX.Element=>{
       codeVerifier,
       codeChallenge
     );
+   
 
     if (result?.access_token) {
      console.log(result?.access_token)

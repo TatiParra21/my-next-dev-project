@@ -132,11 +132,12 @@ ipcMain.handle(
     }):Promise<GoogleAuthResult> => {
     try {
       // 1. Get OAuth URL from backend
+      console.log("We are over here")
       const res = await axios.get("http://localhost:4000/auth/google", {
         params: { code_challenge: codeChallenge },
       });
       const authUrl = res.data.authUrl;
-
+      console.log("We are over here")
       // 2. Open visible BrowserWindow to handle login
       const loginWindow = new BrowserWindow({
         width: 500,

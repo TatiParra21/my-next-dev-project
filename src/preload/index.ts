@@ -14,6 +14,7 @@ const mergedElectronAPI = {
     ipcRenderer.on("auth-token-url", (_, url) => callback(url));
   },
 };
+console.log("✅ PRELOAD FILE LOADED");
 import { GoogleAuthResult } from "../main";
 import { GoogleUserProfile } from "../main";
 contextBridge.exposeInMainWorld("api", {
