@@ -13,7 +13,7 @@ import express from 'express'
 import listEndpoints from "express-list-endpoints";
 
 const app = express();
-const PORT = 3000
+const PORT = 4000
 // 👇 Serve your built React files
 app.use(express.static(path.join(__dirname, "out/renderer")));
 
