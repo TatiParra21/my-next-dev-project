@@ -146,7 +146,7 @@ ipcMain.handle(
 
           // 3. Check if Google redirected to our backend callback
           if (
-            parsedUrl.origin === "http://localhost:4000" &&
+            parsedUrl.origin === "https://my-next-dev-project.onrender.com" &&
             parsedUrl.pathname === "/oauth2callback"
           ) {
             const code = parsedUrl.searchParams.get("code");
