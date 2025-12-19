@@ -5,9 +5,6 @@ import path from 'node:path';
 import { ipcMain, } from "electron";
 import axios from "axios";
 
-///declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string | undefined
-//declare const MAIN_WINDOW_VITE_NAME: string
-
 const store = new Conf<Record<string, string>>({
   name: "secure-tokens",
 
@@ -43,7 +40,7 @@ async function refreshAccessToken():Promise<string| null> {
   const refreshToken = getSecureToken("google-refresh-token");
   if (!refreshToken) throw new Error("No refresh token available");
 
-  const res = await axios.get("http://localhost:4000/refresh-token", {
+  const res = await axios.get("https://my-next-dev-project.onrender.com/refresh-token", {
     params: { refresh_token: refreshToken },
   });
 
@@ -121,9 +118,6 @@ app.on('activate', () => {
   }
 });
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
-
 ipcMain.handle(
   "google-login",
   async (_event, { codeVerifier, codeChallenge }: {
@@ -133,7 +127,7 @@ ipcMain.handle(
     try {
       // 1. Get OAuth URL from backend
       console.log("We are over here")
-      const res = await axios.get("http://localhost:4000/auth/google", {
+      const res = await axios.get("https://my-next-dev-project.onrender.com/auth/google", {
         params: { code_challenge: codeChallenge },
       });
       const authUrl = res.data.authUrl;
@@ -152,7 +146,7 @@ ipcMain.handle(
 
           // 3. Check if Google redirected to our backend callback
           if (
-            parsedUrl.origin === "http://localhost:4000" &&
+            parsedUrl.origin === "https://my-next-dev-project.onrender.com" &&
             parsedUrl.pathname === "/oauth2callback"
           ) {
             const code = parsedUrl.searchParams.get("code");
@@ -162,7 +156,7 @@ ipcMain.handle(
             try {
               //Exchange code for token via backend
               const tokenRes = await axios.get(
-                "http://localhost:4000/oauth2callback",
+                "https://my-next-dev-project.onrender.com/oauth2callback",
                 {
                   params: { code, code_verifier: codeVerifier },
                 }
@@ -237,7 +231,7 @@ export interface GoogleUserProfile {
   locale?: string;
 }
 ipcMain.handle("fetch-google-profile", async (): Promise<GoogleUserProfile | null> => {
-  const accessToken = getAccessToken()
+  const accessToken =await getAccessToken()
   if (!accessToken) return null;
 
   try {

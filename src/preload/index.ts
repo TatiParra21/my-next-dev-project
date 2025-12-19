@@ -30,7 +30,7 @@ contextBridge.exposeInMainWorld("api", {
   logout: (): Promise<boolean> => ipcRenderer.invoke("logout"),
   isLoggedIn: (): Promise<boolean> => ipcRenderer.invoke("is-logged-in"),
   getAccessToken: (): Promise<string> => ipcRenderer.invoke("get-access-token"),
-  getProfile: ():  Promise<GoogleUserProfile | null> => ipcRenderer.invoke("get-profile"),
+  getProfile: ():  Promise<GoogleUserProfile | null> => ipcRenderer.invoke("fetch-google-profile"),
 });
 contextBridge.exposeInMainWorld("secureAuth", {
   saveToken: (token: string) => ipcRenderer.invoke("save-token", token),
