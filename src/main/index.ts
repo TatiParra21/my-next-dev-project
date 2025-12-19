@@ -127,7 +127,7 @@ ipcMain.handle(
     try {
       // 1. Get OAuth URL from backend
       console.log("We are over here")
-      const res = await axios.get("https://my-next-dev-project.onrender.com/auth/google", {
+      const res = await axios.get("https://my-next-dev-project.onrender.com/oauth2callback", {
         params: { code_challenge: codeChallenge },
       });
       const authUrl = res.data.authUrl;
