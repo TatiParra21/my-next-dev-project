@@ -127,11 +127,11 @@ ipcMain.handle(
     try {
       // 1. Get OAuth URL from backend
       console.log("We are over here")
-      const res = await axios.get("https://my-next-dev-project.onrender.com/oauth2callback", {
+      const res = await axios.get("https://my-next-dev-project.onrender.com/auth/google", {
         params: { code_challenge: codeChallenge },
       });
       const authUrl = res.data.authUrl;
-      console.log("We are over here")
+      console.log("We are over here2")
       // 2. Open visible BrowserWindow to handle login
       const loginWindow = new BrowserWindow({
         width: 500,
@@ -143,7 +143,7 @@ ipcMain.handle(
       return await new Promise<GoogleAuthResult>((resolve, reject) => {
         loginWindow.webContents.on("did-navigate", async (_event, newUrl) => {
           const parsedUrl = new URL(newUrl);
-
+  console.log("we went onto rokern res")
           // 3. Check if Google redirected to our backend callback
           if (
             parsedUrl.origin === "https://my-next-dev-project.onrender.com" &&
@@ -154,6 +154,7 @@ ipcMain.handle(
             if (!code) return reject("No code received");
 
             try {
+              console.log("we went onto rokern res")
               //Exchange code for token via backend
               const tokenRes = await axios.get(
                 "https://my-next-dev-project.onrender.com/oauth2callback",
